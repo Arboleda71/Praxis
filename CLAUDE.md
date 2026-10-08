@@ -1,0 +1,1 @@
+- Monorepo con npm workspaces: instalar dependencias solo desde la raíz (`npm install <pkg> -w <app>`), nunca dentro de `apps/*`; un único `package-lock.json` en la raíz. Detalles en [MONOREPO.md](MONOREPO.md).
