@@ -27,7 +27,12 @@ const cuenta = {
 };
 
 const coinciden = (d: { contrasena: string; confirmarContrasena: string }) => d.contrasena === d.confirmarContrasena;
-const noCoinciden = { path: ["confirmarContrasena"], error: "Las contraseñas no coinciden." };
+const camposContrasena = z.object({ contrasena: z.string(), confirmarContrasena: z.string() });
+const noCoinciden = {
+  path: ["confirmarContrasena"],
+  error: "Las contraseñas no coinciden.",
+  when: ({ value }: { value: unknown }) => camposContrasena.safeParse(value).success,
+};
 
 // strictObject: rechaza campos que no se piden (minimización, principio VIII).
 export const registroEstudianteSchema = z
@@ -46,17 +51,17 @@ export const registroEmpresaSchema = z
   .strictObject({
     ...cuenta,
     razonSocial: z.string().trim().min(2, { error: "Escribe la razón social de la empresa." }).max(200),
-    nit: z.string(),
+    nit: z.string().transform((valor, ctx) => {
+      const leido = leerNit(valor);
+      if (!leido.ok) {
+        ctx.issues.push({ code: "custom", input: valor, message: NIT_ERROR[leido.error] });
+        return z.NEVER;
+      }
+      return leido;
+    }),
   })
   .refine(coinciden, noCoinciden)
-  .transform((d, ctx) => {
-    const leido = leerNit(d.nit);
-    if (!leido.ok) {
-      ctx.issues.push({ code: "custom", input: d.nit, path: ["nit"], message: NIT_ERROR[leido.error] });
-      return z.NEVER;
-    }
-    return { ...d, nit: leido.nit, dv: leido.dv };
-  });
+  .transform((d) => ({ ...d, nit: d.nit.nit, dv: d.nit.dv }));
 
 export const loginSchema = z.strictObject({
   correo,

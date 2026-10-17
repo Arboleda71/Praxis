@@ -1,12 +1,21 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, type APIRequestContext, type Page } from "@playwright/test";
+import { expect, test as base, type APIRequestContext, type Page } from "@playwright/test";
 import { digitoVerificacion } from "@praxis/contracts";
+import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
 export const CONTRASENA = "contrasena-segura";
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
+
+// Cada caso representa un origen independiente. Los fallos dentro del mismo caso sí se acumulan.
+export const test = base.extend({
+  extraHTTPHeaders: async ({ baseURL }, provide, info) => {
+    const id = createHash("sha256").update(`${baseURL}:${info.testId}`).digest();
+    await provide({ "X-Forwarded-For": `198.18.${id[0]}.${id[1]}` });
+  },
+});
 
 export async function sinViolaciones(page: Page) {
   const { violations } = await new AxeBuilder({ page }).withTags(WCAG).analyze();

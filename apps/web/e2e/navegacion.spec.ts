@@ -1,5 +1,5 @@
-import { expect, request as nuevoContexto, test, type Page } from "@playwright/test";
-import { CONTRASENA, crearCuenta, sinViolaciones } from "./ayudas";
+import { expect, request as nuevoContexto, type Page } from "@playwright/test";
+import { CONTRASENA, crearCuenta, sinViolaciones, test } from "./ayudas";
 
 /** Destino de la navegación visible: enlace en la barra inferior (móvil) o pestaña de MUI Tabs (escritorio). */
 const destino = (page: Page, name: string) => {

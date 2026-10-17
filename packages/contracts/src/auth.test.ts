@@ -33,6 +33,12 @@ describe("registroEstudianteSchema", () => {
     expect(errores(r).confirmarContrasena).toBe("Las contraseñas no coinciden.");
   });
 
+  test("informa las contraseñas distintas aunque falte la autorización", () => {
+    const r = registroEstudianteSchema.safeParse({ ...estudiante, confirmarContrasena: "otra-contrasena", autorizaDatos: false });
+    expect(errores(r).confirmarContrasena).toBe("Las contraseñas no coinciden.");
+    expect(errores(r).autorizaDatos).toBe("Debes aceptar la política para continuar.");
+  });
+
   test("el correo debe ser válido", () => {
     const r = registroEstudianteSchema.safeParse({ ...estudiante, correo: "laura@" });
     expect(errores(r).correo).toMatch(/correo válido/);
@@ -61,6 +67,12 @@ describe("registroEmpresaSchema", () => {
   test("explica el formato del NIT", () => {
     const r = registroEmpresaSchema.safeParse({ ...empresa, nit: "900123456" });
     expect(errores(r).nit).toBe("Escríbelo con el dígito de verificación, por ejemplo 900123456-8.");
+  });
+
+  test("informa el NIT errado aunque falte la autorización", () => {
+    const r = registroEmpresaSchema.safeParse({ ...empresa, nit: "900123456-7", autorizaDatos: false });
+    expect(errores(r).nit).toBe("El dígito de verificación no corresponde a este NIT. Revísalo en tu RUT.");
+    expect(errores(r).autorizaDatos).toBe("Debes aceptar la política para continuar.");
   });
 });
 

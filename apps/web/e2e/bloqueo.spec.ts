@@ -1,7 +1,7 @@
-import { expect, request as nuevoContexto, test } from "@playwright/test";
-import { crearCuenta, sinViolaciones } from "./ayudas";
+import { expect, request as nuevoContexto } from "@playwright/test";
+import { crearCuenta, sinViolaciones, test } from "./ayudas";
 
-// Corre al final (proyecto «bloqueo»): deja la IP local bloqueada 15 minutos.
+// Corre al final (proyecto «bloqueo»): deja el origen de este caso bloqueado 15 minutos.
 test("tras 5 intentos fallidos, el inicio de sesión se bloquea", async ({ page, baseURL }) => {
   const otro = await nuevoContexto.newContext({ baseURL });
   const correo = await crearCuenta(otro, "estudiante");
