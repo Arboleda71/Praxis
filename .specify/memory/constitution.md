@@ -1,5 +1,12 @@
 <!--
-Sync Impact Report
+Sync Impact Report (v1.2.0, 2026-10-16)
+- Versión: 1.1.0 → 1.2.0 (MINOR: cambia una fila de «Stack y restricciones técnicas»; ningún principio cambia)
+- Cambio: Pruebas → Jest en la API (modo ESM nativo con SWC, porque Nest 12 es solo ESM) y Vitest en la web
+- Motivo: decisión del equipo (2026-10-16)
+- Plantillas: sin cambios
+- Pendiente: aprobación por PR de otro integrante (Gobernanza)
+
+Sync Impact Report (v1.1.0)
 - Versión: 1.0.0 → 1.1.0 (MINOR: se agregan principios y una sección de stack; no se quita ni se
   redefine ningún principio)
 - Principios agregados: XII. Simplicidad y uso directo del framework; XIII. Pruebas primero en lo
@@ -140,7 +147,7 @@ Cambiar cualquier elemento de esta tabla es una enmienda a la constitución.
 | Pagos | Wompi, con pagos únicos en COP. Modo de pruebas mientras el piloto use datos ficticios |
 | Correo | Resend, solo para la confirmación de cuenta en el MVP |
 | Despliegue | Vercel para la web; Railway para la API y Postgres |
-| Pruebas | Vitest (unitarias e integración en la API), Postgres real en Docker para integración, Playwright con axe para E2E |
+| Pruebas | Jest en la API (unitarias e integración, modo ESM con SWC), Vitest en la web (unitarias), Postgres real en Docker para integración, Playwright con axe para E2E |
 | Calidad de código | oxlint y Prettier en la API, ESLint en la web, TypeScript en modo `strict` |
 
 **Restricciones del producto:**
@@ -178,4 +185,4 @@ Cambiar cualquier elemento de esta tabla es una enmienda a la constitución.
   cada revisión de PR verifica que no se rompa ningún principio.
 - La guía de producto para el trabajo diario es `docs/context(pre-constitucion).md`.
 
-**Version**: 1.1.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-15
+**Version**: 1.2.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-16
