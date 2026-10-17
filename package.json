@@ -1,13 +1,18 @@
 {
   "name": "praxis-portal",
   "private": true,
-  "workspaces": ["apps/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "engines": {
     "node": ">=24"
   },
   "scripts": {
     "dev": "npm run dev -w web",
     "dev:api": "npm run start:dev -w api",
-    "lint": "npm run lint -w web"
+    "lint": "npm run lint -w web",
+    "postinstall": "npm run build -w @praxis/contracts",
+    "db": "docker compose up -d"
   }
 }

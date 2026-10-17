@@ -50,6 +50,12 @@ No están en la constitución, pero las specs las necesitan.
 - [ ] **Reemplazar el CV en una postulación *Enviada*** (antes de que la empresa la revise): ¿se anota
   como fase posterior?
 
+## 3.1 Features pendientes (no olvidar)
+
+- [ ] **Restablecer la contraseña** (decidido el 2026-10-16): queda fuera de la primera muestra y se construye
+  después. Exige enmendar la constitución (hoy el único correo del MVP es la confirmación de cuenta). Detalle de
+  pantallas y reglas en `docs/modulos.md`, sección «Feature pendiente: restablecer la contraseña».
+
 ## 4. Pendientes externos
 
 - [ ] **Documento fuente:** `docs/context(pre-constitucion).md` cita `docs/Praxis_Metodologia_Tradicional_Final_APA.docx`,

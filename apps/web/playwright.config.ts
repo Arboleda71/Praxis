@@ -1,0 +1,42 @@
+import { defineConfig, devices } from "@playwright/test";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
+const WEB = 3100;
+const API = 3101;
+export const CORREOS_DIR = join(tmpdir(), "praxis-correos-e2e");
+const DATABASE_URL = process.env.E2E_DATABASE_URL ?? "postgresql://praxis:praxis@localhost:5432/praxis_e2e";
+
+const movil = { ...devices["Desktop Chrome"], viewport: { width: 360, height: 740 } };
+const escritorio = { ...devices["Desktop Chrome"], viewport: { width: 1080, height: 800 } };
+
+export default defineConfig({
+  testDir: "e2e",
+  fullyParallel: true,
+  retries: process.env.CI ? 1 : 0,
+  globalSetup: "./e2e/migrar.ts",
+  use: { baseURL: `http://localhost:${WEB}`, trace: "retain-on-failure" },
+  projects: [
+    { name: "movil-360", use: movil, testIgnore: /bloqueo/ },
+    { name: "escritorio", use: escritorio, testIgnore: /bloqueo/ },
+    // Bloquea la IP local 15 minutos: corre al final, sola.
+    { name: "bloqueo", use: escritorio, testMatch: /bloqueo/, dependencies: ["movil-360", "escritorio"] },
+  ],
+  webServer: [
+    {
+      command: "npm run start:dev -w api",
+      cwd: "../..",
+      port: API,
+      reuseExistingServer: false,
+      timeout: 180_000,
+      env: { PORT: String(API), DATABASE_URL, CORREOS_DIR, RESEND_API_KEY: "", WEB_URL: `http://localhost:${WEB}` },
+    },
+    {
+      command: `npx next dev --port ${WEB}`,
+      url: `http://localhost:${WEB}`,
+      reuseExistingServer: false,
+      timeout: 180_000,
+      env: { API_URL: `http://localhost:${API}` },
+    },
+  ],
+});
