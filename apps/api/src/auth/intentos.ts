@@ -29,8 +29,8 @@ export class Intentos {
     }
   }
 
-  exito(clave: string): void {
-    this.fallos.delete(clave);
+  exito(...claves: string[]): void {
+    for (const c of claves) this.fallos.delete(c);
   }
 
   limpiar(): void {

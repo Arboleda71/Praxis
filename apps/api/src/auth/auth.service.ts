@@ -51,7 +51,8 @@ export class AuthService {
       this.intentos.fallo(...claves);
       throw new UnauthorizedException({ mensaje: CREDENCIALES });
     }
-    this.intentos.exito(claves[0]);
+    // Un acierto corta la racha: el bloqueo es por cinco fallos seguidos (FR-012).
+    this.intentos.exito(...claves);
     return this.abrirSesion(cuenta);
   }
 
@@ -113,6 +114,8 @@ export class AuthService {
       }
       throw e;
     }
+    // Un registro logrado también corta la racha de esa IP (FR-012: cinco fallos seguidos).
+    this.intentos.exito(`ip:${ip}`);
     await this.enviarEnlace(cuenta.id, cuenta.correo);
     return this.abrirSesion(cuenta);
   }

@@ -106,6 +106,15 @@ describe('/auth (integración, Postgres real)', () => {
       expect(res.body.errores.nit).toMatch(/dígito de verificación/);
       expect(res.body.errores.autorizaDatos).toBe('Debes aceptar la política para continuar.');
     });
+
+    it('un registro logrado reinicia la cuenta de intentos de la IP', async () => {
+      await agente.post('/auth/registro/estudiante').send(estudiante).expect(201);
+      for (let i = 0; i < 4; i++) await agente.post('/auth/registro/estudiante').send(estudiante).expect(409);
+      // El registro de la empresa sí prospera: los cuatro fallos anteriores dejan de contar.
+      await agente.post('/auth/registro/empresa').send(empresa).expect(201);
+      for (let i = 0; i < 4; i++) await agente.post('/auth/registro/estudiante').send(estudiante).expect(409);
+      await agente.post('/auth/registro/estudiante').send({ ...estudiante, correo: 'otra@correo.co' }).expect(201);
+    });
   });
 
   describe('inicio y cierre de sesión', () => {
@@ -135,6 +144,15 @@ describe('/auth (integración, Postgres real)', () => {
       }
       const res = await agente.post('/auth/login').send({ correo: 'laura@correo.co', contrasena: estudiante.contrasena }).expect(429);
       expect(res.body.mensaje).toBe('Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.');
+    });
+
+    it('un inicio de sesión correcto reinicia la cuenta de intentos', async () => {
+      const malo = { correo: 'laura@correo.co', contrasena: 'equivocada' };
+      const bueno = { correo: 'laura@correo.co', contrasena: estudiante.contrasena };
+      for (let i = 0; i < 4; i++) await agente.post('/auth/login').send(malo).expect(401);
+      await agente.post('/auth/login').send(bueno).expect(200);
+      for (let i = 0; i < 4; i++) await agente.post('/auth/login').send(malo).expect(401);
+      await agente.post('/auth/login').send(bueno).expect(200);
     });
 
     it('cerrar sesión la termina en el servidor', async () => {
