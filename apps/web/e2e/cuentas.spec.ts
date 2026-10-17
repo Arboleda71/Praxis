@@ -1,5 +1,5 @@
-import { expect, request as nuevoContexto, test } from "@playwright/test";
-import { CONTRASENA, correoUnico, crearCuenta, nitUnico, sinViolaciones, tokenDe } from "./ayudas";
+import { expect, request as nuevoContexto } from "@playwright/test";
+import { CONTRASENA, correoUnico, crearCuenta, nitUnico, sinViolaciones, test, tokenDe } from "./ayudas";
 
 test.describe("Crear cuenta", () => {
   test("elegir tipo lleva a cada formulario", async ({ page }) => {
@@ -24,7 +24,7 @@ test.describe("Crear cuenta", () => {
     await page.getByRole("button", { name: "Crear cuenta" }).click();
 
     await expect(page.getByRole("heading", { name: "Revisa tu correo" })).toBeVisible();
-    await expect(page.getByText(correo)).toBeVisible();
+    await expect(page.getByRole("main").getByText(correo, { exact: true })).toBeVisible();
     await sinViolaciones(page);
 
     await page.goto(`/confirmar-correo?token=${tokenDe(correo)}`);
