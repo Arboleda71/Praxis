@@ -44,6 +44,17 @@ describe("registroEstudianteSchema", () => {
     expect(errores(r).correo).toMatch(/correo válido/);
   });
 
+  test("un formulario con varios errores los devuelve todos juntos", () => {
+    const r = registroEstudianteSchema.safeParse({
+      ...estudiante,
+      correo: "laura@",
+      contrasena: "corta1",
+      confirmarContrasena: "otra",
+      autorizaDatos: false,
+    });
+    expect(Object.keys(errores(r)).sort()).toEqual(["autorizaDatos", "confirmarContrasena", "contrasena", "correo"]);
+  });
+
   test("no acepta campos que no pide (minimización)", () => {
     const r = registroEstudianteSchema.safeParse({ ...estudiante, edad: 20 });
     expect(r.success).toBe(false);

@@ -13,6 +13,12 @@ const escritorio = { ...devices["Desktop Chrome"], viewport: { width: 1080, heig
 export default defineConfig({
   testDir: "e2e",
   fullyParallel: true,
+  // Cada prueba hace un barrido de accesibilidad con axe: pesan. Con más en paralelo se
+  // estorban entre ellas y se agota el tiempo de las pruebas.
+  workers: 3,
+  timeout: 60_000,
+  // En un portátil cargado, una navegación puede tardar más que los 5 s que Playwright espera.
+  expect: { timeout: 15_000 },
   retries: process.env.CI ? 1 : 0,
   globalSetup: "./e2e/migrar.ts",
   use: { baseURL: `http://localhost:${WEB}`, trace: "retain-on-failure" },
@@ -32,10 +38,12 @@ export default defineConfig({
       env: { PORT: String(API), DATABASE_URL, CORREOS_DIR, RESEND_API_KEY: "", WEB_URL: `http://localhost:${WEB}` },
     },
     {
-      command: `npx next dev --port ${WEB}`,
+      // Compilación de producción: en modo dev, Next compila cada ruta al primer acceso y las
+      // pruebas se agotan esperando. Construir una vez cuesta menos que esas esperas.
+      command: `npx next build && npx next start --port ${WEB}`,
       url: `http://localhost:${WEB}`,
       reuseExistingServer: false,
-      timeout: 180_000,
+      timeout: 300_000,
       env: { API_URL: `http://localhost:${API}` },
     },
   ],
