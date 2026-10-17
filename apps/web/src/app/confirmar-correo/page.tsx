@@ -46,7 +46,8 @@ export default async function ConfirmarCorreo({ searchParams }: { searchParams: 
             Tu correo quedó confirmado
           </Typography>
           <Typography color="text.secondary">Ya puedes usar Praxis con tu cuenta de {d.cuenta}.</Typography>
-          <Button href={d.href} variant="contained" size="large" fullWidth>
+          {/* Recarga el layout para leer la sesión después de confirmar el correo. */}
+          <Button component="a" href={d.href} variant="contained" size="large" fullWidth>
             {d.texto}
           </Button>
         </Stack>
