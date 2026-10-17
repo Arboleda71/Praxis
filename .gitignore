@@ -5,3 +5,7 @@ coverage/
 *.tsbuildinfo
 .env
 .env*.local
+
+# API: bandeja local de correos y cliente generado de Prisma
+.correos/
+apps/api/src/generated/

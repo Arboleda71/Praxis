@@ -15,7 +15,7 @@ export default function MuiDemoPage() {
           Praxis · Material UI
         </Typography>
         <Typography>
-          Componentes con el tema global, la fuente Geist y utilidades de Tailwind.
+          Componentes con el tema global, las fuentes Poppins e Inter y utilidades de Tailwind.
         </Typography>
         <Alert severity="success">
           Material UI está integrado. Esta página es una demostración visual.
