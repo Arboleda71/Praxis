@@ -1,6 +1,6 @@
 # Módulos de la primera muestra académica
 
-> Estado al 2026-10-15. Base: `.specify/memory/constitution.md` v1.1.0 y `docs/context(pre-constitucion).md`.
+> Estado al 2026-10-17. Base: `.specify/memory/constitution.md` v2.0.0 y `docs/context(pre-constitucion).md`.
 > Los números romanos citan principios de la constitución; «§» cita secciones del contexto de producto.
 >
 > **Alcance de la muestra:** login, creación de cuenta, perfil (estudiante y empresa) y formulario de vacantes.
@@ -96,11 +96,10 @@ mismos campos y se pueden comparar (II). No tiene pantallas propias: alimenta lo
 |---|---|---|
 | Nivel de formación | Técnico, tecnólogo, universitario | M3, M5 |
 | Programa | Lista cerrada; semilla ficticia para la muestra | M3, M5 |
-| Ciudad | Municipios del Valle de Aburrá | M3, M4, M5 |
 | Modalidad | Presencial, híbrida, remota | M5 |
 | Jornada | Tiempo completo, medio tiempo | M3, M5 |
 | Idioma y nivel | Idiomas + MCER A1, A2, B1, B2, C1, C2 | M3, M5 |
-| Avance académico | Semestre o periodo (ver pregunta abierta) | M3, M5 |
+| Avance académico | Semestre 1.º–12.º (universitario); etapa lectiva o productiva (técnico y tecnólogo) | M3, M5 |
 | Sector de la empresa | Lista corta | M4 |
 
 **Reglas**
@@ -109,9 +108,10 @@ mismos campos y se pueden comparar (II). No tiene pantallas propias: alimenta lo
 
 **Depende de:** nada.
 
-**Preguntas abiertas** (ya en `docs/pendientes-constitucion.md` §3)
-- Los técnicos y tecnólogos del SENA no cuentan por semestres: ¿con qué unidad se compara el avance?
-- ¿De dónde sale la lista de programas? ¿SNIES?
+**Decisiones** (2026-10-17, spec `specs/004-catalogos-compartidos`)
+- La ciudad no es catálogo ni requisito: la vacante y la empresa solo dicen el nombre de la ciudad.
+- El avance se mide por semestre (universitario) o por etapa (SENA), y solo se compara dentro del mismo nivel.
+- Programas: semilla ficticia para la muestra; SNIES y programas SENA antes de salir del piloto.
 
 ---
 
@@ -125,14 +125,14 @@ mismos campos y se pueden comparar (II). No tiene pantallas propias: alimenta lo
 1. Ver mi perfil, con un indicador de «Perfil mínimo: completo / incompleto» y qué falta.
 2. Editar perfil por secciones:
    - Formación: nivel, programa, institución, avance académico.
-   - Disponibilidad: ciudad de residencia, disponible desde (fecha), jornada.
+   - Disponibilidad: disponible desde (fecha), jornada.
    - Idiomas: idioma y nivel MCER (0 o más).
    - Aval: «¿Tienes aval de tu institución?» sí/no, y subir el soporte (opcional, recomendado).
    - Hoja de vida: subir o reemplazar el CV.
 3. Subida de archivo (CV y soporte del aval): nombre, tamaño, reemplazar, ver.
 
 **Reglas**
-- Perfil mínimo = nivel de formación + programa. Sin eso no habrá postulación (IV); el perfil lo dice claro.
+- Perfil mínimo = nivel de formación + programa + CV. Sin eso no habrá postulación (IV); el perfil lo dice claro.
 - Un campo vacío se muestra como «Falta información» con un enlace para completarlo (IV).
 - El aval se rotula «Aval declarado (con soporte)» o «Aval declarado (sin soporte)», nunca «verificado» (IX, §4.2).
 - Se invita a subir el soporte del aval, sin obligarlo.
@@ -206,14 +206,14 @@ o híbrida), duración, fecha de inicio y fecha de vigencia (obligatoria).
 |---|---|
 | Nivel de formación (uno o varios) | Siempre excluyente |
 | Programa (uno o varios, del catálogo) | Siempre excluyente |
-| Avance académico mínimo | Excluyente o deseable |
-| Exige aval (sí/no) | Excluyente o deseable |
-| Ciudad (la de la plaza) | Excluyente o deseable |
-| Fecha de inicio | Excluyente o deseable |
-| Jornada | Excluyente o deseable |
-| Idioma y nivel mínimo (opcional) | Excluyente o deseable |
+| Avance académico mínimo | Siempre deseable |
+| Exige aval (sí/no) | Siempre deseable |
+| Fecha de inicio | Siempre deseable |
+| Jornada | Siempre deseable |
+| Idioma y nivel mínimo (opcional) | Siempre deseable |
 
-Cada requisito opcional tiene un selector **Excluyente / Deseable** con una línea que explica la diferencia.
+Solo el nivel de formación y el programa bloquean la postulación. Los deseables informan a la empresa, que decide en
+la entrevista; el sistema no descarta por ellos (IV). La ciudad es un dato de la vacante, no un requisito.
 
 **Reglas**
 - Ciclo: Borrador → Abierta → Cerrada. No se reabre (§5.1).

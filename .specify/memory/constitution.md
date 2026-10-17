@@ -1,4 +1,15 @@
 <!--
+Sync Impact Report (v2.0.0, 2026-10-17)
+- Versión: 1.2.0 → 2.0.0 (MAYOR: se redefine el principio IV)
+- Cambio: solo el nivel de formación y el programa pueden ser excluyentes; el resto de los requisitos son
+  siempre deseables y la ciudad deja de ser requisito. El perfil mínimo suma el CV.
+- Motivo: decisión del equipo (2026-10-17): el sistema no descarta lo que una persona puede decidir en la
+  entrevista (por ejemplo, un candidato de Envigado para una plaza en Medellín).
+- Afecta: docs/modulos.md (M2, M3, M5), docs/context(pre-constitucion).md (§3, §5.2, §6),
+  specs/004-catalogos-compartidos
+- Plantillas: sin cambios
+- Pendiente: aprobación por PR de otro integrante (Gobernanza)
+
 Sync Impact Report (v1.2.0, 2026-10-16)
 - Versión: 1.1.0 → 1.2.0 (MINOR: cambia una fila de «Stack y restricciones técnicas»; ningún principio cambia)
 - Cambio: Pruebas → Jest en la API (modo ESM nativo con SWC, porque Nest 12 es solo ESM) y Vitest en la web
@@ -45,10 +56,13 @@ estudiante y a la empresa. Praxis MUST NOT usar porcentajes de afinidad, ranking
 posiciones pagadas que parezcan una probabilidad de contratación.
 
 ### IV. No se postula a lo que no se cumple
-Si un requisito excluyente da *no cumple*, el sistema MUST bloquear la postulación y MUST decir por
-qué. Consultar la vacante sigue permitido. Un dato que falta no bloquea; se muestra como *falta
-información* y se invita a completarlo. La excepción es el perfil mínimo (nivel de formación y
-programa): sin él MUST NOT haber postulación.
+Solo el nivel de formación y el programa MAY ser requisitos excluyentes. Si uno da *no cumple*, el
+sistema MUST bloquear la postulación y MUST decir por qué. Todos los demás requisitos (avance, aval,
+fechas, jornada, idioma) MUST ser deseables: informan a la empresa, que decide en la entrevista. El
+sistema MUST NOT descartar a un estudiante por lo que una persona puede resolver al conocerlo; por eso
+la ciudad no es requisito. Consultar la vacante sigue permitido. Un dato que falta no bloquea; se
+muestra como *falta información* y se invita a completarlo. La excepción es el perfil mínimo (nivel de
+formación, programa y CV): sin él MUST NOT haber postulación.
 
 ### V. Trazabilidad del proceso
 Cada postulación MUST tener un estado y un historial visibles para el estudiante. Ningún cambio de
@@ -185,4 +199,4 @@ Cambiar cualquier elemento de esta tabla es una enmienda a la constitución.
   cada revisión de PR verifica que no se rompa ningún principio.
 - La guía de producto para el trabajo diario es `docs/context(pre-constitucion).md`.
 
-**Version**: 1.2.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-16
+**Version**: 2.0.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-17

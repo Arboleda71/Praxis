@@ -1,6 +1,6 @@
 # Pendientes de la constitución
 
-> Estado al 2026-10-15. Constitución vigente: `.specify/memory/constitution.md` v1.1.0.
+> Estado al 2026-10-17. Constitución vigente: `.specify/memory/constitution.md` v2.0.0.
 > Detalle del producto: `docs/context(pre-constitucion).md`.
 >
 > Marquen cada punto con `[x]` cuando quede confirmado y anoten la decisión al lado. Si algo cambia la
@@ -44,9 +44,13 @@ No están en la constitución, pero las specs las necesitan.
 
 ## 3. Detalles por definir en las specs
 
-- [ ] **Avance académico:** los técnicos y tecnólogos del SENA no cuentan por semestres. ¿Con qué unidad
-  se compara?
-- [ ] **Catálogo de programas:** ¿de dónde sale la lista cerrada de programas? ¿SNIES?
+- [x] **Avance académico** (resuelto el 2026-10-17, spec 004): semestre para universitarios y etapa
+  lectiva/productiva para el SENA; solo se compara dentro del mismo nivel.
+- [x] **Catálogo de programas** (resuelto el 2026-10-17, spec 004): semilla ficticia para la muestra.
+- [ ] **Programas reales:** antes de salir del piloto, reemplazar la semilla por el SNIES más los programas del
+  SENA, que el SNIES no cubre del todo.
+- [ ] **Enmienda v2.0.0** (2026-10-17): principio IV redefinido (solo nivel y programa son excluyentes; perfil
+  mínimo con CV; la ciudad no es requisito). Falta la aprobación por PR de otro integrante.
 - [ ] **Reemplazar el CV en una postulación *Enviada*** (antes de que la empresa la revise): ¿se anota
   como fase posterior?
 

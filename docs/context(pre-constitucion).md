@@ -42,10 +42,11 @@ Ninguna spec, funcionalidad ni decisión de diseño puede romperlos.
    que haya que interpretar.
 3. **Elegibilidad transparente, sin puntajes.** Cada requisito se muestra como *cumple*, *no cumple* o *falta información*.
    Nunca se usa un porcentaje de afinidad ni un ranking opaco que parezca una probabilidad de contratación.
-4. **No se postula a lo que no se cumple.** Si un requisito excluyente da *no cumple*, el sistema bloquea la postulación
+4. **No se postula a lo que no se cumple.** Solo el nivel de formación y el programa son excluyentes; si uno da *no cumple*, el sistema bloquea la postulación
    y **siempre dice por qué**. Consultar la vacante sigue estando permitido. Un dato que falta no bloquea: se muestra
    como *falta información* al estudiante y a la empresa, y el sistema invita a completarlo. La excepción es el
-   **perfil mínimo** (nivel de formación y programa): sin él no hay postulación.
+   **perfil mínimo** (nivel de formación, programa y CV): sin él no hay postulación. Lo demás lo decide la
+   empresa en la entrevista, no el sistema.
 5. **Trazabilidad del proceso.** Cada postulación tiene un estado y un historial que el estudiante puede ver. Ningún cambio
    de estado ocurre en silencio ni se borra. La única excepción es el derecho de supresión del titular de los datos: en
    ese caso el historial se anonimiza, no se borra (sección 8).
@@ -82,7 +83,7 @@ ver requisitos o postularse tiene que crear una cuenta.
 
 ### 4.2 Estudiante
 - **Puede:**
-  - Crear y editar su perfil académico (programa, institución, semestre, aval, disponibilidad, ciudad) y subir su CV.
+  - Crear y editar su perfil académico (programa, institución, avance académico, aval, disponibilidad) y subir su CV.
   - Buscar y filtrar vacantes por carrera, ciudad, modalidad, fecha de inicio y disponibilidad.
   - Ver el detalle de cualquier vacante abierta, con el estado de cada requisito frente a su perfil.
   - Postularse a las vacantes cuyos requisitos excluyentes cumple.
@@ -90,7 +91,7 @@ ver requisitos o postularse tiene que crear una cuenta.
   - Retirar una postulación mientras el proceso siga abierto. El retiro queda registrado en el historial.
 - **No puede:**
   - Postularse si un requisito excluyente da *no cumple*.
-  - Postularse sin el perfil mínimo completo: nivel de formación y programa.
+  - Postularse sin el perfil mínimo completo: nivel de formación, programa y CV.
   - Postularse dos veces a la misma vacante, aunque haya retirado la primera postulación.
   - Ver otros estudiantes, sus perfiles ni sus postulaciones.
   - Ver los candidatos de una vacante ni cambiar el estado de una postulación.
@@ -186,23 +187,25 @@ Borrador ──publicar──▶ Abierta ──cerrar / vence──▶ Cerrada
 
 ### 5.2 Requisitos estructurados
 
-Cada requisito compara un campo de la vacante con el mismo campo del perfil del estudiante. La empresa marca cada uno
-como **excluyente** (bloquea la postulación si no se cumple) o **deseable** (solo informa). Si el perfil no tiene el
-dato, el resultado es *falta información*: no bloquea, pero la empresa lo ve y al estudiante se le invita a completarlo.
+Cada requisito compara un campo de la vacante con el mismo campo del perfil del estudiante. Solo el nivel de formación y
+el programa son **excluyentes** (bloquean la postulación si no se cumplen). Todos los demás son **deseables**: informan a
+la empresa, que decide en la entrevista; el sistema no descarta a nadie por ellos (decisión del 2026-10-17). Si el
+perfil no tiene el dato, el resultado es *falta información*: no bloquea, pero la empresa lo ve y al estudiante se le
+invita a completarlo.
 
 | Requisito | En la vacante | En el perfil | Cumple si… | Tipo |
 |---|---|---|---|---|
 | Nivel de formación | Técnico, tecnólogo y/o universitario | El nivel del estudiante | El nivel está entre los aceptados | Siempre excluyente |
 | Programa (carrera) | Uno o varios programas, de un catálogo cerrado | Su programa | El programa está entre los aceptados | Siempre excluyente |
-| Avance académico | Semestre o periodo mínimo | Semestre o periodo actual | Actual ≥ mínimo | Excluyente o deseable |
-| Aval | ¿Exige aval? (sí/no) | Aval declarado (sí/no) | No se exige, o el estudiante lo declaró | Excluyente o deseable |
-| Ciudad | Ciudad de la plaza (solo presencial o híbrida) | Ciudad de residencia | Coinciden | Excluyente o deseable |
-| Fecha de inicio | Fecha de inicio de la práctica | Fecha desde la que está disponible | Disponible ≤ inicio | Excluyente o deseable |
-| Jornada | Tiempo completo o medio tiempo | Jornada disponible | Coinciden | Excluyente o deseable |
-| Idioma | Idioma y nivel mínimo (MCER, de A1 a C2) | Idiomas y nivel declarado | Nivel ≥ mínimo | Opcional; excluyente o deseable |
+| Avance académico | Semestre mínimo (universitario) o etapa lectiva/productiva (SENA) | Semestre o etapa actual | Actual ≥ mínimo, dentro del mismo nivel | Siempre deseable |
+| Aval | ¿Exige aval? (sí/no) | Aval declarado (sí/no) | No se exige, o el estudiante lo declaró | Siempre deseable |
+| Fecha de inicio | Fecha de inicio de la práctica | Fecha desde la que está disponible | Disponible ≤ inicio | Siempre deseable |
+| Jornada | Tiempo completo o medio tiempo | Jornada disponible | Coinciden | Siempre deseable |
+| Idioma | Idioma y nivel mínimo (MCER, de A1 a C2) | Idiomas y nivel declarado | Nivel ≥ mínimo | Opcional; siempre deseable |
 
-- **La modalidad** (presencial, híbrida o remota) y **la duración** son datos de la vacante y sirven como filtros, pero no
-  son requisitos.
+- **La modalidad** (presencial, híbrida o remota), **la ciudad** y **la duración** son datos de la vacante y sirven como
+  filtros, pero no son requisitos. La ciudad no se compara con el estudiante: en el área metropolitana, que el candidato
+  pueda llegar lo decide la empresa en la entrevista.
 - **Lo que no existe como requisito:** edad, sexo, estado civil, foto ni cualquier otro dato sensible (principio 7).
 - **Sin requisitos en texto libre.** La descripción de la vacante es texto libre, pero Praxis nunca evalúa contra ella.
 - **Cada candidato ve cada requisito por separado.** La empresa ve, para cada candidato, el resultado de cada requisito.
@@ -213,9 +216,10 @@ dato, el resultado es *falta información*: no bloquea, pero la empresa lo ve y 
 - **Estados:** Enviada, En revisión, Entrevista, Seleccionada, Rechazada y Retirada.
 - *(propuesta)* La empresa mueve los estados entre Enviada y Seleccionada o Rechazada. El estudiante solo puede pasar a
   Retirada, y solo mientras el proceso siga abierto, es decir, antes de Seleccionada o Rechazada.
-- **Perfil mínimo para postularse:** nivel de formación y programa son obligatorios. Son los dos requisitos que siempre
-  son excluyentes; si faltaran, un perfil vacío nunca daría *no cumple* y podría postularse a cualquier vacante. El resto
-  de los datos, incluido el aval, puede quedar en *falta información*.
+- **Perfil mínimo para postularse:** nivel de formación, programa y CV son obligatorios. El nivel y el programa son los
+  únicos requisitos excluyentes; si faltaran, un perfil vacío nunca daría *no cumple* y podría postularse a cualquier
+  vacante. El CV es lo que la empresa necesita para decidir. El resto de los datos, incluido el aval (opcional), puede
+  quedar en *falta información*.
 - **Una postulación por estudiante y vacante.** Se controla en la lógica de negocio y con una restricción única en la base
   de datos `(estudiante, vacante)`.
 - **Foto al postularse.** Al postularse se guarda una copia del perfil académico, del CV y del resultado de cada
