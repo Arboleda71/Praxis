@@ -5,6 +5,7 @@ import { join } from "node:path";
 const WEB = 3100;
 const API = 3101;
 export const CORREOS_DIR = join(tmpdir(), "praxis-correos-e2e");
+const ARCHIVOS_DIR = join(tmpdir(), "praxis-archivos-e2e");
 const DATABASE_URL = process.env.E2E_DATABASE_URL ?? "postgresql://praxis:praxis@localhost:5432/praxis_e2e";
 
 const movil = { ...devices["Desktop Chrome"], viewport: { width: 360, height: 740 } };
@@ -35,7 +36,7 @@ export default defineConfig({
       port: API,
       reuseExistingServer: false,
       timeout: 180_000,
-      env: { PORT: String(API), DATABASE_URL, CORREOS_DIR, RESEND_API_KEY: "", WEB_URL: `http://localhost:${WEB}` },
+      env: { PORT: String(API), DATABASE_URL, CORREOS_DIR, ARCHIVOS_DIR, S3_BUCKET: "", RESEND_API_KEY: "", WEB_URL: `http://localhost:${WEB}` },
     },
     {
       // Compilación de producción: en modo dev, Next compila cada ruta al primer acceso y las

@@ -31,7 +31,7 @@ test.describe("Crear cuenta", () => {
     await expect(page.getByRole("heading", { name: "Tu correo quedó confirmado" })).toBeVisible();
     await sinViolaciones(page);
     await page.getByRole("link", { name: "Ir a mi perfil" }).click();
-    await expect(page.getByRole("heading", { name: "Mi perfil" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Empieza por tu perfil mínimo" })).toBeVisible();
     await expect(page.getByText("Confirma tu correo")).toHaveCount(0);
   });
 

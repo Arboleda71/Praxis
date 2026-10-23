@@ -32,9 +32,10 @@
 ## Notes
 
 - Aclaraciones resueltas (2026-10-17):
-  - FR-008: programas con semilla ficticia ahora y SNIES antes de salir del piloto.
+  - FR-008: programas con semilla ficticia ahora y SNIES antes de salir del piloto. Reemplazada el 2026-10-23
+    (constitución v4.0.0): el programa es texto libre y la vacante solicita de 1 a 5 programas sin evaluarlos.
   - FR-009: avance por semestre (universitario) y por etapa lectiva/productiva (SENA), comparable solo dentro del
     mismo nivel.
   - FR-010: la ciudad no es catálogo ni requisito.
-  - FR-017: solo el nivel y el programa pueden ser excluyentes.
+  - FR-017: solo el nivel y el programa pueden ser excluyentes. Desde v4.0.0, solo el nivel.
 - Las listas de idiomas y sectores son propuestas; el equipo puede ajustarlas sin cambiar las reglas.

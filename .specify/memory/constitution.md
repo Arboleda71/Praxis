@@ -1,4 +1,29 @@
 <!--
+Sync Impact Report (v4.0.0, 2026-10-23)
+- Versión: 3.0.0 → 4.0.0 (MAYOR: se redefinen los principios II y IV)
+- Cambio: el programa académico deja de ser una lista cerrada. El estudiante escribe su programa y la vacante
+  solicita uno o varios programas, ambos en texto libre. La solicitud se muestra junto al programa del
+  estudiante («La empresa revisa la afinidad») sin *cumple*/*no cumple* y sin bloquear (II, III). El único
+  requisito excluyente es el nivel de formación (IV). El perfil mínimo sigue siendo nivel + programa + CV.
+- Motivo: decisión del equipo (2026-10-23): la cantidad de programas reales (SNIES, SENA, extranjeros) no cabe
+  en un catálogo mantenido por Praxis y lo rompería.
+- Riesgo aceptado: la elegibilidad no puede decir si el programa coincide; esa revisión la hace la empresa.
+- Afecta: specs/004-catalogos-compartidos (se retira el catálogo de programas), specs/005-perfil-estudiante,
+  docs/modulos.md (M2, M3, M5), mockups de M2 y M3
+- Plantillas: sin cambios
+- Pendiente: aprobación por PR de otro integrante (Gobernanza)
+
+Sync Impact Report (v3.0.0, 2026-10-23)
+- Versión: 2.0.0 → 3.0.0 (MAYOR: se redefine el principio VII y cambia una regla de XIV)
+- Cambio: VII permite una foto de perfil opcional, que nunca es requisito, no se compara ni filtra, y solo la
+  ven el estudiante y las empresas a cuyas vacantes se postuló. XIV admite la foto en JPG o PNG de máximo 2 MB.
+- Motivo: decisión del equipo (2026-10-23): la empresa ve el perfil completo de quien se postuló.
+- Riesgo aceptado: la foto puede inducir sesgo al revisar candidatos. Mitigación: opcional, sin efecto en la
+  elegibilidad y sin mostrarse en listados antes de abrir la postulación (detalle en la spec de M3).
+- Afecta: docs/modulos.md (M3), mockups de M3
+- Plantillas: sin cambios
+- Pendiente: aprobación por PR de otro integrante (Gobernanza)
+
 Sync Impact Report (v2.0.0, 2026-10-17)
 - Versión: 1.2.0 → 2.0.0 (MAYOR: se redefine el principio IV)
 - Cambio: solo el nivel de formación y el programa pueden ser excluyentes; el resto de los requisitos son
@@ -49,15 +74,20 @@ que solo tiene sentido para el empleo general MUST NOT entrar. Praxis no sustitu
 Toda vacante MUST declarar sus requisitos en campos estructurados, de una lista cerrada que se compara
 con los mismos campos del perfil del estudiante. Los requisitos MUST NOT expresarse en texto libre ni
 evaluarse contra la descripción. Una vez publicada la vacante, sus requisitos MUST NOT cambiar.
+El programa académico es la excepción: hay demasiados programas reales para una lista cerrada. El
+estudiante escribe su programa como texto libre, y la vacante MAY solicitar uno o varios programas,
+también en texto libre. Esa solicitud es parte explícita de la oferta y MUST mostrarse junto al programa
+del estudiante, pero MUST NOT evaluarse como *cumple* o *no cumple*: la afinidad la valora la empresa.
 
 ### III. Elegibilidad transparente, sin puntajes
 Cada requisito MUST mostrarse por separado como *cumple*, *no cumple* o *falta información*, al
 estudiante y a la empresa. Praxis MUST NOT usar porcentajes de afinidad, rankings opacos ni
-posiciones pagadas que parezcan una probabilidad de contratación.
+posiciones pagadas que parezcan una probabilidad de contratación. Los programas solicitados se
+muestran aparte, rotulados «La empresa revisa la afinidad», sin estado automático (II).
 
 ### IV. No se postula a lo que no se cumple
-Solo el nivel de formación y el programa MAY ser requisitos excluyentes. Si uno da *no cumple*, el
-sistema MUST bloquear la postulación y MUST decir por qué. Todos los demás requisitos (avance, aval,
+Solo el nivel de formación MAY ser requisito excluyente. Si da *no cumple*, el sistema MUST
+bloquear la postulación y MUST decir por qué. Todos los demás requisitos (avance, aval,
 fechas, jornada, idioma) MUST ser deseables: informan a la empresa, que decide en la entrevista. El
 sistema MUST NOT descartar a un estudiante por lo que una persona puede resolver al conocerlo; por eso
 la ciudad no es requisito. Consultar la vacante sigue permitido. Un dato que falta no bloquea; se
@@ -77,7 +107,9 @@ NOT ofrecer una base de talento abierta ni vender datos de estudiantes.
 
 ### VII. No discriminación
 La edad, el sexo, el estado civil, la foto y cualquier otro dato personal sensible MUST NOT ser requisito
-de acceso ni de postulación. Esos campos no existen como requisito.
+de acceso ni de postulación. Esos campos no existen como requisito. La foto de perfil MAY existir solo
+como dato opcional del estudiante: nunca es obligatoria, no se compara, no filtra ni ordena, y sin ella el
+perfil está completo. La ven solo él y las empresas a cuyas vacantes se postuló (VI).
 
 ### VIII. Protección de datos
 El tratamiento de datos personales MUST cumplir la Ley 1581 de 2012, con el RGPD como referencia de
@@ -119,7 +151,8 @@ Toda entrada externa MUST validarse en la API con los esquemas de `packages/cont
 MUST verificar el rol y la propiedad del recurso (una empresa solo toca sus vacantes; un estudiante,
 solo sus postulaciones). Las contraseñas MUST guardarse con argon2 y la sesión MUST ir en una cookie
 `httpOnly`, `Secure` y `SameSite`. El inicio de sesión y el registro MUST tener límite de intentos. Los
-archivos MUST ser PDF de máximo 5 MB y servirse solo con URLs firmadas de corta duración. Los secretos
+documentos MUST ser PDF de máximo 5 MB; la foto de perfil, JPG o PNG de máximo 2 MB. Todos los archivos
+MUST servirse solo con URLs firmadas de corta duración. Los secretos
 MUST vivir en variables de entorno, nunca en el repositorio. Los logs MUST NOT contener contraseñas,
 tokens ni datos personales.
 
@@ -199,4 +232,4 @@ Cambiar cualquier elemento de esta tabla es una enmienda a la constitución.
   cada revisión de PR verifica que no se rompa ningún principio.
 - La guía de producto para el trabajo diario es `docs/context(pre-constitucion).md`.
 
-**Version**: 2.0.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-17
+**Version**: 4.0.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-23

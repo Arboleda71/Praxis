@@ -42,7 +42,7 @@ Ninguna spec, funcionalidad ni decisión de diseño puede romperlos.
    que haya que interpretar.
 3. **Elegibilidad transparente, sin puntajes.** Cada requisito se muestra como *cumple*, *no cumple* o *falta información*.
    Nunca se usa un porcentaje de afinidad ni un ranking opaco que parezca una probabilidad de contratación.
-4. **No se postula a lo que no se cumple.** Solo el nivel de formación y el programa son excluyentes; si uno da *no cumple*, el sistema bloquea la postulación
+4. **No se postula a lo que no se cumple.** Solo el nivel de formación es excluyente (actualizado por constitución v4.0.0); si da *no cumple*, el sistema bloquea la postulación
    y **siempre dice por qué**. Consultar la vacante sigue estando permitido. Un dato que falta no bloquea: se muestra
    como *falta información* al estudiante y a la empresa, y el sistema invita a completarlo. La excepción es el
    **perfil mínimo** (nivel de formación, programa y CV): sin él no hay postulación. Lo demás lo decide la
@@ -187,8 +187,8 @@ Borrador ──publicar──▶ Abierta ──cerrar / vence──▶ Cerrada
 
 ### 5.2 Requisitos estructurados
 
-Cada requisito compara un campo de la vacante con el mismo campo del perfil del estudiante. Solo el nivel de formación y
-el programa son **excluyentes** (bloquean la postulación si no se cumplen). Todos los demás son **deseables**: informan a
+Cada requisito compara un campo de la vacante con el mismo campo del perfil del estudiante. Solo el nivel de formación
+es **excluyente** (bloquea la postulación si no se cumple; actualizado por constitución v4.0.0). Todos los demás son **deseables**: informan a
 la empresa, que decide en la entrevista; el sistema no descarta a nadie por ellos (decisión del 2026-10-17). Si el
 perfil no tiene el dato, el resultado es *falta información*: no bloquea, pero la empresa lo ve y al estudiante se le
 invita a completarlo.
@@ -196,7 +196,7 @@ invita a completarlo.
 | Requisito | En la vacante | En el perfil | Cumple si… | Tipo |
 |---|---|---|---|---|
 | Nivel de formación | Técnico, tecnólogo y/o universitario | El nivel del estudiante | El nivel está entre los aceptados | Siempre excluyente |
-| Programa (carrera) | Uno o varios programas, de un catálogo cerrado | Su programa | El programa está entre los aceptados | Siempre excluyente |
+| Programa (carrera) | Opcional: de 1 a 5 programas en texto libre | Su programa, en texto libre | No se evalúa: se muestra junto al del estudiante con «La empresa revisa la afinidad» (actualizado por constitución v4.0.0) | Nunca bloquea |
 | Avance académico | Semestre mínimo (universitario) o etapa lectiva/productiva (SENA) | Semestre o etapa actual | Actual ≥ mínimo, dentro del mismo nivel | Siempre deseable |
 | Aval | ¿Exige aval? (sí/no) | Aval declarado (sí/no) | No se exige, o el estudiante lo declaró | Siempre deseable |
 | Fecha de inicio | Fecha de inicio de la práctica | Fecha desde la que está disponible | Disponible ≤ inicio | Siempre deseable |
@@ -208,6 +208,7 @@ invita a completarlo.
   pueda llegar lo decide la empresa en la entrevista.
 - **Lo que no existe como requisito:** edad, sexo, estado civil, foto ni cualquier otro dato sensible (principio 7).
 - **Sin requisitos en texto libre.** La descripción de la vacante es texto libre, pero Praxis nunca evalúa contra ella.
+  La excepción son los programas solicitados, en texto libre y sin evaluación (actualizado por constitución v4.0.0).
 - **Cada candidato ve cada requisito por separado.** La empresa ve, para cada candidato, el resultado de cada requisito.
   No hay puntaje ni ordenamiento por afinidad (principio 3).
 
@@ -216,8 +217,8 @@ invita a completarlo.
 - **Estados:** Enviada, En revisión, Entrevista, Seleccionada, Rechazada y Retirada.
 - *(propuesta)* La empresa mueve los estados entre Enviada y Seleccionada o Rechazada. El estudiante solo puede pasar a
   Retirada, y solo mientras el proceso siga abierto, es decir, antes de Seleccionada o Rechazada.
-- **Perfil mínimo para postularse:** nivel de formación, programa y CV son obligatorios. El nivel y el programa son los
-  únicos requisitos excluyentes; si faltaran, un perfil vacío nunca daría *no cumple* y podría postularse a cualquier
+- **Perfil mínimo para postularse:** nivel de formación, programa y CV son obligatorios. El nivel es el único requisito
+  excluyente (actualizado por constitución v4.0.0); si el perfil mínimo faltara, un perfil vacío nunca daría *no cumple* y podría postularse a cualquier
   vacante. El CV es lo que la empresa necesita para decidir. El resto de los datos, incluido el aval (opcional), puede
   quedar en *falta información*.
 - **Una postulación por estudiante y vacante.** Se controla en la lógica de negocio y con una restricción única en la base

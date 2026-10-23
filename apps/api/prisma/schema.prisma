@@ -30,10 +30,55 @@ model Cuenta {
   enlaces             EnlaceConfirmacion[]
 }
 
+/// Perfil del estudiante (M3). Los campos de catálogo guardan el id de @praxis/contracts (M2).
 model Estudiante {
-  cuentaId       String @id @db.Uuid
-  nombreCompleto String
-  cuenta         Cuenta @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
+  cuentaId            String            @id @db.Uuid
+  nombreCompleto      String
+  nivelFormacion      String?
+  /// Texto libre escrito por el estudiante (constitución v4.0.0, II): no es catálogo ni se compara.
+  programa            String?           @db.VarChar(150)
+  institucion         String?
+  avance              String?
+  disponibleDesde     DateTime?         @db.Date
+  jornada             String?
+  /// null = sin responder.
+  aval                Boolean?
+  perfilActualizadoEn DateTime?
+  cuenta              Cuenta            @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
+  idiomas             IdiomaDeclarado[]
+  archivos            ArchivoPerfil[]
+
+  @@index([nivelFormacion])
+}
+
+model IdiomaDeclarado {
+  cuentaId   String     @db.Uuid
+  idioma     String
+  nivel      String
+  estudiante Estudiante @relation(fields: [cuentaId], references: [cuentaId], onDelete: Cascade)
+
+  @@id([cuentaId, idioma])
+  @@index([idioma])
+}
+
+enum TipoArchivo {
+  HOJA_DE_VIDA
+  SOPORTE_AVAL
+  FOTO
+}
+
+/// Un archivo vigente por tipo. La clave es aleatoria; el nombre original solo se muestra.
+model ArchivoPerfil {
+  id         String      @id @default(uuid()) @db.Uuid
+  cuentaId   String      @db.Uuid
+  tipo       TipoArchivo
+  clave      String      @unique
+  nombre     String
+  bytes      Int
+  subidoEn   DateTime    @default(now())
+  estudiante Estudiante  @relation(fields: [cuentaId], references: [cuentaId], onDelete: Cascade)
+
+  @@unique([cuentaId, tipo])
 }
 
 model Empresa {
