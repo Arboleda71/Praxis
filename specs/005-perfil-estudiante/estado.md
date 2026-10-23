@@ -45,3 +45,9 @@ Hasta entonces las tareas T001 y T006–T022 quedan como `[~]` en `tasks.md`.
 - El ejemplo de la portada (`RequisitosEjemplo`) muestra «Programa solicitado: Ingeniería de Sistemas o afines —
   La empresa revisa la afinidad».
 - Pruebas de contracts: 78 aprobadas.
+
+## Validación local retomada · 2026-10-23
+
+Docker operativo; instancia efímera praxis-test-postgres-test-1, puerto exclusivo 55432 y base praxis_test. Ambas migraciones aplicadas y verificadas en _prisma_migrations. API: 33/33 pruebas de cuentas y perfil aprobadas contra Postgres real.
+
+Primera ejecución Playwright M3: 8/12 aprobadas; axe detectó contraste en ayudas deshabilitadas y menú, y nombres accesibles que omitían el texto visible Falta. Se corrigieron los tres puntos; repetición pendiente de resultado. No se modificó ninguna base externa, ni se hizo push/merge. S3/R2 real y revisión por PR siguen pendientes.

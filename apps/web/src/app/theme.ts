@@ -35,6 +35,8 @@ const theme = createTheme({
     MuiLink: { defaultProps: { component: NextLink } },
     // El gris por defecto del borde da 1,7:1; WCAG 1.4.11 pide 3:1 en bordes de controles.
     MuiOutlinedInput: { styleOverrides: { notchedOutline: { borderColor: "#64748B" } } },
+    MuiFormHelperText: { styleOverrides: { root: { "&.Mui-disabled": { color: "#475569" } } } },
+    MuiMenuItem: { styleOverrides: { root: { color: "#0B1F4B", "&.Mui-focusVisible, &:hover, &.Mui-selected": { backgroundColor: "#E2E8F0", color: "#0B1F4B" } } } },
   },
 });
 

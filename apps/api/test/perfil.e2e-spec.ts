@@ -1,3 +1,4 @@
+import { validarBasePruebas } from './seguridad/base-pruebas.js';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { rmSync } from 'node:fs';
@@ -35,6 +36,7 @@ describe('/perfil (integración, Postgres real)', () => {
   });
 
   beforeEach(async () => {
+    validarBasePruebas(process.env.DATABASE_URL);
     await prisma.$executeRawUnsafe('TRUNCATE "Cuenta" CASCADE');
     app.get(Intentos).limpiar();
     rmSync(process.env.ARCHIVOS_DIR!, { recursive: true, force: true });

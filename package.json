@@ -13,6 +13,8 @@
     "dev:api": "npm run start:dev -w api",
     "lint": "npm run lint -w web",
     "postinstall": "npm run build -w @praxis/contracts",
-    "db": "docker compose up -d"
+    "db": "docker compose up -d",
+    "test:seguridad-db": "node --test apps/api/test/seguridad/base-pruebas.test.ts",
+    "db:test": "docker compose -p praxis-test -f docker-compose.test.yml up -d --wait"
   }
 }

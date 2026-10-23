@@ -1,3 +1,4 @@
+import { validarBasePruebas, BASE_PRUEBAS } from '../api/test/seguridad/base-pruebas';
 import { defineConfig, devices } from "@playwright/test";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -6,7 +7,7 @@ const WEB = 3100;
 const API = 3101;
 export const CORREOS_DIR = join(tmpdir(), "praxis-correos-e2e");
 const ARCHIVOS_DIR = join(tmpdir(), "praxis-archivos-e2e");
-const DATABASE_URL = process.env.E2E_DATABASE_URL ?? "postgresql://praxis:praxis@localhost:5432/praxis_e2e";
+const DATABASE_URL = validarBasePruebas(process.env.E2E_DATABASE_URL ?? BASE_PRUEBAS);
 
 const movil = { ...devices["Desktop Chrome"], viewport: { width: 360, height: 740 } };
 const escritorio = { ...devices["Desktop Chrome"], viewport: { width: 1080, height: 800 } };
