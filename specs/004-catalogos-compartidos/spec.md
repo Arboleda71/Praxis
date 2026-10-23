@@ -14,6 +14,11 @@ abierta para SENA); sector de la empresa. Reglas: no existe catálogo de edad, s
 catálogos los comparten la web y la API. Preguntas abiertas: unidad de avance académico para SENA y origen de la
 lista de programas (¿SNIES?)."
 
+> **Cambio 2026-10-23 (constitución v4.0.0)**: el programa deja de ser catálogo. El estudiante lo escribe en texto
+> libre y la vacante puede solicitar de 1 a 5 programas, también en texto libre, que se muestran junto al programa
+> del estudiante con «La empresa revisa la afinidad», sin *cumple*/*no cumple* y sin bloquear. El único requisito
+> excluyente es el nivel de formación. M2 queda con 7 catálogos. La pregunta abierta sobre el SNIES queda obsoleta.
+
 ## Contexto
 
 La elegibilidad (fase posterior) compara cada requisito de la vacante con el mismo campo del perfil del estudiante
@@ -26,9 +31,10 @@ empresa) y M5 (vacantes).
 
 ### User Story 1 - Estudiante y empresa eligen de la misma lista (Priority: P1)
 
-Una estudiante declara en su perfil que es tecnóloga en Desarrollo de Software. Una empresa crea una vacante que
-pide tecnólogos de ese mismo programa. Ambos eligieron el valor de una lista, no lo
-escribieron, así que el sistema puede decir sin ambigüedad que la estudiante cumple.
+Una estudiante declara en su perfil que es tecnóloga. Una empresa crea una vacante que pide tecnólogos. Ambos
+eligieron el valor de una lista, no lo escribieron, así que el sistema puede decir sin ambigüedad que la
+estudiante cumple. (Antes el ejemplo usaba el programa; desde la constitución v4.0.0 el programa es texto libre y
+no se compara.)
 
 **Why this priority**: es la razón de existir de M2. Sin listas compartidas, M3 y M5 no se pueden construir de
 forma comparable y la elegibilidad no funciona.
@@ -38,9 +44,9 @@ reconoce como igual, y que no hay forma de introducir un valor que no esté en l
 
 **Acceptance Scenarios**:
 
-1. **Given** un perfil y una vacante que eligieron el mismo programa, **When** se comparan, **Then** el programa
-   coincide.
-2. **Given** un valor que no pertenece al catálogo (por ejemplo, un programa escrito a mano), **When** se intenta
+1. **Given** un perfil y una vacante que eligieron el mismo nivel de formación, **When** se comparan, **Then** el
+   nivel coincide.
+2. **Given** un valor que no pertenece al catálogo (por ejemplo, una jornada escrita a mano), **When** se intenta
    guardar en un perfil o en una vacante, **Then** se rechaza con un mensaje que dice que se elija de la lista.
 3. **Given** un catálogo, **When** se muestra en cualquier selector de M3, M4 o M5, **Then** aparecen los mismos
    valores, con el mismo nombre y en el mismo orden.
@@ -69,7 +75,11 @@ orden definido no se pueden evaluar.
 
 ---
 
-### User Story 3 - El programa depende del nivel de formación (Priority: P2)
+### User Story 3 - El programa depende del nivel de formación (Priority: P2) — Retirada (constitución v4.0.0)
+
+> **Retirada el 2026-10-23**: el programa pasó a texto libre (constitución v4.0.0), así que no hay lista de
+> programas por nivel que filtrar ni combinación programa-nivel que rechazar. Se conserva como historia; solo
+> sigue vigente la regla de avance por nivel (FR-009).
 
 Un estudiante elige «Tecnólogo» y luego busca su programa: solo ve programas de ese nivel. Una empresa que pide
 varios niveles ve los programas de esos niveles.
@@ -105,7 +115,7 @@ pueden salir de estos catálogos.
 
 ### Edge Cases
 
-- Un valor del catálogo deja de usarse (por ejemplo, un programa que se retira): no se ofrece en perfiles ni
+- Un valor del catálogo deja de usarse (por ejemplo, un idioma que se retira): no se ofrece en perfiles ni
   vacantes nuevos, pero los perfiles y las vacantes ya publicadas que lo usan lo conservan y siguen mostrándolo con
   su nombre (II: los requisitos publicados no cambian).
 - Un valor cambia de nombre (corrección de una tilde): el cambio se ve en todas partes y no rompe comparaciones,
@@ -113,8 +123,8 @@ pueden salir de estos catálogos.
 - Vacante remota: no lleva ciudad.
 - Estudiante que vive en Envigado y vacante en Medellín: puede postularse igual. Si la distancia importa, lo
   decide la empresa en la entrevista, no el sistema.
-- Búsqueda en listas largas (programa): se encuentra escribiendo parte del nombre, sin importar tildes ni
-  mayúsculas («ingenieria» encuentra «Ingeniería»).
+- Búsqueda en listas largas (idioma, sector): se encuentra escribiendo parte del nombre, sin importar tildes ni
+  mayúsculas («ingles» encuentra «Inglés»). El programa ya no es lista: se escribe (constitución v4.0.0).
 - Estudiante que declara el mismo idioma dos veces: se rechaza; cada idioma va una sola vez con su nivel.
 
 ## Requirements *(mandatory)*
@@ -137,10 +147,12 @@ pueden salir de estos catálogos.
 
 - **FR-007**: **Nivel de formación**: Técnico, Tecnólogo, Universitario. Sin orden entre ellos: la comparación es
   «está entre los aceptados».
-- **FR-008**: **Programa**: cada programa pertenece a un único nivel de formación. La muestra MUST usar una semilla
-  ficticia de unos 30 programas representativos de los tres niveles, armada a mano (VIII: solo datos ficticios).
-  Antes de salir del piloto se reemplaza por el catálogo oficial (SNIES para educación superior, más los programas
-  del SENA, que el SNIES no cubre del todo); queda anotado como pendiente.
+- **FR-008**: **Programa**: no es un catálogo (constitución v4.0.0, 2026-10-23). El estudiante lo escribe en texto
+  libre (3 a 150 caracteres, sin espacios sobrantes; error «Escribe el nombre completo de tu programa.») y no
+  depende del nivel. La vacante MAY solicitar de 1 a 5 programas en texto libre, sin repetidos (ignorando tildes y
+  mayúsculas), que se muestran junto al programa del estudiante con «La empresa revisa la afinidad»; nunca dan
+  *cumple*/*no cumple* ni bloquean (`programasSolicitadosSchema`, `PROGRAMA_REVISA_EMPRESA`). Reemplaza la
+  semilla ficticia de ~30 programas por nivel y el pendiente de SNIES + SENA.
 - **FR-009**: **Avance académico**: la unidad depende del nivel. Universitario: semestre, del 1.º al 12.º, ordenado.
   Técnico y tecnólogo: etapa, Lectiva < Productiva, ordenada. La comparación «igual o mayor al mínimo» solo se hace
   dentro del mismo nivel; entre niveles distintos el resultado es *falta información*.
@@ -160,30 +172,34 @@ pueden salir de estos catálogos.
 **Comparación**
 
 - **FR-015**: Para cada tipo de catálogo MUST existir una regla de comparación única y documentada («está entre»,
-  «coinciden» o «igual o mayor al mínimo»), que usarán la elegibilidad y la búsqueda.
+  «coinciden» o «igual o mayor al mínimo»), que usarán la elegibilidad y la búsqueda. El programa no tiene regla
+  de comparación: se muestra para que la empresa revise la afinidad (v4.0.0).
 - **FR-016**: Un campo del perfil vacío MUST dar *falta información*, nunca *no cumple* (IV).
-- **FR-017**: Solo el nivel de formación y el programa MUST poder ser requisitos excluyentes. Avance académico, aval,
+- **FR-017**: Solo el nivel de formación MUST poder ser requisito excluyente (`REQUISITOS_EXCLUYENTES =
+  ["nivelFormacion"]`; actualizado por la constitución v4.0.0). Los programas solicitados no se evalúan (FR-008). Avance académico, aval,
   fecha de inicio, jornada e idioma MUST ser siempre deseables: informan a la empresa, pero nunca bloquean una
   postulación. El sistema no decide lo que una persona puede resolver en la entrevista (IV).
 - **FR-018**: La búsqueda dentro de un catálogo MUST ignorar tildes y mayúsculas.
 
 ### Key Entities
 
-- **Catálogo**: una lista cerrada con nombre (nivel de formación, programa, modalidad, jornada, idioma,
-  nivel MCER, avance académico, sector) y su regla de comparación.
+- **Catálogo**: una lista cerrada con nombre (nivel de formación, modalidad, jornada, idioma, nivel MCER, avance
+  académico, sector) y su regla de comparación. Son 7.
 - **Valor de catálogo**: identidad estable, nombre visible, posición en el orden, vigente o retirado.
-- **Programa**: valor de catálogo que pertenece a un nivel de formación.
+- **Programa**: texto libre, fuera de M2 desde la constitución v4.0.0 (antes: valor de catálogo de un nivel).
 - **Nivel ordenado**: valor de catálogo con posición comparable (MCER, avance académico).
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
-- **SC-001**: El 100 % de los campos comparables de M3 y M5 se eligen de un catálogo de M2; ninguno es texto libre.
+- **SC-001**: El 100 % de los campos comparables de M3 y M5 se eligen de un catálogo de M2; ninguno es texto libre
+  (el programa no es comparable desde la constitución v4.0.0).
 - **SC-002**: El 100 % de los pares posibles de niveles MCER da el resultado esperado al compararse.
 - **SC-003**: Un valor fuera de catálogo se rechaza en el 100 % de los intentos, tanto en la web como en la API.
 - **SC-004**: Retirar un valor no cambia ninguna vacante publicada ni ningún perfil existente.
-- **SC-005**: Un estudiante encuentra su programa escribiendo parte del nombre en menos de 10 segundos.
+- **SC-005**: ~~Un estudiante encuentra su programa escribiendo parte del nombre en menos de 10 segundos.~~
+  Retirado (constitución v4.0.0): el programa se escribe, no se busca en una lista.
 - **SC-006**: Ningún catálogo trata datos sensibles (revisión del equipo antes de aprobar la spec).
 
 ## Assumptions
@@ -194,6 +210,7 @@ pueden salir de estos catálogos.
 - La institución del estudiante (M3) no es un catálogo en la muestra; no se compara con requisitos.
 - El perfil mínimo para postularse pasa a ser nivel de formación, programa y CV (decisión del 2026-10-17). El CV no
   es un catálogo: lo exige M3 y lo recoge la constitución (IV). La ciudad de residencia sale del perfil (VIII).
+  Desde la constitución v4.0.0 el programa del perfil mínimo es texto libre; el perfil mínimo no cambia.
 - La lista de idiomas y la de sectores son propuestas razonables para el piloto; el equipo las puede ajustar sin
   cambiar la spec.
 - Solo español: los nombres visibles van en español, sin traducciones.
