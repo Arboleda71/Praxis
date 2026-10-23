@@ -38,7 +38,7 @@ test.describe("Visitante", () => {
   });
 
   test("una sección protegida lleva a iniciar sesión y vuelve después", async ({ page, baseURL }) => {
-    const otro = await nuevoContexto.newContext({ baseURL });
+    const otro = await nuevoContexto.newContext({ baseURL, extraHTTPHeaders: { Origin: baseURL! } });
     const correo = await crearCuenta(otro, "empresa");
     await otro.dispose();
     await page.goto("/empresa/vacantes");
@@ -95,3 +95,4 @@ test.describe("Con sesión", () => {
     await expect(page.getByRole("link", { name: "Crear cuenta", exact: true })).toBeVisible();
   });
 });
+

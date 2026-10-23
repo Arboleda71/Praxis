@@ -13,7 +13,7 @@ export const nuevoToken = () => randomBytes(32).toString('base64url');
 export const opcionesCookie = () => ({
   httpOnly: true,
   sameSite: 'lax' as const,
-  secure: process.env.NODE_ENV === 'production',
+  secure: true,
   path: '/',
 });
 
@@ -22,6 +22,7 @@ const incluir = { estudiante: true, empresa: true } as const;
 async function buscarSesion(prisma: PrismaService, token: string | undefined) {
   if (!token) return null;
   const s = await prisma.sesion.findUnique({ where: { id: hashToken(token) }, include: { cuenta: { include: incluir } } });
+  if (s && s.expiraEn <= new Date()) await prisma.sesion.deleteMany({ where: { id: s.id } });
   return s && s.expiraEn > new Date() ? s : null;
 }
 

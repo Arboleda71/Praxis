@@ -10,6 +10,7 @@ const correo = z
   .pipe(z.email({ error: "Escribe un correo válido, por ejemplo nombre@correo.co." }));
 
 const contrasena = z.string().check((ctx) => {
+  if (ctx.value.length > 128) ctx.issues.push({ code: 'custom', input: ctx.value, message: 'Usa como máximo 128 caracteres.' });
   if (ctx.value.length < CONTRASENA_MIN) {
     ctx.issues.push({
       code: "custom",
@@ -65,7 +66,7 @@ export const registroEmpresaSchema = z
 
 export const loginSchema = z.strictObject({
   correo,
-  contrasena: z.string().min(1, { error: "Escribe tu contraseña." }),
+  contrasena: z.string().min(1, { error: "Escribe tu contraseña." }).max(128, { error: "Usa como máximo 128 caracteres." }),
 });
 
 export const tokenSchema = z.strictObject({ token: z.string().min(16).max(128) });

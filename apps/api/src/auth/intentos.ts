@@ -3,37 +3,42 @@ import { Injectable } from '@nestjs/common';
 export const MAX_INTENTOS = 5;
 export const BLOQUEO_MS = 15 * 60_000;
 
-/**
- * Fallos seguidos por clave (correo o IP). Bloquea 15 minutos desde el último fallo al llegar a 5.
- * ponytail: en memoria, una sola instancia de la API; con varias instancias, mover a Postgres.
- */
+/** Ventanas acotadas; una instancia de API en el piloto. Reservar antes de esperar argon2. */
 @Injectable()
 export class Intentos {
-  private readonly fallos = new Map<string, { n: number; ultimo: number }>();
-
+  private readonly fallos = new Map<string, { n: number; vence: number }>();
   constructor(private readonly ahora: () => number = Date.now) {}
-
-  bloqueado(...claves: string[]): boolean {
-    return claves.some((c) => {
-      const f = this.fallos.get(c);
-      return !!f && f.n >= MAX_INTENTOS && this.ahora() - f.ultimo < BLOQUEO_MS;
-    });
-  }
-
-  fallo(...claves: string[]): void {
+  private depurar() {
     const t = this.ahora();
+    for (const [c, v] of this.fallos) if (v.vence <= t) this.fallos.delete(c);
+  }
+  private limite(c: string) { return c.startsWith('ip:') ? 30 : c.startsWith('registro:') ? 10 : MAX_INTENTOS; }
+  bloqueado(...claves: string[]) {
+    this.depurar();
+    return claves.some(c => (this.fallos.get(c)?.n ?? 0) >= this.limite(c));
+  }
+  fallo(...claves: string[]) {
+    this.depurar();
     for (const c of claves) {
-      const f = this.fallos.get(c);
-      const n = f && t - f.ultimo < BLOQUEO_MS ? f.n + 1 : 1;
-      this.fallos.set(c, { n, ultimo: t });
+      const f = this.fallos.get(c) ?? { n: 0, vence: this.ahora() + (c.startsWith('registro:') ? 3_600_000 : BLOQUEO_MS) };
+      f.n++;
+      if (!c.startsWith('ip:') && !c.startsWith('registro:') && f.n === MAX_INTENTOS) f.vence = this.ahora() + BLOQUEO_MS;
+      this.fallos.set(c, f);
     }
   }
-
-  exito(...claves: string[]): void {
-    for (const c of claves) this.fallos.delete(c);
+  reservar(...claves: string[]) {
+    if (this.bloqueado(...claves)) return false;
+    this.fallo(...claves);
+    return true;
   }
-
-  limpiar(): void {
-    this.fallos.clear();
+  registro(ip: string) { return this.reservar(`registro:${ip}`); }
+  exito(...claves: string[]) {
+    for (const c of claves) {
+      if (c.startsWith('ip:')) {
+        const f = this.fallos.get(c);
+        if (f) f.n = Math.max(0, f.n - 1); // libera solo la reserva de esta petición
+      } else this.fallos.delete(c);
+    }
   }
+  limpiar() { this.fallos.clear(); }
 }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 
 /**
  * Envía el único correo del MVP: la confirmación de cuenta.
@@ -23,7 +24,8 @@ export class Correo {
       if (process.env.NODE_ENV === 'production') throw new Error('Falta RESEND_API_KEY en producción.');
       const dir = process.env.CORREOS_DIR ?? '.correos';
       await mkdir(dir, { recursive: true });
-      await writeFile(join(dir, `${process.hrtime.bigint()}-${destino}.html`), html);
+      const id = createHash('sha256').update(destino).digest('hex');
+      await writeFile(join(dir, `${process.hrtime.bigint()}-${id}.html`), html);
       return;
     }
 

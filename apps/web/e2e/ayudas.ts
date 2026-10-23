@@ -9,14 +9,14 @@ import { tmpdir } from "node:os";
 export const CONTRASENA = "contrasena-segura";
 const WCAG = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 
-// Cada caso representa un origen independiente. Los fallos dentro del mismo caso sí se acumulan.
-export const test = base.extend({
-  extraHTTPHeaders: async ({ baseURL }, provide, info) => {
-    const id = createHash("sha256").update(`${baseURL}:${info.testId}`).digest();
-    await provide({ "X-Forwarded-For": `198.18.${id[0]}.${id[1]}` });
-  },
+// Solo el servidor exclusivo de Playwright ofrece este control; no existe en main.ts.
+export const test = base.extend<{ preparar: void }>({
+  preparar: [async ({ request, baseURL }, provide) => {
+    const res = await request.post('/api/__pruebas/reiniciar', { headers: { Origin: baseURL!, 'x-praxis-test': process.env.PRAXIS_TEST_CONTROL_SECRET! } });
+    expect(res.status()).toBe(204);
+    await provide();
+  }, { auto: true }],
 });
-
 export async function sinViolaciones(page: Page) {
   const { violations } = await new AxeBuilder({ page }).withTags(WCAG).analyze();
   expect(violations.map((v) => `${v.id}: ${v.nodes.map((n) => n.target).join(", ")}`)).toEqual([]);
@@ -50,6 +50,7 @@ export async function crearCuenta(req: APIRequestContext, rol: "estudiante" | "e
 /** Token del último correo de confirmación enviado a `correo` (bandeja local de la API). */
 export function tokenDe(correo: string): string {
   const dir = join(tmpdir(), "praxis-correos-e2e");
-  const archivo = readdirSync(dir).filter((f) => f.includes(correo)).sort().at(-1)!;
+  const archivo = readdirSync(dir).filter((f) => f.includes(createHash("sha256").update(correo).digest("hex"))).sort().at(-1)!;
   return readFileSync(join(dir, archivo), "utf8").match(/token=([A-Za-z0-9_-]+)/)![1];
 }
+

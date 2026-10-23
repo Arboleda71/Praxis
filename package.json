@@ -6,7 +6,7 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=24"
+    "node": ">=24.15.0"
   },
   "scripts": {
     "dev": "npm run dev -w web",
@@ -18,3 +18,4 @@
     "db:test": "docker compose -p praxis-test -f docker-compose.test.yml up -d --wait"
   }
 }
+

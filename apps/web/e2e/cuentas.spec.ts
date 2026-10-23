@@ -28,6 +28,7 @@ test.describe("Crear cuenta", () => {
     await sinViolaciones(page);
 
     await page.goto(`/confirmar-correo?token=${tokenDe(correo)}`);
+    await page.getByRole("button", { name: "Confirmar mi correo" }).click();
     await expect(page.getByRole("heading", { name: "Tu correo quedó confirmado" })).toBeVisible();
     await sinViolaciones(page);
     await page.getByRole("link", { name: "Ir a mi perfil" }).click();
@@ -52,7 +53,7 @@ test.describe("Crear cuenta", () => {
   });
 
   test("un correo ya registrado se rechaza junto al campo", async ({ page, baseURL }) => {
-    const otro = await nuevoContexto.newContext({ baseURL });
+    const otro = await nuevoContexto.newContext({ baseURL, extraHTTPHeaders: { Origin: baseURL! } });
     const correo = await crearCuenta(otro, "estudiante");
     await otro.dispose();
     await page.goto("/registro/estudiante");
@@ -110,7 +111,7 @@ test.describe("Confirmar el correo", () => {
 
 test.describe("Iniciar sesión", () => {
   test("con error genérico y luego con datos correctos", async ({ page, baseURL }) => {
-    const otro = await nuevoContexto.newContext({ baseURL });
+    const otro = await nuevoContexto.newContext({ baseURL, extraHTTPHeaders: { Origin: baseURL! } });
     const correo = await crearCuenta(otro, "estudiante");
     await otro.dispose();
     await page.goto("/ingresar");
@@ -153,7 +154,7 @@ test("la contraseña se puede mostrar y ocultar", async ({ page }) => {
 
 test.describe("NIT repetido", () => {
   test("una sola cuenta por empresa", async ({ page, baseURL }) => {
-    const otro = await nuevoContexto.newContext({ baseURL });
+    const otro = await nuevoContexto.newContext({ baseURL, extraHTTPHeaders: { Origin: baseURL! } });
     const nit = nitUnico();
     const r = await otro.post("/api/auth/registro/empresa", {
       data: { razonSocial: "Andina Soft S.A.S.", nit, correo: correoUnico("empresa"), contrasena: CONTRASENA, confirmarContrasena: CONTRASENA, autorizaDatos: true },
@@ -171,3 +172,4 @@ test.describe("NIT repetido", () => {
     await expect(page.getByText("Ya existe una cuenta para este NIT.")).toBeVisible();
   });
 });
+

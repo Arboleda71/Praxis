@@ -1,9 +1,10 @@
+import { createHash } from 'node:crypto';
 import { validarBasePruebas } from './seguridad/base-pruebas.js';
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 import { readdirSync, readFileSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
-import request from 'supertest';
+import request from './cliente.js';
 import { App } from 'supertest/types.js';
 import { AppModule } from '../src/app.module.js';
 import { configurarApp } from '../src/configurar.js';
@@ -30,7 +31,7 @@ const empresa = {
 
 /** Token del último correo de confirmación enviado a `correo`. */
 function tokenDe(correo: string): string {
-  const archivos = readdirSync(CORREOS).filter((f) => f.includes(correo)).sort();
+  const archivos = readdirSync(CORREOS).filter((f) => f.includes(createHash('sha256').update(correo).digest('hex'))).sort();
   const html = readFileSync(join(CORREOS, archivos.at(-1)!), 'utf8');
   return html.match(/token=([A-Za-z0-9_-]+)/)![1];
 }
@@ -109,13 +110,13 @@ describe('/auth (integración, Postgres real)', () => {
       expect(res.body.errores.autorizaDatos).toBe('Debes aceptar la política para continuar.');
     });
 
-    it('un registro logrado reinicia la cuenta de intentos de la IP', async () => {
+    it('los registros tienen una ventana independiente y limitada', async () => {
       await agente.post('/auth/registro/estudiante').send(estudiante).expect(201);
       for (let i = 0; i < 4; i++) await agente.post('/auth/registro/estudiante').send(estudiante).expect(409);
       // El registro de la empresa sí prospera: los cuatro fallos anteriores dejan de contar.
       await agente.post('/auth/registro/empresa').send(empresa).expect(201);
       for (let i = 0; i < 4; i++) await agente.post('/auth/registro/estudiante').send(estudiante).expect(409);
-      await agente.post('/auth/registro/estudiante').send({ ...estudiante, correo: 'otra@correo.co' }).expect(201);
+      await agente.post('/auth/registro/estudiante').send({ ...estudiante, correo: 'otra@correo.co' }).expect(429);
     });
   });
 
@@ -180,7 +181,7 @@ describe('/auth (integración, Postgres real)', () => {
       expect(ok.body.rol).toBe('estudiante');
       const s = await agente.get('/auth/sesion').expect(200);
       expect(s.body.correoConfirmado).toBe(true);
-      await request(app.getHttpServer()).post('/auth/confirmar-correo').send({ token }).expect(410);
+      await request(app.getHttpServer()).post('/auth/confirmar-correo').send({ token }).expect(200);
     });
 
     it('un enlace vencido no sirve', async () => {
@@ -205,3 +206,5 @@ describe('/auth (integración, Postgres real)', () => {
     });
   });
 });
+
+

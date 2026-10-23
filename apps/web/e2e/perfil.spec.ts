@@ -7,11 +7,12 @@ const pdf = (bytes = 3000) => ({
   mimeType: "application/pdf",
   buffer: Buffer.concat([Buffer.from("%PDF-1.4\n"), Buffer.alloc(bytes - 9, 0x20)]),
 });
-const png = { name: "yo.png", mimeType: "image/png", buffer: Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), Buffer.alloc(300)]) };
+const png = { name: "yo.png", mimeType: "image/png", buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aZf8AAAAASUVORK5CYII=", "base64") };
 
 async function elegir(page: Page, campo: RegExp, opcion: string) {
   await page.getByRole("combobox", { name: campo }).click();
   await page.getByRole("option", { name: opcion, exact: true }).click();
+  await expect(page.getByRole("listbox")).toBeHidden();
 }
 
 test.beforeEach(async ({ page }) => {
@@ -100,3 +101,5 @@ test("aval declarado, nunca verificado, y foto opcional", async ({ page }) => {
   await page.getByRole("button", { name: "Quitar foto" }).click();
   await expect(page.getByRole("button", { name: "Agregar foto (opcional)" })).toBeVisible();
 });
+
+

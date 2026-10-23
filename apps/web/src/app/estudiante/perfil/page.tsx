@@ -196,7 +196,7 @@ function Resumen({ perfil }: { perfil: Perfil }) {
                     Listo
                   </Typography>
                 ) : (
-                  <Link href={SECCION_DE[c]} variant="body2" sx={{ fontWeight: 600 }} aria-label={`Falta completar ${NOMBRES_MINIMO[c]}`}>
+                  <Link href={SECCION_DE[c]} variant="body2" sx={{ fontWeight: 600 }} aria-label={`Falta. Completar ${NOMBRES_MINIMO[c]}`}>
                     Falta
                   </Link>
                 )}
@@ -273,4 +273,5 @@ function Secciones({ perfil }: { perfil: Perfil }) {
     </Stack>
   );
 }
+
 

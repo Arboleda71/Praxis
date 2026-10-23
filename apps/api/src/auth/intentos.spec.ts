@@ -43,7 +43,7 @@ describe('Intentos', () => {
 
   it('bloquea si cualquiera de las claves lo está', () => {
     const i = new Intentos(reloj);
-    for (let n = 0; n < MAX_INTENTOS; n++) i.fallo('ip:1');
+    for (let n = 0; n < 30; n++) i.fallo('ip:1');
     expect(i.bloqueado('a@b.co', 'ip:1')).toBe(true);
   });
 });
