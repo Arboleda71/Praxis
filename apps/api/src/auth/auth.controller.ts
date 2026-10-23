@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  Post,
+  Query,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import {
   loginSchema,
   registroEmpresaSchema,
@@ -10,7 +20,13 @@ import {
 } from '@praxis/contracts';
 import type { Request, Response } from 'express';
 import { AuthService, publica } from './auth.service.js';
-import { COOKIE, opcionesCookie, SESION_MS, SesionGuard, type RequestConSesion } from './sesion.js';
+import {
+  COOKIE,
+  opcionesCookie,
+  SESION_MS,
+  SesionGuard,
+  type RequestConSesion,
+} from './sesion.js';
 import { ZodPipe } from './zod.pipe.js';
 
 @Controller('auth')
@@ -23,7 +39,10 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.conCookie(res, await this.auth.registrarEstudiante(datos, req.ip ?? ''));
+    return this.conCookie(
+      res,
+      await this.auth.registrarEstudiante(datos, req.ip ?? ''),
+    );
   }
 
   @Post('registro/empresa')
@@ -32,12 +51,19 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.conCookie(res, await this.auth.registrarEmpresa(datos, req.ip ?? ''));
+    return this.conCookie(
+      res,
+      await this.auth.registrarEmpresa(datos, req.ip ?? ''),
+    );
   }
 
   @Post('login')
   @HttpCode(200)
-  async login(@Body(new ZodPipe(loginSchema)) datos: Login, @Req() req: Request, @Res({ passthrough: true }) res: Response) {
+  async login(
+    @Body(new ZodPipe(loginSchema)) datos: Login,
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
     return this.conCookie(res, await this.auth.login(datos, req.ip ?? ''));
   }
 
@@ -59,6 +85,10 @@ export class AuthController {
   confirmar(@Body(new ZodPipe(tokenSchema)) { token }: { token: string }) {
     return this.auth.confirmarCorreo(token);
   }
+  @Get('confirmar-correo')
+  estadoEnlace(@Query(new ZodPipe(tokenSchema)) { token }: { token: string }) {
+    return this.auth.estadoEnlace(token);
+  }
 
   @Post('reenviar-confirmacion')
   @HttpCode(204)
@@ -67,7 +97,10 @@ export class AuthController {
     await this.auth.reenviarConfirmacion(req.sesion.cuenta);
   }
 
-  private conCookie(res: Response, { token, sesion }: { token: string; sesion: unknown }) {
+  private conCookie(
+    res: Response,
+    { token, sesion }: { token: string; sesion: unknown },
+  ) {
     res.cookie(COOKIE, token, { ...opcionesCookie(), maxAge: SESION_MS });
     return { sesion };
   }

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 
 /**
  * Envía el único correo del MVP: la confirmación de cuenta.
@@ -20,16 +21,21 @@ export class Correo {
 
     const clave = process.env.RESEND_API_KEY;
     if (!clave) {
-      if (process.env.NODE_ENV === 'production') throw new Error('Falta RESEND_API_KEY en producción.');
+      if (process.env.NODE_ENV === 'production')
+        throw new Error('Falta RESEND_API_KEY en producción.');
       const dir = process.env.CORREOS_DIR ?? '.correos';
       await mkdir(dir, { recursive: true });
-      await writeFile(join(dir, `${process.hrtime.bigint()}-${destino}.html`), html);
+      const id = createHash('sha256').update(destino).digest('hex');
+      await writeFile(join(dir, `${process.hrtime.bigint()}-${id}.html`), html);
       return;
     }
 
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { Authorization: `Bearer ${clave}`, 'Content-Type': 'application/json' },
+      headers: {
+        Authorization: `Bearer ${clave}`,
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         from: process.env.CORREO_REMITENTE,
         to: destino,

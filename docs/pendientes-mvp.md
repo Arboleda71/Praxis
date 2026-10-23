@@ -4,14 +4,12 @@
 > MVP. Fuentes: `specs/002-cuentas-acceso/estado.md` (hallazgos C, S, P, R), `specs/003-endurecer-seguridad-acceso/spec.md`
 > y `docs/pendientes-constitucion.md`. Al cerrar una tarea, márcala y deja el commit o PR.
 
-## 🚨 Urgente: entorno con Postgres (bloquea cerrar M3)
+## Entorno de pruebas · verificado localmente
 
-La virtualización del equipo está desactivada (2026-10-23): Docker Desktop no arranca su motor y no hay Postgres.
-M3 quedó escrito y compilado, pero sin migración aplicada ni pruebas contra la base (`specs/005-perfil-estudiante/estado.md`).
+Estado vigente y evidencia: `docs/mvp-entrega.md`. Las secciones siguientes conservan tareas históricas; la definición formal de terminado sigue pendiente de CI remoto y revisión por otra persona.
 
-- [ ] PM000 Activar la virtualización (BIOS/UEFI: Intel VT-x o AMD-V; en Windows, «Plataforma de máquina virtual» y WSL 2), arrancar Docker Desktop y `docker compose up -d` (alternativa sin Docker: instalar PostgreSQL 17 para Windows con usuario `praxis` y las bases `praxis`, `praxis_test` y `praxis_e2e`)
-- [ ] PM000b Aplicar la migración `20261023120000_perfil` (`npm exec --no --workspace api -- prisma migrate dev`) y correr `npm run test:e2e -w api` y `npm run test:e2e -w web -- --workers=2`; corregir lo que falle y pasar a `[x]` las tareas `[~]` de `specs/005-perfil-estudiante/tasks.md`
-
+- [x] PM000 Docker operativo y Postgres 17 efímero exclusivo en 127.0.0.1:55432/praxis_test; las guardas rechazan Neon, remoto y base de desarrollo.
+- [x] PM000b Cinco migraciones comprobadas desde una base vacía; 55 pruebas de integración API y 67 de navegador aprobadas. No usar migrate dev con una URL heredada del entorno.
 ## A. Seguridad de cuentas (spec 003, ya especificada)
 
 La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (intentos y proxies), S2
@@ -26,7 +24,7 @@ La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (in
 
 - [ ] PM005 [S3] Cerrar sesión cuando la API falla: la web debe avisar y no dejar al usuario creyendo que salió (`apps/web/src/components`, cierre de sesión)
 - [ ] PM006 [S4] Fallo del proveedor de correo al reenviar: mensaje claro y la cuenta sigue usable (`apps/api/src/auth/correo.ts`)
-- [ ] PM007 [P3] Guarda en las pruebas: abortar si `DATABASE_URL` no apunta a `praxis_test`/`praxis_e2e` (`apps/api/test`, configuración de Playwright)
+- [x] PM007 [P3] Guarda en las pruebas: abortar si `DATABASE_URL` no apunta a `praxis_test`/`praxis_e2e` (`apps/api/test`, configuración de Playwright)
 - [ ] PM008 [R1] Confirmar el correo sin sesión abierta y distinguir error de red de enlace vencido (`apps/web/src/app/confirmar-correo`)
 - [ ] PM009 [R2] Reactivar el formulario de ingreso al terminar los 15 minutos de bloqueo, sin recargar (`apps/web/src/components/FormularioIngreso.tsx`)
 - [ ] PM010 [P4] Revisión manual de teclado y lector de pantalla de M0 y M1 a 360 y 1080 px; registrar el resultado en `estado.md`
@@ -34,10 +32,10 @@ La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (in
 
 ## C. Calidad y entrega
 
-- [ ] PM012 [C4] Crear `.github/workflows/ci.yml`: lint, tipos, pruebas (con Postgres de servicio) y build en cada PR (constitución, «CI»)
+- [x] PM012 [C4] Crear `.github/workflows/ci.yml`: lint, tipos, pruebas (con Postgres de servicio) y build en cada PR (constitución, «CI»)
 - [ ] PM013 Proteger `main` en GitHub: PR obligatorio con revisión y CI en verde
 - [ ] PM014 Alinear Node a ≥ 24.15 (lo piden dependencias) y fijarlo en `engines` del `package.json` raíz y en el CI
-- [ ] PM015 Revisar las 24 vulnerabilidades de `npm audit` (5 altas); actualizar solo lo que no rompa, sin `audit fix --force`
+- [x] PM015 Revisar las 24 vulnerabilidades de `npm audit` (5 altas); actualizar solo lo que no rompa, sin `audit fix --force`
 
 ## D. Gobernanza
 
@@ -58,3 +56,7 @@ La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (in
 
 A (seguridad) y PM012–PM013 (CI) primero: protegen todo lo que venga después. Luego B. D en paralelo, porque
 depende de otra persona. E y F antes de salir del piloto.
+
+## Actualización de entrega local · 2026-10-23
+
+Seguridad implementada y verificada localmente en la rama 003; planes manuales y evidencia en specs/003. M4, M5, búsqueda, elegibilidad, postulación, seguimiento, notificaciones y Wompi sandbox implementados en ramas 007–010. PM012 corresponde a definir/validar el workflow; su ejecución en GitHub sigue pendiente. PM015: npm audit completo 0 vulnerabilidades tras Next 16.4.3. PM014: .nvmrc fija 24.22.1, usado en validación; el Node del sistema 24.14.1 no se cambió. Proxy de producción, proveedores externos, auditoría manual completa de accesibilidad, CI remoto y revisión por PR siguen pendientes. Ver docs/mvp-entrega.md.

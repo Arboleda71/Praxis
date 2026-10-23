@@ -13,11 +13,19 @@ import MenuItem from "@mui/material/MenuItem";
 import Typography from "@mui/material/Typography";
 import { useState, useTransition } from "react";
 import { logout } from "@/lib/actions";
+import Link from "next/link";
 
 const MENU_ID = "menu-cuenta";
 
-export default function AccountMenu({ name, email }: { name: string; email: string }) {
+export default function AccountMenu({
+  name,
+  email,
+}: {
+  name: string;
+  email: string;
+}) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
   const open = Boolean(anchor);
   const trigger = {
@@ -28,7 +36,17 @@ export default function AccountMenu({ name, email }: { name: string; email: stri
     onClick: (e: React.MouseEvent<HTMLElement>) => setAnchor(e.currentTarget),
   };
   const avatar = (size: number) => (
-    <Avatar aria-hidden sx={{ width: size, height: size, fontSize: size / 2, bgcolor: "primary.main" }}>{name[0]}</Avatar>
+    <Avatar
+      aria-hidden
+      sx={{
+        width: size,
+        height: size,
+        fontSize: size / 2,
+        bgcolor: "primary.main",
+      }}
+    >
+      {name[0]}
+    </Avatar>
   );
 
   return (
@@ -43,7 +61,10 @@ export default function AccountMenu({ name, email }: { name: string; email: stri
         variant="outlined"
         avatar={avatar(24)}
         label={
-          <Box component="span" sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}>
+          <Box
+            component="span"
+            sx={{ display: "inline-flex", alignItems: "center", gap: 0.5 }}
+          >
             <span className="sr-only">Cuenta </span>
             {email}
             <KeyboardArrowDownRounded fontSize="small" aria-hidden />
@@ -67,13 +88,36 @@ export default function AccountMenu({ name, email }: { name: string; email: stri
           </Typography>
         </Box>
         <Divider />
-        <MenuItem disabled={pending} onClick={() => startTransition(() => logout())}>
+        <MenuItem
+          component={Link}
+          href="/notificaciones"
+          onClick={() => setAnchor(null)}
+        >
+          Notificaciones
+        </MenuItem>
+        <MenuItem
+          disabled={pending}
+          onClick={() =>
+            startTransition(async () => {
+              const r = await logout();
+              if (r?.error) {
+                setError(r.error);
+                setAnchor(null);
+              }
+            })
+          }
+        >
           <ListItemIcon>
             <LogoutRounded fontSize="small" />
           </ListItemIcon>
           Cerrar sesión
         </MenuItem>
       </Menu>
+      {error && (
+        <Typography role="alert" color="error">
+          {error}
+        </Typography>
+      )}
     </>
   );
 }

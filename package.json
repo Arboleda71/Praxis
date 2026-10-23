@@ -6,13 +6,19 @@
     "packages/*"
   ],
   "engines": {
-    "node": ">=24"
+    "node": ">=24.15.0 <25"
   },
   "scripts": {
     "dev": "npm run dev -w web",
     "dev:api": "npm run start:dev -w api",
     "lint": "npm run lint -w web",
     "postinstall": "npm run build -w @praxis/contracts",
-    "db": "docker compose up -d"
+    "db": "docker compose up -d",
+    "demo:db": "npm run db:test && node scripts/demo-migrar.mts",
+    "demo:api": "npm run build -w api && node scripts/demo-api.mts",
+    "demo:api:wompi": "npm run build -w api && node scripts/demo-api.mts --wompi",
+    "demo:web": "node scripts/demo-web.mts",
+    "test:seguridad-db": "node --test apps/api/test/seguridad/base-pruebas.test.ts",
+    "db:test": "docker compose -p praxis-test -f docker-compose.test.yml up -d --wait"
   }
 }

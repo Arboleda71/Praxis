@@ -1,9 +1,8 @@
 # Estado de M3 · Perfil del estudiante
 
-> 2026-10-23, America/Bogota. Código completo; **falta la verificación con Postgres**. La virtualización del equipo
-> está desactivada y Docker Desktop no arranca su motor, así que no se aplicó la migración ni corrieron las pruebas
-> de integración ni el E2E. Tarea urgente: `docs/pendientes-mvp.md` PM000.
+> Actualización local 2026-10-23: migración aplicada y verificada en Postgres efímero; pruebas API y navegador aprobadas. La batería final global tiene 55 integración API y 67 Playwright. CI remoto, revisión humana y S3/R2 real siguen pendientes. Ver docs/mvp-entrega.md.
 
+## Verificación inicial (registro histórico)
 ## Verificado sin base de datos
 
 | Parte | Resultado |
@@ -45,3 +44,9 @@ Hasta entonces las tareas T001 y T006–T022 quedan como `[~]` en `tasks.md`.
 - El ejemplo de la portada (`RequisitosEjemplo`) muestra «Programa solicitado: Ingeniería de Sistemas o afines —
   La empresa revisa la afinidad».
 - Pruebas de contracts: 78 aprobadas.
+
+## Validación local retomada · 2026-10-23
+
+Docker operativo; instancia efímera praxis-test-postgres-test-1, puerto exclusivo 55432 y base praxis_test. Ambas migraciones aplicadas y verificadas en _prisma_migrations. API: 33/33 pruebas de cuentas y perfil aprobadas contra Postgres real.
+
+Primera ejecución Playwright M3: 8/12 aprobadas; axe detectó contraste en ayudas deshabilitadas y menú, y nombres accesibles que omitían el texto visible Falta. Se corrigieron los tres puntos; repetición pendiente de resultado. No se modificó ninguna base externa, ni se hizo push/merge. S3/R2 real y revisión por PR siguen pendientes.

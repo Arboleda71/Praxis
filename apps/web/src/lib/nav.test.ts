@@ -3,18 +3,30 @@ import { NAV, currentHref } from "./nav";
 
 describe("NAV", () => {
   test("cada rol tiene sus destinos", () => {
-    expect(NAV.estudiante.map((i) => i.label)).toEqual(["Inicio", "Mi perfil"]);
-    expect(NAV.empresa.map((i) => i.label)).toEqual(["Mis vacantes", "Perfil de la empresa"]);
+    expect(NAV.estudiante.map((i) => i.label)).toEqual([
+      "Inicio",
+      "Mi perfil",
+      "Buscar",
+      "Postulaciones",
+    ]);
+    expect(NAV.empresa.map((i) => i.label)).toEqual([
+      "Mis vacantes",
+      "Perfil de la empresa",
+    ]);
   });
 });
 
 describe("currentHref", () => {
   test("marca el destino exacto", () => {
-    expect(currentHref("/estudiante/perfil", NAV.estudiante)).toBe("/estudiante/perfil");
+    expect(currentHref("/estudiante/perfil", NAV.estudiante)).toBe(
+      "/estudiante/perfil",
+    );
   });
 
   test("marca el destino de una subruta", () => {
-    expect(currentHref("/empresa/vacantes/nueva", NAV.empresa)).toBe("/empresa/vacantes");
+    expect(currentHref("/empresa/vacantes/nueva", NAV.empresa)).toBe(
+      "/empresa/vacantes",
+    );
   });
 
   test("el inicio solo se marca en «/»", () => {

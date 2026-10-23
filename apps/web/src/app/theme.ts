@@ -3,7 +3,11 @@
 import { createTheme } from "@mui/material/styles";
 import NextLink from "next/link";
 
-const heading = { fontFamily: "var(--font-poppins), Arial, sans-serif", fontWeight: 600, lineHeight: 1.3 };
+const heading = {
+  fontFamily: "var(--font-poppins), Arial, sans-serif",
+  fontWeight: 600,
+  lineHeight: 1.3,
+};
 
 // Paleta y tipografía de la identidad de Praxis (documento de la Entrega 1, tabla 6).
 const theme = createTheme({
@@ -34,7 +38,23 @@ const theme = createTheme({
     MuiButtonBase: { defaultProps: { LinkComponent: NextLink } },
     MuiLink: { defaultProps: { component: NextLink } },
     // El gris por defecto del borde da 1,7:1; WCAG 1.4.11 pide 3:1 en bordes de controles.
-    MuiOutlinedInput: { styleOverrides: { notchedOutline: { borderColor: "#64748B" } } },
+    MuiOutlinedInput: {
+      styleOverrides: { notchedOutline: { borderColor: "#64748B" } },
+    },
+    MuiFormHelperText: {
+      styleOverrides: { root: { "&.Mui-disabled": { color: "#475569" } } },
+    },
+    MuiMenuItem: {
+      styleOverrides: {
+        root: {
+          color: "#0B1F4B",
+          "&.Mui-focusVisible, &:hover, &.Mui-selected": {
+            backgroundColor: "#E2E8F0",
+            color: "#0B1F4B",
+          },
+        },
+      },
+    },
   },
 });
 

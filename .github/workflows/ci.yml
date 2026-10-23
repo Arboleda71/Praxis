@@ -1,0 +1,50 @@
+name: Verificación del MVP
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verificar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: praxis_test
+          POSTGRES_PASSWORD: praxis_test
+          POSTGRES_DB: praxis_test
+        ports: ['55432:5432']
+        options: --health-cmd "pg_isready -U praxis_test -d praxis_test" --health-interval 2s --health-timeout 3s --health-retries 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npm exec --no --workspace api -- prisma generate
+      - run: npm run test:seguridad-db
+      - run: npm run lint -w api
+      - run: npm run lint -w web
+      - run: npm exec --no --workspace api -- tsc --noEmit
+      - run: npm exec --no --workspace api -- tsc -p ../../scripts/tsconfig.json
+      - run: npm exec --no --workspace web -- next typegen
+      - run: npm exec --no --workspace web -- tsc --noEmit
+      - run: npm run test -w @praxis/contracts
+      - run: npm run test -w api -- --runInBand
+      - run: npm run test -w web
+      - run: npm run test:e2e -w api
+      - run: npm run build -w api
+      - run: npm exec --no --workspace web -- playwright install --with-deps chromium
+      - run: npm run test:e2e -w web -- --workers=1
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: pruebas-web
+          path: apps/web/test-results
