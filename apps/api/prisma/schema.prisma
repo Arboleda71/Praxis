@@ -87,6 +87,12 @@ model Empresa {
   /// Sin dígito de verificación; una sola cuenta por NIT.
   nit         String @unique
   dv          Int
+  sector      String?
+  ciudad      String?
+  sitioWeb    String?
+  descripcion String?
+  correoContacto String?
+  telefono    String?
   cuenta      Cuenta @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
 }
 

@@ -9,16 +9,19 @@ import { ArchivosController } from './perfil/archivos.controller.js';
 import { PerfilController } from './perfil/perfil.controller.js';
 import { PerfilService } from './perfil/perfil.service.js';
 import { PrismaService } from './prisma.service.js';
+import { EmpresaController } from './empresa/empresa.controller.js';
+import { SoloEmpresaGuard } from './auth/sesion.js';
 
 @Module({
   imports: [],
-  controllers: [AuthController, PerfilController, ArchivosController],
+  controllers: [AuthController, PerfilController, ArchivosController, EmpresaController],
   providers: [
     PrismaService,
     AuthService,
     Correo,
     SesionGuard,
     SoloEstudianteGuard,
+    SoloEmpresaGuard,
     PerfilService,
     Archivos,
     { provide: Intentos, useValue: new Intentos() },

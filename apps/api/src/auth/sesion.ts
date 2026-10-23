@@ -52,3 +52,12 @@ export class SoloEstudianteGuard extends SesionGuard {
     return true;
   }
 }
+
+@Injectable()
+export class SoloEmpresaGuard extends SesionGuard {
+  async canActivate(ctx: ExecutionContext): Promise<boolean> {
+    await super.canActivate(ctx);
+    if (ctx.switchToHttp().getRequest<RequestConSesion>().sesion.cuenta.rol !== 'EMPRESA') throw new ForbiddenException({ mensaje: 'Esta sección es solo para empresas.' });
+    return true;
+  }
+}
