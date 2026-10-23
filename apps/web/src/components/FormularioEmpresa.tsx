@@ -20,11 +20,11 @@ export default function FormularioEmpresa() {
   const [error, setError] = useState('');
   const resumen = useRef<HTMLDivElement>(null);
   async function cargar() {
-    setError('');
     try {
       const res = await fetch('/api/empresa/perfil');
       if (!res.ok) throw new Error();
       const d = await res.json();
+      setError('');
       setV({ razonSocial: d.razonSocial, nit: `${d.nit}-${d.dv}`, sector: d.sector, ciudad: d.ciudad, sitioWeb: d.sitioWeb, descripcion: d.descripcion, correoContacto: d.correoContacto, telefono: d.telefono });
       setConfirmado(d.correoConfirmado);
     } catch { setError('No pudimos cargar tu empresa. Inténtalo de nuevo.'); }
@@ -64,3 +64,4 @@ export default function FormularioEmpresa() {
     </>}
   </Stack>;
 }
+

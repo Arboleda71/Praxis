@@ -3,7 +3,7 @@ import { NAV, currentHref } from "./nav";
 
 describe("NAV", () => {
   test("cada rol tiene sus destinos", () => {
-    expect(NAV.estudiante.map((i) => i.label)).toEqual(["Inicio", "Mi perfil"]);
+    expect(NAV.estudiante.map((i) => i.label)).toEqual(["Inicio", "Mi perfil", 'Buscar', 'Postulaciones']);
     expect(NAV.empresa.map((i) => i.label)).toEqual(["Mis vacantes", "Perfil de la empresa"]);
   });
 });

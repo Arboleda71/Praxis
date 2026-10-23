@@ -28,6 +28,7 @@ model Cuenta {
   empresa             Empresa?
   sesiones            Sesion[]
   enlaces             EnlaceConfirmacion[]
+  notificaciones      Notificacion[]
 }
 
 /// Perfil del estudiante (M3). Los campos de catálogo guardan el id de @praxis/contracts (M2).
@@ -47,6 +48,7 @@ model Estudiante {
   cuenta              Cuenta            @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
   idiomas             IdiomaDeclarado[]
   archivos            ArchivoPerfil[]
+  postulaciones       Postulacion[]
 
   @@index([nivelFormacion])
 }
@@ -93,7 +95,85 @@ model Empresa {
   descripcion String?
   correoContacto String?
   telefono    String?
+  vacantes    Vacante[]
   cuenta      Cuenta @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
+}
+
+model Vacante {
+  id String @id @default(uuid()) @db.Uuid
+  empresaId String @db.Uuid
+  empresa Empresa @relation(fields: [empresaId], references: [cuentaId], onDelete: Restrict)
+  titulo String @db.VarChar(150)
+  descripcion String
+  modalidad String
+  ciudad String?
+  duracionMeses Int
+  fechaInicio DateTime @db.Date
+  vigencia DateTime @db.Date
+  niveles String[]
+  programas String[]
+  avances Json
+  aval Boolean
+  jornada String
+  idiomas Json
+  estado String @default("Borrador")
+  motivoCierre String?
+  creadaEn DateTime @default(now())
+  publicadaEn DateTime?
+  cupoTipo String?
+  cupoPeriodo DateTime?
+  postulaciones Postulacion[]
+  @@index([empresaId, estado])
+  @@index([estado, vigencia])
+  @@index([niveles], type: Gin)
+  @@index([modalidad, ciudad])
+}
+
+model Postulacion {
+  id String @id @default(uuid()) @db.Uuid
+  vacanteId String @db.Uuid
+  estudianteId String @db.Uuid
+  vacante Vacante @relation(fields: [vacanteId], references: [id], onDelete: Restrict)
+  estudiante Estudiante @relation(fields: [estudianteId], references: [cuentaId], onDelete: Restrict)
+  estado String @default("Enviada")
+  perfil Json
+  evaluacion Json
+  creadaEn DateTime @default(now())
+  archivos ArchivoPostulacion[]
+  historial HistorialPostulacion[]
+  @@unique([vacanteId, estudianteId])
+  @@index([estudianteId, creadaEn])
+}
+
+model ArchivoPostulacion {
+  id String @id @default(uuid()) @db.Uuid
+  postulacionId String @db.Uuid
+  postulacion Postulacion @relation(fields: [postulacionId], references: [id], onDelete: Restrict)
+  tipo String
+  clave String @unique
+  nombre String
+  bytes Int
+  @@unique([postulacionId, tipo])
+}
+
+model HistorialPostulacion {
+  id String @id @default(uuid()) @db.Uuid
+  postulacionId String @db.Uuid
+  postulacion Postulacion @relation(fields: [postulacionId], references: [id], onDelete: Restrict)
+  estado String
+  fecha DateTime @default(now())
+  @@index([postulacionId, fecha])
+}
+
+model Notificacion {
+  id String @id @default(uuid()) @db.Uuid
+  cuentaId String @db.Uuid
+  cuenta Cuenta @relation(fields: [cuentaId], references: [id], onDelete: Restrict)
+  postulacionId String @db.Uuid
+  texto String
+  creadaEn DateTime @default(now())
+  leidaEn DateTime?
+  @@index([cuentaId, creadaEn])
 }
 
 /// El id es el hash SHA-256 del token de la cookie; el token nunca se guarda.

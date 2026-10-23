@@ -11,6 +11,8 @@ export const NAV: Record<Role, NavItem[]> = {
   estudiante: [
     { href: "/", label: "Inicio", Icon: HomeRounded },
     { href: "/estudiante/perfil", label: "Mi perfil", Icon: PersonRounded },
+    { href: '/estudiante/vacantes', label: 'Buscar', Icon: WorkRounded },
+    { href: '/estudiante/postulaciones', label: 'Postulaciones', Icon: ApartmentRounded },
   ],
   empresa: [
     { href: "/empresa/vacantes", label: "Mis vacantes", Icon: WorkRounded },

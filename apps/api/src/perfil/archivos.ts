@@ -41,6 +41,13 @@ export class Archivos {
     await s3.client.send(new DeleteObjectCommand({ Bucket: s3.bucket, Key: clave }));
   }
 
+  async copiar(origen: string, destino: string) {
+    const s3 = await this.conS3();
+    if (!s3) return this.guardar(destino, await readFile(join(this.dir, origen)));
+    const { CopyObjectCommand } = await import('@aws-sdk/client-s3');
+    await s3.client.send(new CopyObjectCommand({ Bucket: s3.bucket, Key: destino, CopySource: `${s3.bucket}/${encodeURIComponent(origen)}` }));
+  }
+
   /** URL válida 5 minutos. En disco va por la web (`/api/…`, rewrite de Next). */
   async enlace(clave: string) {
     const exp = Date.now() + ENLACE_MS;

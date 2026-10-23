@@ -6,6 +6,8 @@ import Link from "@mui/material/Link";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import RequisitosEjemplo from "@/components/RequisitosEjemplo";
+import BuscarVacantes from '@/components/BuscarVacantes';
+import { getSession } from '@/lib/session';
 
 const PASOS = [
   ["Completa tu perfil académico", "Programa, semestre, aval y disponibilidad. Solo lo que se usa para comparar."],
@@ -13,9 +15,11 @@ const PASOS = [
   ["Postúlate y sigue tu proceso", "Solo a lo que cumples, con el estado y el historial siempre visibles."],
 ];
 
-export default function Inicio() {
+export default async function Inicio() {
+  const session = await getSession();
   return (
     <>
+      {!session && <BuscarVacantes visitante />}
       <Box component="section" sx={{ bgcolor: "background.paper" }}>
         <Container maxWidth="lg" sx={{ py: { xs: 4, md: 11 } }}>
           <Stack direction={{ xs: "column", md: "row" }} spacing={{ xs: 4, md: 12 }} sx={{ alignItems: { md: "center" } }}>
