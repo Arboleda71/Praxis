@@ -1,10 +1,12 @@
 import { expect, type Page } from "@playwright/test";
 import { crearCuenta, sinViolaciones, test, tokenDe } from "./ayudas";
-test('la web envía cabeceras de seguridad sin revelar el framework', async ({ page }) => {
-  const res = await page.goto('/');
-  expect(res?.headers()['x-powered-by']).toBeUndefined();
-  expect(res?.headers()['x-content-type-options']).toBe('nosniff');
-  expect(res?.headers()['x-frame-options']).toBe('DENY');
+test("la web envía cabeceras de seguridad sin revelar el framework", async ({
+  page,
+}) => {
+  const res = await page.goto("/");
+  expect(res?.headers()["x-powered-by"]).toBeUndefined();
+  expect(res?.headers()["x-content-type-options"]).toBe("nosniff");
+  expect(res?.headers()["x-frame-options"]).toBe("DENY");
 });
 const futuro = (dias: number) =>
   new Date(Date.now() + dias * 86400000).toISOString().slice(0, 10);

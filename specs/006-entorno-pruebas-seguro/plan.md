@@ -34,3 +34,7 @@ Node instalado: 24.14.1. Algunas dependencias declaradas advierten que requieren
 5. Validar la migración M3 y registrar los resultados reales antes de pasar a seguridad 003 y CI.
 
 Las fases 2–6 siguen pendientes en el orden solicitado: seguridad/CI; empresa M4; vacantes M5/búsqueda/elegibilidad/postulación; seguimiento/notificaciones/Wompi sandbox; pruebas completas/accesibilidad/entrega. No marcar ninguna completa sin evidencia y revisión.
+
+## Estado vigente
+
+Docker operativo; las cinco migraciones se verificaron desde una base efímera vacía. La batería final local aprobó 55 integración API y 67 Playwright. El bloqueo de Docker descrito arriba es histórico y quedó resuelto por el usuario. Ver docs/mvp-entrega.md.

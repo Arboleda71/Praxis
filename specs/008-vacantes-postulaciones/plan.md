@@ -9,3 +9,7 @@ Elegibilidad compartida: solo nivel excluyente; mínimo nivel/programa/CV; progr
 Pruebas primero: vacantes.test.ts falló por módulo inexistente; integración falló por endpoints inexistentes. Después: dos casos de contratos y tres de integración críticos aprobados (cupos concurrentes, perfil mínimo/nivel, unicidad concurrente y preservación del CV). Se añadieron pruebas de inmutabilidad/roles aprobadas y una de seguimiento pendiente de implementación (siguiente fase).
 
 Pendientes: seguimiento, notificaciones, Wompi sandbox, controles finales de navegador/axe y CI remoto. Revisión por PR pendiente. No se declara MVP completo.
+
+## Resultado final local · 2026-10-23
+
+El recorrido completo de 008 está incluido en 67/67 Playwright y 55/55 integración API aprobados. Roles/propiedad, inmutabilidad, cierre, vencimiento, dos cupos concurrentes, elegibilidad sin programa automático, unicidad y copia de CV fueron verificados. Seguimiento y pagos se implementaron en 009. La aprobación formal espera CI remoto y revisión por PR; ver docs/mvp-entrega.md.

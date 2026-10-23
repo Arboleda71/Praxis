@@ -1,9 +1,8 @@
 # Estado de M3 · Perfil del estudiante
 
-> 2026-10-23, America/Bogota. Código completo; **falta la verificación con Postgres**. La virtualización del equipo
-> está desactivada y Docker Desktop no arranca su motor, así que no se aplicó la migración ni corrieron las pruebas
-> de integración ni el E2E. Tarea urgente: `docs/pendientes-mvp.md` PM000.
+> Actualización local 2026-10-23: migración aplicada y verificada en Postgres efímero; pruebas API y navegador aprobadas. La batería final global tiene 55 integración API y 67 Playwright. CI remoto, revisión humana y S3/R2 real siguen pendientes. Ver docs/mvp-entrega.md.
 
+## Verificación inicial (registro histórico)
 ## Verificado sin base de datos
 
 | Parte | Resultado |

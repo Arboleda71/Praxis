@@ -266,7 +266,13 @@ describe('/perfil (integración, Postgres real)', () => {
         .get('/perfil/archivos/hoja-de-vida/enlace')
         .expect(200);
       await request(app.getHttpServer())
-        .get(ruta(body.url).replace(/firma=(.)/, (_texto: string, primero: string) => `firma=${primero === 'X' ? 'Y' : 'X'}`))
+        .get(
+          ruta(body.url).replace(
+            /firma=(.)/,
+            (_texto: string, primero: string) =>
+              `firma=${primero === 'X' ? 'Y' : 'X'}`,
+          ),
+        )
         .expect(403);
       await request(app.getHttpServer())
         .get(ruta(body.url).replace(/exp=\d+/, 'exp=1'))

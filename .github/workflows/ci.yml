@@ -19,17 +19,21 @@ jobs:
         ports: ['55432:5432']
         options: --health-cmd "pg_isready -U praxis_test -d praxis_test" --health-interval 2s --health-timeout 3s --health-retries 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
         with:
-          node-version: '24'
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: '.nvmrc'
           cache: npm
       - run: npm ci
+      - run: npm audit --audit-level=high
       - run: npm exec --no --workspace api -- prisma generate
       - run: npm run test:seguridad-db
       - run: npm run lint -w api
       - run: npm run lint -w web
       - run: npm exec --no --workspace api -- tsc --noEmit
+      - run: npm exec --no --workspace api -- tsc -p ../../scripts/tsconfig.json
       - run: npm exec --no --workspace web -- next typegen
       - run: npm exec --no --workspace web -- tsc --noEmit
       - run: npm run test -w @praxis/contracts
@@ -39,7 +43,7 @@ jobs:
       - run: npm run build -w api
       - run: npm exec --no --workspace web -- playwright install --with-deps chromium
       - run: npm run test:e2e -w web -- --workers=1
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: failure()
         with:
           name: pruebas-web

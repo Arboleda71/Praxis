@@ -19,3 +19,7 @@ API 003: 36 pruebas de integración aprobadas tras la implementación (más prue
 El servidor E2E se compila una vez y tiene una entrada exclusiva fuera de src/main.ts para reiniciar límites entre casos; exige NODE_ENV=test, base aislada validada, enlace loopback y secreto aleatorio. No agrega endpoints al producto ni confía en X-Forwarded-For. Suites secuenciales, un worker.
 
 Pendiente: verificación final de navegador/axe; envío real Resend con credenciales y proxy de producción deben validarse antes de despliegue. No se declara la fase cerrada ni CI remoto aprobado.
+
+## Resultado final local · 2026-10-23
+
+La batería final suma 55/55 integración API (incluye reenvíos paralelos y rollback por fallo real de Postgres) y 67/67 Playwright (incluye cabeceras web y flujo completo). Lint/tipos/builds aprobados; npm audit 0 vulnerabilidades. No se ejecutó CI remoto ni se publicó PR. Proxy de producción y proveedores externos siguen pendientes; ver docs/mvp-entrega.md.

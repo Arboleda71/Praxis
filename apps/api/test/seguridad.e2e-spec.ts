@@ -125,28 +125,58 @@ describe('003: integración de seguridad', () => {
     expect(await prisma.sesion.count()).toBe(0);
   });
   it('dos reenvíos simultáneos crean un solo enlace nuevo', async () => {
-    const r = await request(app.getHttpServer()).post('/auth/registro/estudiante').set('Origin', origen).send(datos).expect(201);
+    const r = await request(app.getHttpServer())
+      .post('/auth/registro/estudiante')
+      .set('Origin', origen)
+      .send(datos)
+      .expect(201);
     const cookie = String(r.headers['set-cookie'][0]).split(';')[0];
-    await prisma.enlaceConfirmacion.updateMany({ data: { creadoEn: new Date(Date.now() - 61_000) } });
-    const estados = await Promise.all([1, 2].map(() => request(app.getHttpServer()).post('/auth/reenviar-confirmacion').set('Origin', origen).set('Cookie', cookie).then(r => r.status)));
+    await prisma.enlaceConfirmacion.updateMany({
+      data: { creadoEn: new Date(Date.now() - 61_000) },
+    });
+    const estados = await Promise.all(
+      [1, 2].map(() =>
+        request(app.getHttpServer())
+          .post('/auth/reenviar-confirmacion')
+          .set('Origin', origen)
+          .set('Cookie', cookie)
+          .then((r) => r.status),
+      ),
+    );
     expect(estados.sort((a, b) => a - b)).toEqual([204, 429]);
     expect(await prisma.enlaceConfirmacion.count()).toBe(2);
-    expect(await prisma.enlaceConfirmacion.count({ where: { usadoEn: null } })).toBe(1);
+    expect(
+      await prisma.enlaceConfirmacion.count({ where: { usadoEn: null } }),
+    ).toBe(1);
   });
   it('un fallo real de Postgres al crear el enlace revierte la cuenta y no filtra el error', async () => {
     validarBasePruebas(process.env.DATABASE_URL);
-    const log = jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+    const log = jest
+      .spyOn(Logger.prototype, 'error')
+      .mockImplementation(() => {});
     try {
-      await prisma.$executeRawUnsafe(`CREATE OR REPLACE FUNCTION praxis_test_rechazar_enlace() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'Fallo ficticio controlado'; END; $$`);
-      await prisma.$executeRawUnsafe('CREATE TRIGGER praxis_test_rechazar_enlace BEFORE INSERT ON "EnlaceConfirmacion" FOR EACH ROW EXECUTE FUNCTION praxis_test_rechazar_enlace()');
-      const r = await request(app.getHttpServer()).post('/auth/registro/estudiante').set('Origin', origen).send(datos).expect(500);
+      await prisma.$executeRawUnsafe(
+        `CREATE OR REPLACE FUNCTION praxis_test_rechazar_enlace() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'Fallo ficticio controlado'; END; $$`,
+      );
+      await prisma.$executeRawUnsafe(
+        'CREATE TRIGGER praxis_test_rechazar_enlace BEFORE INSERT ON "EnlaceConfirmacion" FOR EACH ROW EXECUTE FUNCTION praxis_test_rechazar_enlace()',
+      );
+      const r = await request(app.getHttpServer())
+        .post('/auth/registro/estudiante')
+        .set('Origin', origen)
+        .send(datos)
+        .expect(500);
       expect(await prisma.cuenta.count()).toBe(0);
       expect(JSON.stringify(r.body)).not.toContain(datos.correo);
       expect(JSON.stringify(log.mock.calls)).not.toContain(datos.correo);
       expect(JSON.stringify(log.mock.calls)).not.toContain(datos.contrasena);
     } finally {
-      await prisma.$executeRawUnsafe('DROP TRIGGER IF EXISTS praxis_test_rechazar_enlace ON "EnlaceConfirmacion"');
-      await prisma.$executeRawUnsafe('DROP FUNCTION IF EXISTS praxis_test_rechazar_enlace()');
+      await prisma.$executeRawUnsafe(
+        'DROP TRIGGER IF EXISTS praxis_test_rechazar_enlace ON "EnlaceConfirmacion"',
+      );
+      await prisma.$executeRawUnsafe(
+        'DROP FUNCTION IF EXISTS praxis_test_rechazar_enlace()',
+      );
       log.mockRestore();
     }
   });
