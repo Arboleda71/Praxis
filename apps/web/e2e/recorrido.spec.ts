@@ -5,7 +5,8 @@ for (const rol of ["estudiante", "empresa"] as const) {
   test(`${rol}: registro, confirmación, cierre y reingreso con navegación protegida`, async ({ page }) => {
     const correo = correoUnico(`recorrido-${rol}`);
     const perfil = rol === "estudiante" ? "/estudiante/perfil" : "/empresa/perfil";
-    const titulo = rol === "estudiante" ? "Mi perfil" : "Perfil de la empresa";
+    // M3: un perfil de estudiante recién creado muestra la guía del perfil mínimo.
+    const titulo = rol === "estudiante" ? "Empieza por tu perfil mínimo" : "Perfil de la empresa";
     await page.goto(`/registro/${rol}`);
     await page.getByLabel(rol === "estudiante" ? "Nombre completo" : "Razón social").fill("Cuenta ficticia de prueba");
     if (rol === "empresa") await page.getByLabel("NIT con dígito de verificación").fill(nitUnico());

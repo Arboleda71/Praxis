@@ -6,6 +6,7 @@ coverage/
 .env
 .env*.local
 
-# API: bandeja local de correos y cliente generado de Prisma
+# API: bandeja local de correos, archivos del perfil y cliente generado de Prisma
 .correos/
+.archivos/
 apps/api/src/generated/

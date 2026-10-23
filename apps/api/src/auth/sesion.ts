@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import { CanActivate, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { createHash, randomBytes } from 'node:crypto';
 import type { Request } from 'express';
 import { PrismaService } from '../prisma.service.js';
@@ -37,6 +37,17 @@ export class SesionGuard implements CanActivate {
     const sesion = await buscarSesion(this.prisma, req.cookies?.[COOKIE]);
     if (!sesion) throw new UnauthorizedException({ mensaje: 'Inicia sesión para continuar.' });
     req.sesion = sesion;
+    return true;
+  }
+}
+
+/** Sesión de estudiante: 401 sin sesión, 403 con otro rol (VI). */
+@Injectable()
+export class SoloEstudianteGuard extends SesionGuard {
+  async canActivate(ctx: ExecutionContext): Promise<boolean> {
+    await super.canActivate(ctx);
+    const { sesion } = ctx.switchToHttp().getRequest<RequestConSesion>();
+    if (sesion.cuenta.rol !== 'ESTUDIANTE') throw new ForbiddenException({ mensaje: 'Esta sección es solo para estudiantes.' });
     return true;
   }
 }
