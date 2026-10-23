@@ -22,6 +22,8 @@
 - [ ] **Accesibilidad:** WCAG 2.1 nivel AA es obligatorio.
 - [ ] **Equipo y aprobación:** se asumió que el equipo son dos personas y que todo PR (incluidos los
   cambios a la constitución) lo aprueba «otro integrante». ¿Quiénes son y quién aprueba?
+- [ ] **Aprobación por PR de otro integrante de las enmiendas v3.0.0 (foto) y v4.0.0 (programa en texto libre)**
+  (ambas del 2026-10-23).
 
 ## 2. Propuestas de producto en `docs/context(pre-constitucion).md`
 
@@ -47,10 +49,13 @@ No están en la constitución, pero las specs las necesitan.
 - [x] **Avance académico** (resuelto el 2026-10-17, spec 004): semestre para universitarios y etapa
   lectiva/productiva para el SENA; solo se compara dentro del mismo nivel.
 - [x] **Catálogo de programas** (resuelto el 2026-10-17, spec 004): semilla ficticia para la muestra.
-- [ ] **Programas reales:** antes de salir del piloto, reemplazar la semilla por el SNIES más los programas del
-  SENA, que el SNIES no cubre del todo.
+  Obsoleto desde la constitución v4.0.0 (2026-10-23): el programa es texto libre y ya no hay catálogo.
+- [x] ~~**Programas reales:** antes de salir del piloto, reemplazar la semilla por el SNIES más los programas del
+  SENA, que el SNIES no cubre del todo.~~ Obsoleto por la constitución v4.0.0 (2026-10-23): programa en texto
+  libre.
 - [ ] **Enmienda v2.0.0** (2026-10-17): principio IV redefinido (solo nivel y programa son excluyentes; perfil
-  mínimo con CV; la ciudad no es requisito). Falta la aprobación por PR de otro integrante.
+  mínimo con CV; la ciudad no es requisito). Falta la aprobación por PR de otro integrante. La v4.0.0 dejó
+  solo el nivel como excluyente.
 - [ ] **Reemplazar el CV en una postulación *Enviada*** (antes de que la empresa la revise): ¿se anota
   como fase posterior?
 

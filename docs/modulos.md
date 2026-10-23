@@ -1,6 +1,6 @@
 # Módulos de la primera muestra académica
 
-> Estado al 2026-10-17. Base: `.specify/memory/constitution.md` v2.0.0 y `docs/context(pre-constitucion).md`.
+> Estado al 2026-10-23. Base: `.specify/memory/constitution.md` v4.0.0 y `docs/context(pre-constitucion).md`.
 > Los números romanos citan principios de la constitución; «§» cita secciones del contexto de producto.
 >
 > **Alcance de la muestra:** login, creación de cuenta, perfil (estudiante y empresa) y formulario de vacantes.
@@ -95,7 +95,6 @@ mismos campos y se pueden comparar (II). No tiene pantallas propias: alimenta lo
 | Catálogo | Valores | Lo usan |
 |---|---|---|
 | Nivel de formación | Técnico, tecnólogo, universitario | M3, M5 |
-| Programa | Lista cerrada; semilla ficticia para la muestra | M3, M5 |
 | Modalidad | Presencial, híbrida, remota | M5 |
 | Jornada | Tiempo completo, medio tiempo | M3, M5 |
 | Idioma y nivel | Idiomas + MCER A1, A2, B1, B2, C1, C2 | M3, M5 |
@@ -105,13 +104,15 @@ mismos campos y se pueden comparar (II). No tiene pantallas propias: alimenta lo
 **Reglas**
 - No existe ningún catálogo de edad, sexo, estado civil ni foto (VII).
 - Los catálogos viven en `packages/contracts` para que la web y la API usen los mismos valores.
+- El programa no es catálogo (constitución v4.0.0): se escribe en texto libre en M3 y M5.
 
 **Depende de:** nada.
 
 **Decisiones** (2026-10-17, spec `specs/004-catalogos-compartidos`)
 - La ciudad no es catálogo ni requisito: la vacante y la empresa solo dicen el nombre de la ciudad.
 - El avance se mide por semestre (universitario) o por etapa (SENA), y solo se compara dentro del mismo nivel.
-- Programas: semilla ficticia para la muestra; SNIES y programas SENA antes de salir del piloto.
+- 2026-10-23 (constitución v4.0.0): se retira el catálogo de programas. Hay demasiados programas reales (SNIES,
+  SENA, extranjeros) para una lista cerrada; el programa se escribe en texto libre. Quedan 7 catálogos.
 
 ---
 
@@ -122,9 +123,10 @@ mismos campos y se pueden comparar (II). No tiene pantallas propias: alimenta lo
 **Roles:** estudiante (solo el suyo, VI).
 
 **Pantallas**
-1. Ver mi perfil, con un indicador de «Perfil mínimo: completo / incompleto» y qué falta.
+1. Ver mi perfil, con un indicador de «Perfil mínimo: completo / incompleto» y qué falta. Arriba, la foto de
+   perfil (opcional) con «Agregar foto» / «Cambiar foto» / «Quitar foto»; sin foto se muestra la inicial.
 2. Editar perfil por secciones:
-   - Formación: nivel, programa, institución, avance académico.
+   - Formación: nivel, programa (texto libre, 3 a 150 caracteres), institución, avance académico.
    - Disponibilidad: disponible desde (fecha), jornada.
    - Idiomas: idioma y nivel MCER (0 o más).
    - Aval: «¿Tienes aval de tu institución?» sí/no, y subir el soporte (opcional, recomendado).
@@ -133,11 +135,16 @@ mismos campos y se pueden comparar (II). No tiene pantallas propias: alimenta lo
 
 **Reglas**
 - Perfil mínimo = nivel de formación + programa + CV. Sin eso no habrá postulación (IV); el perfil lo dice claro.
+- El programa se escribe en texto libre y no depende del nivel (constitución v4.0.0, II); cambiar el nivel solo
+  vacía el avance.
 - Un campo vacío se muestra como «Falta información» con un enlace para completarlo (IV).
 - El aval se rotula «Aval declarado (con soporte)» o «Aval declarado (sin soporte)», nunca «verificado» (IX, §4.2).
 - Se invita a subir el soporte del aval, sin obligarlo.
-- Archivos: solo PDF de máximo 5 MB; si no cumple, el error dice por qué (XIV).
-- No hay campos de edad, sexo, estado civil ni foto (VII). Solo se piden datos que se usan (VIII).
+- Archivos: CV y soporte en PDF de máximo 5 MB; foto en JPG o PNG de máximo 2 MB. Si no cumple, el error dice
+  por qué (XIV).
+- Foto (constitución v3.0.0, VII): opcional, no cuenta para el perfil mínimo ni para la elegibilidad. La ven el
+  estudiante y las empresas a cuyas vacantes se postuló. Se avisa antes de subirla.
+- No hay campos de edad, sexo ni estado civil (VII). Solo se piden datos que se usan (VIII).
 - El estudiante ve y edita su perfil en cualquier momento (derecho de rectificación, §8).
 
 **Estados:** perfil vacío (primera vez, con guía para empezar por el perfil mínimo), guardando, guardado,
@@ -205,14 +212,14 @@ o híbrida), duración, fecha de inicio y fecha de vigencia (obligatoria).
 | Requisito | Tipo |
 |---|---|
 | Nivel de formación (uno o varios) | Siempre excluyente |
-| Programa (uno o varios, del catálogo) | Siempre excluyente |
+| Programas solicitados (opcional, 1 a 5, texto libre) | Nunca se evalúa: se muestran junto al programa del estudiante con «La empresa revisa la afinidad» y nunca bloquean |
 | Avance académico mínimo | Siempre deseable |
 | Exige aval (sí/no) | Siempre deseable |
 | Fecha de inicio | Siempre deseable |
 | Jornada | Siempre deseable |
 | Idioma y nivel mínimo (opcional) | Siempre deseable |
 
-Solo el nivel de formación y el programa bloquean la postulación. Los deseables informan a la empresa, que decide en
+Solo el nivel de formación es excluyente y bloquea la postulación (constitución v4.0.0, IV). Los deseables informan a la empresa, que decide en
 la entrevista; el sistema no descarta por ellos (IV). La ciudad es un dato de la vacante, no un requisito.
 
 **Reglas**
@@ -222,10 +229,13 @@ la entrevista; el sistema no descarta por ellos (IV). La ciudad es un dato de la
 - Publicar exige correo confirmado, NIT válido y cupo. Cada publicación consume un cupo (§5.1).
 - Cupo de la muestra: 2 publicaciones gratis cada 6 meses. Sin cupo, se dice claramente y no se ofrece ni se
   simula un pago, porque los planes están fuera de la muestra (IX).
-- Los requisitos no se escriben en texto libre ni se evalúan contra la descripción (II).
+- Los requisitos no se escriben en texto libre ni se evalúan contra la descripción (II). La excepción son los
+  programas solicitados, que son parte explícita de la oferta pero no se evalúan (II, III).
 - No hay campo de edad, sexo, estado civil ni foto (VII).
 - Validaciones con mensaje claro: vigencia posterior a hoy; ciudad obligatoria si no es remota; al menos un
-  nivel y un programa.
+  nivel. Programas solicitados: máximo 5, sin repetidos (ignorando tildes y mayúsculas), cada uno de 3 a 150
+  caracteres («Escribe el nombre completo del programa.», «Ya agregaste este programa.», «Escribe máximo 5
+  programas.»).
 - Al llegar la fecha de vigencia, la vacante pasa sola a Cerrada con el motivo «venció»; si la cierra la
   empresa, el motivo es «cerrada por la empresa».
 

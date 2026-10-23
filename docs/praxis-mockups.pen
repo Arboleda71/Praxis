@@ -2051,6 +2051,1920 @@
         },
         {
           "type": "frame",
+          "id": "Kkz3b",
+          "name": "Sección Selectores de catálogo (M2)",
+          "layout": "vertical",
+          "gap": 16,
+          "children": [
+            {
+              "type": "frame",
+              "id": "sJ5ra",
+              "name": "Encabezado",
+              "layout": "vertical",
+              "gap": 4,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "bLz9W",
+                  "name": "Título",
+                  "fill": "$text",
+                  "content": "Selectores de catálogo (M2)",
+                  "fontFamily": "$font-heading",
+                  "fontSize": 20,
+                  "fontWeight": "600"
+                },
+                {
+                  "type": "text",
+                  "id": "Wyy0u",
+                  "name": "Descripción",
+                  "fill": "$text-muted",
+                  "content": "Select y Autocomplete de MUI sobre las listas de @praxis/contracts · se elige de la lista, nunca texto libre · los usan M3, M4 y M5",
+                  "fontFamily": "$font-body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "fJvpZ",
+              "name": "Contenido",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "O8RKI",
+                  "name": "Select/outlined",
+                  "reusable": true,
+                  "width": 328,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": [
+                    9,
+                    0,
+                    0,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "kZi9v",
+                      "name": "Campo",
+                      "width": "fill_container",
+                      "height": 56,
+                      "cornerRadius": 4,
+                      "stroke": "$input-border",
+                      "strokeWidth": 1,
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Z9SySj",
+                          "name": "Valor",
+                          "fill": "$text",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Tecnólogo",
+                          "fontFamily": "$font-body",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "icon",
+                          "id": "bhPOd",
+                          "name": "Icono final",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow_drop_down",
+                          "library": "Material Symbols Rounded",
+                          "fill": "$text-muted"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "n8ljWP",
+                      "layoutPosition": "absolute",
+                      "x": 10,
+                      "y": 1,
+                      "name": "Label",
+                      "fill": "$surface",
+                      "padding": [
+                        0,
+                        4
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "HeWbP",
+                          "name": "Texto",
+                          "fill": "$text-muted",
+                          "content": "Nivel de formación",
+                          "fontFamily": "$font-body",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "ZD1Fy",
+                      "x": 0,
+                      "y": 0,
+                      "name": "Ayuda",
+                      "enabled": false,
+                      "width": "fill_container(0)",
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "uZY6q",
+                          "name": "Texto ayuda",
+                          "fill": "$text-muted",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Texto de ayuda",
+                          "fontFamily": "$font-body",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "muLjZ",
+                  "name": "Select/outlined error",
+                  "reusable": true,
+                  "width": 328,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": [
+                    9,
+                    0,
+                    0,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "pOwT4",
+                      "name": "Campo",
+                      "width": "fill_container",
+                      "height": 56,
+                      "cornerRadius": 4,
+                      "stroke": "$error",
+                      "strokeWidth": 2,
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "Yo3vv",
+                          "name": "Valor",
+                          "fill": "$text",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Ingeniería de sistemas",
+                          "fontFamily": "$font-body",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "icon",
+                          "id": "Avafb",
+                          "name": "Icono final",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow_drop_down",
+                          "library": "Material Symbols Rounded",
+                          "fill": "$text-muted"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "AqoWn",
+                      "layoutPosition": "absolute",
+                      "x": 10,
+                      "y": 1,
+                      "name": "Label",
+                      "fill": "$surface",
+                      "padding": [
+                        0,
+                        4
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "tqk25",
+                          "name": "Texto",
+                          "fill": "$error",
+                          "content": "Programa",
+                          "fontFamily": "$font-body",
+                          "fontSize": 12,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "nBv10",
+                      "name": "Ayuda",
+                      "width": "fill_container",
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "hRbn8",
+                          "name": "Texto ayuda",
+                          "fill": "$error",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Este programa no corresponde al nivel elegido.",
+                          "fontFamily": "$font-body",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "R7gI4",
+                  "name": "Select vacío (estado)",
+                  "width": 328,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "padding": [
+                    9,
+                    0,
+                    0,
+                    0
+                  ],
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "QtUph",
+                      "name": "Campo",
+                      "width": "fill_container",
+                      "height": 56,
+                      "cornerRadius": 4,
+                      "stroke": "$input-border",
+                      "strokeWidth": 1,
+                      "gap": 8,
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "dtGUb",
+                          "name": "Valor",
+                          "fill": "$text-muted",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Elige una opción",
+                          "fontFamily": "$font-body",
+                          "fontSize": 16,
+                          "fontWeight": "normal"
+                        },
+                        {
+                          "type": "icon",
+                          "id": "USp0l",
+                          "name": "Icono final",
+                          "width": 24,
+                          "height": 24,
+                          "icon": "arrow_drop_down",
+                          "library": "Material Symbols Rounded",
+                          "fill": "$text-muted"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "qIlKz",
+                      "layoutPosition": "absolute",
+                      "x": 10,
+                      "y": 1,
+                      "name": "Label",
+                      "fill": "$surface",
+                      "padding": [
+                        0,
+                        4
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "DDDJn",
+                          "name": "Texto",
+                          "fill": "$text-muted",
+                          "content": "Jornada",
+                          "fontFamily": "$font-body",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "PnMZX",
+                      "name": "Ayuda",
+                      "width": "fill_container",
+                      "padding": [
+                        0,
+                        14
+                      ],
+                      "children": [
+                        {
+                          "type": "text",
+                          "id": "liJDg",
+                          "name": "Texto ayuda",
+                          "fill": "$text-muted",
+                          "textGrowth": "fixed-width",
+                          "width": "fill_container",
+                          "content": "Opcional. Si la dejas vacía, la empresa verá «Falta información».",
+                          "fontFamily": "$font-body",
+                          "fontSize": 12,
+                          "fontWeight": "normal"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "GGTJr",
+                  "name": "Select abierto",
+                  "width": 328,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "p6P6tx",
+                      "name": "Campo",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "padding": [
+                        9,
+                        0,
+                        0,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "NSSEE",
+                          "name": "Campo",
+                          "width": "fill_container",
+                          "height": 56,
+                          "cornerRadius": 4,
+                          "stroke": "$primary",
+                          "strokeWidth": 2,
+                          "gap": 8,
+                          "padding": [
+                            0,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "Uxrjj",
+                              "name": "Valor",
+                              "fill": "$text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Tecnólogo",
+                              "fontFamily": "$font-body",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "iFZ2d",
+                              "name": "Icono final",
+                              "width": 24,
+                              "height": 24,
+                              "icon": "arrow_drop_up",
+                              "library": "Material Symbols Rounded",
+                              "fill": "$text-muted"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "hfsOH",
+                          "layoutPosition": "absolute",
+                          "x": 10,
+                          "y": 1,
+                          "name": "Label",
+                          "fill": "$surface",
+                          "padding": [
+                            0,
+                            4
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "O9F0Y",
+                              "name": "Texto",
+                              "fill": "$primary",
+                              "content": "Nivel de formación",
+                              "fontFamily": "$font-body",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "yCtgQ",
+                      "name": "Menú",
+                      "width": "fill_container",
+                      "fill": "$surface",
+                      "cornerRadius": 4,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#0000002E",
+                        "offset": {
+                          "x": 0,
+                          "y": 4
+                        },
+                        "blur": 16
+                      },
+                      "layout": "vertical",
+                      "padding": [
+                        8,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "HHBnp",
+                          "name": "Opción Técnico",
+                          "width": "fill_container",
+                          "height": 48,
+                          "gap": 12,
+                          "padding": [
+                            0,
+                            16
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "WLtaf",
+                              "name": "Texto",
+                              "fill": "$text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Técnico",
+                              "fontFamily": "$font-body",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "JZvVz",
+                          "name": "Opción Tecnólogo",
+                          "width": "fill_container",
+                          "height": 48,
+                          "fill": "$action-selected",
+                          "gap": 12,
+                          "padding": [
+                            0,
+                            16
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "zYY7E",
+                              "name": "Texto",
+                              "fill": "$text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Tecnólogo",
+                              "fontFamily": "$font-body",
+                              "fontSize": 16,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "cYOMX",
+                              "name": "Marca",
+                              "width": 20,
+                              "height": 20,
+                              "icon": "check",
+                              "library": "Material Symbols Rounded",
+                              "fill": "$primary"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "DIWOw",
+                          "name": "Opción Universitario",
+                          "width": "fill_container",
+                          "height": 48,
+                          "gap": 12,
+                          "padding": [
+                            0,
+                            16
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "K7nZ6",
+                              "name": "Texto",
+                              "fill": "$text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Universitario",
+                              "fontFamily": "$font-body",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "IhtLI",
+                  "name": "Autocomplete/programa",
+                  "width": 328,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "ngGq3",
+                      "name": "Campo",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "padding": [
+                        9,
+                        0,
+                        0,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "t9quU",
+                          "name": "Campo",
+                          "width": "fill_container",
+                          "height": 56,
+                          "cornerRadius": 4,
+                          "stroke": "$primary",
+                          "strokeWidth": 2,
+                          "gap": 8,
+                          "padding": [
+                            0,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "rprNJ",
+                              "name": "Valor",
+                              "fill": "$text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "ingenieria",
+                              "fontFamily": "$font-body",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "mXGQz",
+                              "name": "Icono final",
+                              "width": 24,
+                              "height": 24,
+                              "icon": "close",
+                              "library": "Material Symbols Rounded",
+                              "fill": "$text-muted"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "cmi6s",
+                          "layoutPosition": "absolute",
+                          "x": 10,
+                          "y": 1,
+                          "name": "Label",
+                          "fill": "$surface",
+                          "padding": [
+                            0,
+                            4
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "x93oT",
+                              "name": "Texto",
+                              "fill": "$primary",
+                              "content": "Programa",
+                              "fontFamily": "$font-body",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "V9BQvd",
+                      "name": "Menú",
+                      "width": "fill_container",
+                      "fill": "$surface",
+                      "cornerRadius": 4,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#0000002E",
+                        "offset": {
+                          "x": 0,
+                          "y": 4
+                        },
+                        "blur": 16
+                      },
+                      "layout": "vertical",
+                      "padding": [
+                        8,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "lRJMP",
+                          "name": "Grupo",
+                          "width": "fill_container",
+                          "padding": [
+                            6,
+                            16
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "j2twc",
+                              "name": "Texto grupo",
+                              "fill": "$text-muted",
+                              "content": "Programas de nivel Universitario",
+                              "fontFamily": "$font-body",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "IlWsG",
+                          "name": "Opción Ingeniería de sistemas",
+                          "width": "fill_container",
+                          "height": 48,
+                          "fill": "$action-selected",
+                          "gap": 12,
+                          "padding": [
+                            0,
+                            16
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "wDDnh",
+                              "name": "Texto",
+                              "fill": "$text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Ingeniería de sistemas",
+                              "fontFamily": "$font-body",
+                              "fontSize": 16,
+                              "fontWeight": "600"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "lNmMA",
+                              "name": "Marca",
+                              "width": 20,
+                              "height": 20,
+                              "icon": "check",
+                              "library": "Material Symbols Rounded",
+                              "fill": "$primary"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "Btbuy",
+                          "name": "Opción Ingeniería industrial",
+                          "width": "fill_container",
+                          "height": 48,
+                          "gap": 12,
+                          "padding": [
+                            0,
+                            16
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "faCbe",
+                              "name": "Texto",
+                              "fill": "$text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Ingeniería industrial",
+                              "fontFamily": "$font-body",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "XIiCf",
+                          "name": "Opción Ingeniería electrónica",
+                          "width": "fill_container",
+                          "height": 48,
+                          "gap": 12,
+                          "padding": [
+                            0,
+                            16
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "eDXtA",
+                              "name": "Texto",
+                              "fill": "$text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "Ingeniería electrónica",
+                              "fontFamily": "$font-body",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "o75o0",
+                  "name": "Autocomplete sin resultados",
+                  "width": 328,
+                  "layout": "vertical",
+                  "gap": 4,
+                  "children": [
+                    {
+                      "type": "frame",
+                      "id": "DFHEI",
+                      "name": "Campo",
+                      "width": "fill_container",
+                      "layout": "vertical",
+                      "gap": 4,
+                      "padding": [
+                        9,
+                        0,
+                        0,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "TK14Y",
+                          "name": "Campo",
+                          "width": "fill_container",
+                          "height": 56,
+                          "cornerRadius": 4,
+                          "stroke": "$primary",
+                          "strokeWidth": 2,
+                          "gap": 8,
+                          "padding": [
+                            0,
+                            14
+                          ],
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "ZWp9E",
+                              "name": "Valor",
+                              "fill": "$text",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "diseño de modas",
+                              "fontFamily": "$font-body",
+                              "fontSize": 16,
+                              "fontWeight": "normal"
+                            },
+                            {
+                              "type": "icon",
+                              "id": "WIZeP",
+                              "name": "Icono final",
+                              "width": 24,
+                              "height": 24,
+                              "icon": "close",
+                              "library": "Material Symbols Rounded",
+                              "fill": "$text-muted"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "rXNq2",
+                          "layoutPosition": "absolute",
+                          "x": 10,
+                          "y": 1,
+                          "name": "Label",
+                          "fill": "$surface",
+                          "padding": [
+                            0,
+                            4
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "M12NLe",
+                              "name": "Texto",
+                              "fill": "$primary",
+                              "content": "Programa",
+                              "fontFamily": "$font-body",
+                              "fontSize": 12,
+                              "fontWeight": "600"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "d1nmk",
+                      "name": "Menú",
+                      "width": "fill_container",
+                      "fill": "$surface",
+                      "cornerRadius": 4,
+                      "effect": {
+                        "type": "shadow",
+                        "shadowType": "outer",
+                        "color": "#0000002E",
+                        "offset": {
+                          "x": 0,
+                          "y": 4
+                        },
+                        "blur": 16
+                      },
+                      "layout": "vertical",
+                      "padding": [
+                        8,
+                        0
+                      ],
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "Jto2V",
+                          "name": "Sin resultados",
+                          "width": "fill_container",
+                          "padding": [
+                            10,
+                            16
+                          ],
+                          "children": [
+                            {
+                              "type": "text",
+                              "id": "u4T7e5",
+                              "name": "Texto",
+                              "fill": "$text-muted",
+                              "textGrowth": "fixed-width",
+                              "width": "fill_container",
+                              "content": "No hay programas con ese nombre en el nivel Tecnólogo. Revisa el nivel o escribe otra parte del nombre.",
+                              "fontFamily": "$font-body",
+                              "fontSize": 14,
+                              "fontWeight": "normal"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "jZVNz",
+              "name": "Contenido idiomas",
+              "gap": 24,
+              "children": [
+                {
+                  "type": "frame",
+                  "id": "AS7SL",
+                  "name": "Idiomas/lista",
+                  "width": 420,
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "WvjOv",
+                      "name": "Título grupo",
+                      "fill": "$text",
+                      "content": "Idiomas",
+                      "fontFamily": "$font-body",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "V8moS",
+                      "name": "Fila idioma",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "b2jyQ",
+                          "name": "Idioma",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": [
+                            9,
+                            0,
+                            0,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Eg1wP",
+                              "name": "Campo",
+                              "width": "fill_container",
+                              "height": 56,
+                              "cornerRadius": 4,
+                              "stroke": "$input-border",
+                              "strokeWidth": 1,
+                              "gap": 8,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "CHfir",
+                                  "name": "Valor",
+                                  "fill": "$text",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Inglés",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 16,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "IP5G4",
+                                  "name": "Icono final",
+                                  "width": 24,
+                                  "height": 24,
+                                  "icon": "arrow_drop_down",
+                                  "library": "Material Symbols Rounded",
+                                  "fill": "$text-muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "I2gBZt",
+                              "layoutPosition": "absolute",
+                              "x": 10,
+                              "y": 1,
+                              "name": "Label",
+                              "fill": "$surface",
+                              "padding": [
+                                0,
+                                4
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "E2nxQC",
+                                  "name": "Texto",
+                                  "fill": "$text-muted",
+                                  "content": "Idioma",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "SCLb1",
+                          "name": "Nivel",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": [
+                            9,
+                            0,
+                            0,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "X0MaJ",
+                              "name": "Campo",
+                              "width": "fill_container",
+                              "height": 56,
+                              "cornerRadius": 4,
+                              "stroke": "$input-border",
+                              "strokeWidth": 1,
+                              "gap": 8,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "WpDVz",
+                                  "name": "Valor",
+                                  "fill": "$text",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "B2",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 16,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "HmIsr",
+                                  "name": "Icono final",
+                                  "width": 24,
+                                  "height": 24,
+                                  "icon": "arrow_drop_down",
+                                  "library": "Material Symbols Rounded",
+                                  "fill": "$text-muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "qvYlN",
+                              "layoutPosition": "absolute",
+                              "x": 10,
+                              "y": 1,
+                              "name": "Label",
+                              "fill": "$surface",
+                              "padding": [
+                                0,
+                                4
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "obn0M",
+                                  "name": "Texto",
+                                  "fill": "$text-muted",
+                                  "content": "Nivel (MCER)",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "JkCv7",
+                          "name": "Quitar",
+                          "width": 48,
+                          "height": 74,
+                          "cornerRadius": 24,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "KE4el",
+                              "name": "Icono quitar",
+                              "width": 24,
+                              "height": 24,
+                              "icon": "delete",
+                              "library": "Material Symbols Rounded",
+                              "fill": "$text-muted"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "G73q2t",
+                      "name": "Fila idioma",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "kNvFm",
+                          "name": "Idioma",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": [
+                            9,
+                            0,
+                            0,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "L1OQE",
+                              "name": "Campo",
+                              "width": "fill_container",
+                              "height": 56,
+                              "cornerRadius": 4,
+                              "stroke": "$input-border",
+                              "strokeWidth": 1,
+                              "gap": 8,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "f50nRl",
+                                  "name": "Valor",
+                                  "fill": "$text",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Portugués",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 16,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "c2vW4s",
+                                  "name": "Icono final",
+                                  "width": 24,
+                                  "height": 24,
+                                  "icon": "arrow_drop_down",
+                                  "library": "Material Symbols Rounded",
+                                  "fill": "$text-muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "DJmAl",
+                              "layoutPosition": "absolute",
+                              "x": 10,
+                              "y": 1,
+                              "name": "Label",
+                              "fill": "$surface",
+                              "padding": [
+                                0,
+                                4
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "uINxI",
+                                  "name": "Texto",
+                                  "fill": "$text-muted",
+                                  "content": "Idioma",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "KY1Hg",
+                          "name": "Nivel",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": [
+                            9,
+                            0,
+                            0,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "Cgn5l",
+                              "name": "Campo",
+                              "width": "fill_container",
+                              "height": 56,
+                              "cornerRadius": 4,
+                              "stroke": "$input-border",
+                              "strokeWidth": 1,
+                              "gap": 8,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "qk7dL",
+                                  "name": "Valor",
+                                  "fill": "$text",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "A2",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 16,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "ocKPa",
+                                  "name": "Icono final",
+                                  "width": 24,
+                                  "height": 24,
+                                  "icon": "arrow_drop_down",
+                                  "library": "Material Symbols Rounded",
+                                  "fill": "$text-muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "F8xNa",
+                              "layoutPosition": "absolute",
+                              "x": 10,
+                              "y": 1,
+                              "name": "Label",
+                              "fill": "$surface",
+                              "padding": [
+                                0,
+                                4
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "O7p07O",
+                                  "name": "Texto",
+                                  "fill": "$text-muted",
+                                  "content": "Nivel (MCER)",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "A5g7iR",
+                          "name": "Quitar",
+                          "width": 48,
+                          "height": 74,
+                          "cornerRadius": 24,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "bsQg0",
+                              "name": "Icono quitar",
+                              "width": 24,
+                              "height": 24,
+                              "icon": "delete",
+                              "library": "Material Symbols Rounded",
+                              "fill": "$text-muted"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "W3UFhi",
+                      "name": "Agregar idioma",
+                      "cornerRadius": 4,
+                      "gap": 8,
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "S5zbW",
+                          "name": "Icono",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "add",
+                          "library": "Material Symbols Rounded",
+                          "fill": "$primary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "D1hImZ",
+                          "name": "Texto",
+                          "fill": "$primary",
+                          "content": "Agregar idioma",
+                          "fontFamily": "$font-body",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "frame",
+                  "id": "nTCnB",
+                  "name": "Idiomas/idioma repetido",
+                  "width": 420,
+                  "layout": "vertical",
+                  "gap": 12,
+                  "children": [
+                    {
+                      "type": "text",
+                      "id": "m94Wq",
+                      "name": "Título grupo",
+                      "fill": "$text",
+                      "content": "Idiomas",
+                      "fontFamily": "$font-body",
+                      "fontSize": 16,
+                      "fontWeight": "600"
+                    },
+                    {
+                      "type": "frame",
+                      "id": "B3qyi",
+                      "name": "Fila idioma",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "CvTrz",
+                          "name": "Idioma",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": [
+                            9,
+                            0,
+                            0,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "z86xY",
+                              "name": "Campo",
+                              "width": "fill_container",
+                              "height": 56,
+                              "cornerRadius": 4,
+                              "stroke": "$input-border",
+                              "strokeWidth": 1,
+                              "gap": 8,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "g6Fq9",
+                                  "name": "Valor",
+                                  "fill": "$text",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Inglés",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 16,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "Vq3ye",
+                                  "name": "Icono final",
+                                  "width": 24,
+                                  "height": 24,
+                                  "icon": "arrow_drop_down",
+                                  "library": "Material Symbols Rounded",
+                                  "fill": "$text-muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "GiYYR",
+                              "layoutPosition": "absolute",
+                              "x": 10,
+                              "y": 1,
+                              "name": "Label",
+                              "fill": "$surface",
+                              "padding": [
+                                0,
+                                4
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "J7egd",
+                                  "name": "Texto",
+                                  "fill": "$text-muted",
+                                  "content": "Idioma",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "K5raBY",
+                          "name": "Nivel",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": [
+                            9,
+                            0,
+                            0,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "ssMLW",
+                              "name": "Campo",
+                              "width": "fill_container",
+                              "height": 56,
+                              "cornerRadius": 4,
+                              "stroke": "$input-border",
+                              "strokeWidth": 1,
+                              "gap": 8,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "buf6g",
+                                  "name": "Valor",
+                                  "fill": "$text",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "B2",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 16,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "suc2A",
+                                  "name": "Icono final",
+                                  "width": 24,
+                                  "height": 24,
+                                  "icon": "arrow_drop_down",
+                                  "library": "Material Symbols Rounded",
+                                  "fill": "$text-muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "LfNmW",
+                              "layoutPosition": "absolute",
+                              "x": 10,
+                              "y": 1,
+                              "name": "Label",
+                              "fill": "$surface",
+                              "padding": [
+                                0,
+                                4
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "fhiv8",
+                                  "name": "Texto",
+                                  "fill": "$text-muted",
+                                  "content": "Nivel (MCER)",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "WjXoV",
+                          "name": "Quitar",
+                          "width": 48,
+                          "height": 74,
+                          "cornerRadius": 24,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "C2QVZq",
+                              "name": "Icono quitar",
+                              "width": 24,
+                              "height": 24,
+                              "icon": "delete",
+                              "library": "Material Symbols Rounded",
+                              "fill": "$text-muted"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "HQQGU",
+                      "name": "Fila idioma",
+                      "width": "fill_container",
+                      "gap": 12,
+                      "children": [
+                        {
+                          "type": "frame",
+                          "id": "uezr5",
+                          "name": "Idioma",
+                          "width": "fill_container",
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": [
+                            9,
+                            0,
+                            0,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "L3bdb",
+                              "name": "Campo",
+                              "width": "fill_container",
+                              "height": 56,
+                              "cornerRadius": 4,
+                              "stroke": "$error",
+                              "strokeWidth": 2,
+                              "gap": 8,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "Iakfx",
+                                  "name": "Valor",
+                                  "fill": "$text",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Inglés",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 16,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "qp8eG",
+                                  "name": "Icono final",
+                                  "width": 24,
+                                  "height": 24,
+                                  "icon": "arrow_drop_down",
+                                  "library": "Material Symbols Rounded",
+                                  "fill": "$text-muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "t2oKOo",
+                              "layoutPosition": "absolute",
+                              "x": 10,
+                              "y": 1,
+                              "name": "Label",
+                              "fill": "$surface",
+                              "padding": [
+                                0,
+                                4
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "VrRIj",
+                                  "name": "Texto",
+                                  "fill": "$error",
+                                  "content": "Idioma",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 12,
+                                  "fontWeight": "600"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "DuLjM",
+                              "name": "Ayuda",
+                              "width": "fill_container",
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "TAtV3",
+                                  "name": "Texto ayuda",
+                                  "fill": "$error",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "Ya agregaste este idioma.",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "i5Fnx",
+                          "name": "Nivel",
+                          "width": 120,
+                          "layout": "vertical",
+                          "gap": 4,
+                          "padding": [
+                            9,
+                            0,
+                            0,
+                            0
+                          ],
+                          "children": [
+                            {
+                              "type": "frame",
+                              "id": "s9NDzl",
+                              "name": "Campo",
+                              "width": "fill_container",
+                              "height": 56,
+                              "cornerRadius": 4,
+                              "stroke": "$input-border",
+                              "strokeWidth": 1,
+                              "gap": 8,
+                              "padding": [
+                                0,
+                                14
+                              ],
+                              "alignItems": "center",
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "pfJ5a",
+                                  "name": "Valor",
+                                  "fill": "$text",
+                                  "textGrowth": "fixed-width",
+                                  "width": "fill_container",
+                                  "content": "C1",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 16,
+                                  "fontWeight": "normal"
+                                },
+                                {
+                                  "type": "icon",
+                                  "id": "yowKA",
+                                  "name": "Icono final",
+                                  "width": 24,
+                                  "height": 24,
+                                  "icon": "arrow_drop_down",
+                                  "library": "Material Symbols Rounded",
+                                  "fill": "$text-muted"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "frame",
+                              "id": "AnJlY",
+                              "layoutPosition": "absolute",
+                              "x": 10,
+                              "y": 1,
+                              "name": "Label",
+                              "fill": "$surface",
+                              "padding": [
+                                0,
+                                4
+                              ],
+                              "children": [
+                                {
+                                  "type": "text",
+                                  "id": "JxGQ6",
+                                  "name": "Texto",
+                                  "fill": "$text-muted",
+                                  "content": "Nivel (MCER)",
+                                  "fontFamily": "$font-body",
+                                  "fontSize": 12,
+                                  "fontWeight": "normal"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "type": "frame",
+                          "id": "TW7xv",
+                          "name": "Quitar",
+                          "width": 48,
+                          "height": 74,
+                          "cornerRadius": 24,
+                          "justifyContent": "center",
+                          "alignItems": "center",
+                          "children": [
+                            {
+                              "type": "icon",
+                              "id": "R62q9",
+                              "name": "Icono quitar",
+                              "width": 24,
+                              "height": 24,
+                              "icon": "delete",
+                              "library": "Material Symbols Rounded",
+                              "fill": "$text-muted"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "frame",
+                      "id": "GBJVy",
+                      "name": "Agregar idioma",
+                      "cornerRadius": 4,
+                      "gap": 8,
+                      "padding": [
+                        6,
+                        8
+                      ],
+                      "alignItems": "center",
+                      "children": [
+                        {
+                          "type": "icon",
+                          "id": "OleJH",
+                          "name": "Icono",
+                          "width": 20,
+                          "height": 20,
+                          "icon": "add",
+                          "library": "Material Symbols Rounded",
+                          "fill": "$primary"
+                        },
+                        {
+                          "type": "text",
+                          "id": "HeYq7",
+                          "name": "Texto",
+                          "fill": "$primary",
+                          "content": "Agregar idioma",
+                          "fontFamily": "$font-body",
+                          "fontSize": 14,
+                          "fontWeight": "600"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "frame",
+              "id": "JMISI",
+              "name": "Notas",
+              "width": 1080,
+              "layout": "vertical",
+              "gap": 4,
+              "children": [
+                {
+                  "type": "text",
+                  "id": "A2qprA",
+                  "name": "Nota",
+                  "fill": "$text-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "· Opciones: vigentes(catálogo) de @praxis/contracts, en el orden del catálogo; se guarda el id, se muestra el nombre.",
+                  "fontFamily": "$font-body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "F60zob",
+                  "name": "Nota",
+                  "fill": "$text-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "· Programa: Autocomplete con programasDe(nivel). createFilterOptions de MUI ignora tildes y mayúsculas («ingenieria» encuentra «Ingeniería»).",
+                  "fontFamily": "$font-body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "hJFjV",
+                  "name": "Nota",
+                  "fill": "$text-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "· Errores con el texto exacto de los esquemas: «Elige una opción de la lista.», «Este programa no corresponde al nivel elegido.», «Ya agregaste este idioma.»",
+                  "fontFamily": "$font-body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                },
+                {
+                  "type": "text",
+                  "id": "PLIOW",
+                  "name": "Nota",
+                  "fill": "$text-muted",
+                  "textGrowth": "fixed-width",
+                  "width": "fill_container",
+                  "content": "· Nivel MCER: el menú muestra «B2 · Intermedio alto»; el campo cerrado solo «B2» para caber a 360 px. Quitar idioma: IconButton con aria-label «Quitar Inglés».",
+                  "fontFamily": "$font-body",
+                  "fontSize": 14,
+                  "fontWeight": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "frame",
           "id": "nDNZo",
           "name": "Sección Rol administrador (fase posterior)",
           "layout": "vertical",
@@ -2787,7 +4701,7 @@
       "type": "frame",
       "id": "ko9Yg",
       "x": 0,
-      "y": 2825,
+      "y": 3551,
       "name": "M0 · Estructura y navegación",
       "fill": "#EEF2F7",
       "layout": "vertical",
@@ -5217,7 +7131,7 @@
       "type": "frame",
       "id": "fyfAT",
       "x": 0,
-      "y": 10202,
+      "y": 10928,
       "name": "M1 · Cuentas y acceso",
       "fill": "#EEF2F7",
       "layout": "vertical",
