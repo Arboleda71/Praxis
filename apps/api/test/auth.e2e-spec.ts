@@ -31,7 +31,11 @@ const empresa = {
 
 /** Token del último correo de confirmación enviado a `correo`. */
 function tokenDe(correo: string): string {
-  const archivos = readdirSync(CORREOS).filter((f) => f.includes(createHash('sha256').update(correo).digest('hex'))).sort();
+  const archivos = readdirSync(CORREOS)
+    .filter((f) =>
+      f.includes(createHash('sha256').update(correo).digest('hex')),
+    )
+    .sort();
   const html = readFileSync(join(CORREOS, archivos.at(-1)!), 'utf8');
   return html.match(/token=([A-Za-z0-9_-]+)/)![1];
 }
@@ -42,7 +46,9 @@ describe('/auth (integración, Postgres real)', () => {
   let agente: ReturnType<typeof request.agent>;
 
   beforeAll(async () => {
-    const mod = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    const mod = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile();
     app = configurarApp(mod.createNestApplication());
     await app.init();
     prisma = app.get(PrismaService);
@@ -62,7 +68,10 @@ describe('/auth (integración, Postgres real)', () => {
 
   describe('registro', () => {
     it('crea la cuenta de estudiante, inicia la sesión y envía el correo', async () => {
-      const res = await agente.post('/auth/registro/estudiante').send(estudiante).expect(201);
+      const res = await agente
+        .post('/auth/registro/estudiante')
+        .send(estudiante)
+        .expect(201);
       expect(res.body.sesion).toEqual({
         rol: 'estudiante',
         nombre: 'Laura Gómez Restrepo',
@@ -78,16 +87,29 @@ describe('/auth (integración, Postgres real)', () => {
     });
 
     it('guarda la contraseña con argon2, nunca en texto plano', async () => {
-      await agente.post('/auth/registro/estudiante').send(estudiante).expect(201);
-      const c = await prisma.cuenta.findUniqueOrThrow({ where: { correo: 'laura@correo.co' } });
+      await agente
+        .post('/auth/registro/estudiante')
+        .send(estudiante)
+        .expect(201);
+      const c = await prisma.cuenta.findUniqueOrThrow({
+        where: { correo: 'laura@correo.co' },
+      });
       expect(c.contrasenaHash).toMatch(/^\$argon2id\$/);
       expect(c.autorizacionDatosEn).toBeInstanceOf(Date);
     });
 
     it('rechaza un correo ya registrado con un mensaje por campo', async () => {
-      await agente.post('/auth/registro/estudiante').send(estudiante).expect(201);
-      const res = await request(app.getHttpServer()).post('/auth/registro/estudiante').send(estudiante).expect(409);
-      expect(res.body.errores.correo).toBe('Este correo ya tiene una cuenta. Inicia sesión.');
+      await agente
+        .post('/auth/registro/estudiante')
+        .send(estudiante)
+        .expect(201);
+      const res = await request(app.getHttpServer())
+        .post('/auth/registro/estudiante')
+        .send(estudiante)
+        .expect(409);
+      expect(res.body.errores.correo).toBe(
+        'Este correo ya tiene una cuenta. Inicia sesión.',
+      );
     });
 
     it('crea la empresa con el NIT normalizado y rechaza un NIT repetido', async () => {
@@ -107,22 +129,41 @@ describe('/auth (integración, Postgres real)', () => {
         .send({ ...empresa, nit: '900123456-7', autorizaDatos: false })
         .expect(400);
       expect(res.body.errores.nit).toMatch(/dígito de verificación/);
-      expect(res.body.errores.autorizaDatos).toBe('Debes aceptar la política para continuar.');
+      expect(res.body.errores.autorizaDatos).toBe(
+        'Debes aceptar la política para continuar.',
+      );
     });
 
     it('los registros tienen una ventana independiente y limitada', async () => {
-      await agente.post('/auth/registro/estudiante').send(estudiante).expect(201);
-      for (let i = 0; i < 4; i++) await agente.post('/auth/registro/estudiante').send(estudiante).expect(409);
+      await agente
+        .post('/auth/registro/estudiante')
+        .send(estudiante)
+        .expect(201);
+      for (let i = 0; i < 4; i++)
+        await agente
+          .post('/auth/registro/estudiante')
+          .send(estudiante)
+          .expect(409);
       // El registro de la empresa sí prospera: los cuatro fallos anteriores dejan de contar.
       await agente.post('/auth/registro/empresa').send(empresa).expect(201);
-      for (let i = 0; i < 4; i++) await agente.post('/auth/registro/estudiante').send(estudiante).expect(409);
-      await agente.post('/auth/registro/estudiante').send({ ...estudiante, correo: 'otra@correo.co' }).expect(429);
+      for (let i = 0; i < 4; i++)
+        await agente
+          .post('/auth/registro/estudiante')
+          .send(estudiante)
+          .expect(409);
+      await agente
+        .post('/auth/registro/estudiante')
+        .send({ ...estudiante, correo: 'otra@correo.co' })
+        .expect(429);
     });
   });
 
   describe('inicio y cierre de sesión', () => {
     beforeEach(async () => {
-      await request(app.getHttpServer()).post('/auth/registro/estudiante').send(estudiante).expect(201);
+      await request(app.getHttpServer())
+        .post('/auth/registro/estudiante')
+        .send(estudiante)
+        .expect(201);
     });
 
     it('inicia sesión con datos correctos', async () => {
@@ -135,31 +176,53 @@ describe('/auth (integración, Postgres real)', () => {
     });
 
     it('responde igual con contraseña errada o correo inexistente', async () => {
-      const a = await agente.post('/auth/login').send({ correo: 'laura@correo.co', contrasena: 'equivocada' }).expect(401);
-      const b = await agente.post('/auth/login').send({ correo: 'nadie@correo.co', contrasena: 'equivocada' }).expect(401);
+      const a = await agente
+        .post('/auth/login')
+        .send({ correo: 'laura@correo.co', contrasena: 'equivocada' })
+        .expect(401);
+      const b = await agente
+        .post('/auth/login')
+        .send({ correo: 'nadie@correo.co', contrasena: 'equivocada' })
+        .expect(401);
       expect(a.body).toEqual(b.body);
       expect(a.body.mensaje).toBe('Correo o contraseña incorrectos.');
     });
 
     it('bloquea 15 minutos tras 5 intentos fallidos', async () => {
       for (let i = 0; i < 5; i++) {
-        await agente.post('/auth/login').send({ correo: 'laura@correo.co', contrasena: 'equivocada' }).expect(401);
+        await agente
+          .post('/auth/login')
+          .send({ correo: 'laura@correo.co', contrasena: 'equivocada' })
+          .expect(401);
       }
-      const res = await agente.post('/auth/login').send({ correo: 'laura@correo.co', contrasena: estudiante.contrasena }).expect(429);
-      expect(res.body.mensaje).toBe('Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.');
+      const res = await agente
+        .post('/auth/login')
+        .send({ correo: 'laura@correo.co', contrasena: estudiante.contrasena })
+        .expect(429);
+      expect(res.body.mensaje).toBe(
+        'Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.',
+      );
     });
 
     it('un inicio de sesión correcto reinicia la cuenta de intentos', async () => {
       const malo = { correo: 'laura@correo.co', contrasena: 'equivocada' };
-      const bueno = { correo: 'laura@correo.co', contrasena: estudiante.contrasena };
-      for (let i = 0; i < 4; i++) await agente.post('/auth/login').send(malo).expect(401);
+      const bueno = {
+        correo: 'laura@correo.co',
+        contrasena: estudiante.contrasena,
+      };
+      for (let i = 0; i < 4; i++)
+        await agente.post('/auth/login').send(malo).expect(401);
       await agente.post('/auth/login').send(bueno).expect(200);
-      for (let i = 0; i < 4; i++) await agente.post('/auth/login').send(malo).expect(401);
+      for (let i = 0; i < 4; i++)
+        await agente.post('/auth/login').send(malo).expect(401);
       await agente.post('/auth/login').send(bueno).expect(200);
     });
 
     it('cerrar sesión la termina en el servidor', async () => {
-      await agente.post('/auth/login').send({ correo: 'laura@correo.co', contrasena: estudiante.contrasena }).expect(200);
+      await agente
+        .post('/auth/login')
+        .send({ correo: 'laura@correo.co', contrasena: estudiante.contrasena })
+        .expect(200);
       await agente.post('/auth/logout').expect(204);
       await agente.get('/auth/sesion').expect(401);
       expect(await prisma.sesion.count()).toBe(1); // solo la del registro inicial
@@ -172,39 +235,63 @@ describe('/auth (integración, Postgres real)', () => {
 
   describe('confirmación de correo', () => {
     beforeEach(async () => {
-      await agente.post('/auth/registro/estudiante').send(estudiante).expect(201);
+      await agente
+        .post('/auth/registro/estudiante')
+        .send(estudiante)
+        .expect(201);
     });
 
     it('un enlace válido confirma el correo una sola vez', async () => {
       const token = tokenDe('laura@correo.co');
-      const ok = await request(app.getHttpServer()).post('/auth/confirmar-correo').send({ token }).expect(200);
+      const ok = await request(app.getHttpServer())
+        .post('/auth/confirmar-correo')
+        .send({ token })
+        .expect(200);
       expect(ok.body.rol).toBe('estudiante');
       const s = await agente.get('/auth/sesion').expect(200);
       expect(s.body.correoConfirmado).toBe(true);
-      await request(app.getHttpServer()).post('/auth/confirmar-correo').send({ token }).expect(200);
+      await request(app.getHttpServer())
+        .post('/auth/confirmar-correo')
+        .send({ token })
+        .expect(200);
     });
 
     it('un enlace vencido no sirve', async () => {
       const token = tokenDe('laura@correo.co');
-      await prisma.enlaceConfirmacion.updateMany({ data: { expiraEn: new Date(Date.now() - 1000) } });
-      const res = await request(app.getHttpServer()).post('/auth/confirmar-correo').send({ token }).expect(410);
+      await prisma.enlaceConfirmacion.updateMany({
+        data: { expiraEn: new Date(Date.now() - 1000) },
+      });
+      const res = await request(app.getHttpServer())
+        .post('/auth/confirmar-correo')
+        .send({ token })
+        .expect(410);
       expect(res.body.mensaje).toBe('Este enlace ya no sirve.');
     });
 
     it('reenviar: uno por minuto y el anterior deja de servir', async () => {
       const viejo = tokenDe('laura@correo.co');
-      await prisma.enlaceConfirmacion.updateMany({ data: { creadoEn: new Date(Date.now() - 61_000) } });
+      await prisma.enlaceConfirmacion.updateMany({
+        data: { creadoEn: new Date(Date.now() - 61_000) },
+      });
       await agente.post('/auth/reenviar-confirmacion').expect(204);
-      const espera = await agente.post('/auth/reenviar-confirmacion').expect(429);
+      const espera = await agente
+        .post('/auth/reenviar-confirmacion')
+        .expect(429);
       expect(espera.body.segundos).toBeGreaterThan(0);
-      await request(app.getHttpServer()).post('/auth/confirmar-correo').send({ token: viejo }).expect(410);
-      await request(app.getHttpServer()).post('/auth/confirmar-correo').send({ token: tokenDe('laura@correo.co') }).expect(200);
+      await request(app.getHttpServer())
+        .post('/auth/confirmar-correo')
+        .send({ token: viejo })
+        .expect(410);
+      await request(app.getHttpServer())
+        .post('/auth/confirmar-correo')
+        .send({ token: tokenDe('laura@correo.co') })
+        .expect(200);
     });
 
     it('reenviar exige sesión', async () => {
-      await request(app.getHttpServer()).post('/auth/reenviar-confirmacion').expect(401);
+      await request(app.getHttpServer())
+        .post('/auth/reenviar-confirmacion')
+        .expect(401);
     });
   });
 });
-
-

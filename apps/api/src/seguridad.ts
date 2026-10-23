@@ -1,13 +1,39 @@
-import { Catch, HttpException, Logger, type ArgumentsHost, type ExceptionFilter } from '@nestjs/common';
+import {
+  Catch,
+  HttpException,
+  Logger,
+  type ArgumentsHost,
+  type ExceptionFilter,
+} from '@nestjs/common';
 import type { Response } from 'express';
 /** Solo la configuración; nunca incluye valores secretos en el error. */
 export function validarConfiguracion(env: NodeJS.ProcessEnv = process.env) {
+  if (env.WOMPI_ENV && env.WOMPI_ENV !== 'sandbox')
+    throw new Error('WOMPI_ENV solo admite sandbox en el piloto.');
+  for (const [key, prefijo] of [
+    ['WOMPI_PUBLIC_KEY', 'pub_test_'],
+    ['WOMPI_INTEGRITY_SECRET', 'test_integrity_'],
+    ['WOMPI_EVENTS_SECRET', 'test_events_'],
+  ]) {
+    if (env[key] && !env[key]!.startsWith(prefijo))
+      throw new Error(`${key} solo admite llaves sandbox.`);
+  }
   if (env.NODE_ENV !== 'production') return;
-  for (const key of ['DATABASE_URL', 'WEB_URL', 'RESEND_API_KEY', 'CORREO_REMITENTE', 'S3_BUCKET', 'S3_ACCESS_KEY_ID', 'S3_SECRET_ACCESS_KEY']) {
+  for (const key of [
+    'DATABASE_URL',
+    'WEB_URL',
+    'RESEND_API_KEY',
+    'CORREO_REMITENTE',
+    'S3_BUCKET',
+    'S3_ACCESS_KEY_ID',
+    'S3_SECRET_ACCESS_KEY',
+  ]) {
     if (!env[key]) throw new Error(`Falta ${key} en producción.`);
   }
-  if (new URL(env.WEB_URL!).protocol !== 'https:') throw new Error('WEB_URL debe usar HTTPS en producción.');
-  if (env.CORREOS_DIR) throw new Error('CORREOS_DIR no está permitido en producción.');
+  if (new URL(env.WEB_URL!).protocol !== 'https:')
+    throw new Error('WEB_URL debe usar HTTPS en producción.');
+  if (env.CORREOS_DIR)
+    throw new Error('CORREOS_DIR no está permitido en producción.');
 }
 
 @Catch()
@@ -19,7 +45,11 @@ export class ErroresSeguros implements ExceptionFilter {
       res.status(error.getStatus()).json(error.getResponse());
     } else {
       this.log.error('No se pudo completar una operación.');
-      res.status(500).json({ mensaje: 'No pudimos completar la operación. Inténtalo de nuevo.' });
+      res
+        .status(500)
+        .json({
+          mensaje: 'No pudimos completar la operación. Inténtalo de nuevo.',
+        });
     }
   }
 }

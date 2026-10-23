@@ -16,10 +16,23 @@ export function configurarApp<T extends INestApplication>(app: T): T {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('X-Frame-Options', 'DENY');
     res.setHeader('Referrer-Policy', 'no-referrer');
-    res.setHeader('Content-Security-Policy', "default-src 'none'; frame-ancestors 'none'");
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'none'; frame-ancestors 'none'",
+    );
     res.setHeader('Cache-Control', 'no-store');
-    if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.path !== '/pagos/eventos' && req.get('origin') !== origen) {
-      res.status(403).json({ mensaje: 'Realiza esta acción desde las pantallas de Praxis.' });
+    if (process.env.NODE_ENV === 'production')
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000');
+    if (
+      !['GET', 'HEAD', 'OPTIONS'].includes(req.method) &&
+      req.path !== '/pagos/eventos' &&
+      req.get('origin') !== origen
+    ) {
+      res
+        .status(403)
+        .json({
+          mensaje: 'Realiza esta acción desde las pantallas de Praxis.',
+        });
       return;
     }
     next();

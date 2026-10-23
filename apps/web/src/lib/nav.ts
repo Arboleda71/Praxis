@@ -11,19 +11,32 @@ export const NAV: Record<Role, NavItem[]> = {
   estudiante: [
     { href: "/", label: "Inicio", Icon: HomeRounded },
     { href: "/estudiante/perfil", label: "Mi perfil", Icon: PersonRounded },
-    { href: '/estudiante/vacantes', label: 'Buscar', Icon: WorkRounded },
-    { href: '/estudiante/postulaciones', label: 'Postulaciones', Icon: ApartmentRounded },
+    { href: "/estudiante/vacantes", label: "Buscar", Icon: WorkRounded },
+    {
+      href: "/estudiante/postulaciones",
+      label: "Postulaciones",
+      Icon: ApartmentRounded,
+    },
   ],
   empresa: [
     { href: "/empresa/vacantes", label: "Mis vacantes", Icon: WorkRounded },
-    { href: "/empresa/perfil", label: "Perfil de la empresa", Icon: ApartmentRounded },
+    {
+      href: "/empresa/perfil",
+      label: "Perfil de la empresa",
+      Icon: ApartmentRounded,
+    },
   ],
 };
 
 /** Destino de la barra que corresponde a la ruta actual, o `false` si ninguno. */
-export function currentHref(pathname: string, items: NavItem[]): string | false {
+export function currentHref(
+  pathname: string,
+  items: NavItem[],
+): string | false {
   const match = items.find(({ href }) =>
-    href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`),
+    href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`),
   );
   return match?.href ?? false;
 }

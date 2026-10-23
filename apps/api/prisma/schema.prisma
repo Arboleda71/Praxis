@@ -96,7 +96,25 @@ model Empresa {
   correoContacto String?
   telefono    String?
   vacantes    Vacante[]
+  plan        String?
+  planInicioEn DateTime?
+  planVenceEn DateTime?
+  pagos       Pago[]
   cuenta      Cuenta @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
+}
+
+model Pago {
+  id String @id @default(uuid()) @db.Uuid
+  empresaId String @db.Uuid
+  empresa Empresa @relation(fields: [empresaId], references: [cuentaId], onDelete: Restrict)
+  plan String
+  montoCentavos Int
+  moneda String @default("COP")
+  estado String @default("Pendiente")
+  wompiId String? @unique
+  creadaEn DateTime @default(now())
+  aprobadaEn DateTime?
+  @@index([empresaId, creadaEn])
 }
 
 model Vacante {

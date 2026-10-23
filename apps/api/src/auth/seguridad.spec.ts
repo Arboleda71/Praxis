@@ -4,7 +4,9 @@ import { opcionesCookie } from './sesion.js';
 describe('spec 003: reservas y ventanas', () => {
   it('reserva antes del await: solo cinco de cincuenta llegan a verificar', () => {
     const i = new Intentos();
-    const aceptados = Array.from({ length: 50 }, () => i.reservar('correo:a', 'ip:1'));
+    const aceptados = Array.from({ length: 50 }, () =>
+      i.reservar('correo:a', 'ip:1'),
+    );
     expect(aceptados.filter(Boolean)).toHaveLength(5);
   });
   it('un acierto libera la cuenta pero conserva el contador del origen', () => {
@@ -24,6 +26,10 @@ describe('spec 003: reservas y ventanas', () => {
     expect(i.registro('ip:1')).toBe(true);
   });
   it('la cookie siempre es Secure, httpOnly y SameSite', () => {
-    expect(opcionesCookie()).toMatchObject({ secure: true, httpOnly: true, sameSite: 'lax' });
+    expect(opcionesCookie()).toMatchObject({
+      secure: true,
+      httpOnly: true,
+      sameSite: 'lax',
+    });
   });
 });

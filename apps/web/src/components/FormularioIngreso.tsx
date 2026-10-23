@@ -9,7 +9,7 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import { loginSchema, type SesionPublica } from "@praxis/contracts";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { inicioDe, safeNext } from "@/lib/rutas";
 import CampoContrasena from "./CampoContrasena";
 
@@ -23,6 +23,11 @@ export default function FormularioIngreso({ next }: { next?: string }) {
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [aviso, setAviso] = useState<Aviso>(null);
   const [enviando, setEnviando] = useState(false);
+  useEffect(() => {
+    if (!aviso?.bloqueado) return;
+    const reloj = setTimeout(() => setAviso(null), 15 * 60_000);
+    return () => clearTimeout(reloj);
+  }, [aviso?.bloqueado]);
 
   function avisar(a: Aviso) {
     setAviso(a);
@@ -50,11 +55,21 @@ export default function FormularioIngreso({ next }: { next?: string }) {
       router.push(safeNext(next) ?? inicioDe(sesion.rol));
       router.refresh();
     } else if (res?.status === 429) {
-      avisar({ titulo: "Demasiados intentos", texto: "Por seguridad, espera 15 minutos e inténtalo de nuevo.", bloqueado: true });
+      avisar({
+        titulo: "Demasiados intentos",
+        texto: "Por seguridad, espera 15 minutos e inténtalo de nuevo.",
+        bloqueado: true,
+      });
     } else if (res?.status === 401) {
-      avisar({ titulo: "Correo o contraseña incorrectos", texto: "Revisa los datos e inténtalo de nuevo." });
+      avisar({
+        titulo: "Correo o contraseña incorrectos",
+        texto: "Revisa los datos e inténtalo de nuevo.",
+      });
     } else {
-      avisar({ titulo: "No pudimos iniciar sesión", texto: "Revisa tu conexión e inténtalo de nuevo." });
+      avisar({
+        titulo: "No pudimos iniciar sesión",
+        texto: "Revisa tu conexión e inténtalo de nuevo.",
+      });
     }
   }
 
@@ -91,12 +106,25 @@ export default function FormularioIngreso({ next }: { next?: string }) {
         helperText={errores.contrasena}
         fullWidth
       />
-      <Button type="submit" variant="contained" size="large" fullWidth disabled={enviando || aviso?.bloqueado}>
+      <Button
+        type="submit"
+        variant="contained"
+        size="large"
+        fullWidth
+        disabled={enviando || aviso?.bloqueado}
+      >
         {enviando ? "Iniciando sesión…" : "Iniciar sesión"}
       </Button>
-      <Typography variant="body2" color="text.secondary" sx={{ textAlign: "center" }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ textAlign: "center" }}
+      >
         ¿No tienes cuenta?{" "}
-        <Link href="/registro" sx={{ fontWeight: 600, display: "inline-block", py: 1.5 }}>
+        <Link
+          href="/registro"
+          sx={{ fontWeight: 600, display: "inline-block", py: 1.5 }}
+        >
           Crear cuenta
         </Link>
       </Typography>

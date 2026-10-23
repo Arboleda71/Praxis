@@ -6,6 +6,7 @@ import { requireRole } from "@/lib/session";
 export const metadata: Metadata = { title: "Mis vacantes" };
 
 export default async function MisVacantes() {
-  if (!(await requireRole("empresa", "/empresa/vacantes"))) return <SinAcceso role="estudiante" />;
+  if (!(await requireRole("empresa", "/empresa/vacantes")))
+    return <SinAcceso role="estudiante" />;
   return <ListaVacantes />;
 }
