@@ -9,6 +9,25 @@ describe('configuración segura al arrancar', () => {
       }),
     ).toThrow('DATABASE_URL');
   });
+  it('producción exige el secreto del proxy: sin él todos compartirían un origen (spec 011)', () => {
+    const base = {
+      NODE_ENV: 'production',
+      DATABASE_URL: 'postgresql://ficticia',
+      WEB_URL: 'https://praxis.test',
+      RESEND_API_KEY: 're_ficticia',
+      CORREO_REMITENTE: 'no-responder@praxis.test',
+      S3_BUCKET: 'ficticio',
+      S3_ACCESS_KEY_ID: 'ficticio',
+      S3_SECRET_ACCESS_KEY: 'ficticio',
+    };
+    expect(() => validarConfiguracion(base)).toThrow('PROXY_SECRETO');
+    expect(() =>
+      validarConfiguracion({ ...base, PROXY_SECRETO: 'corto' }),
+    ).toThrow('PROXY_SECRETO');
+    expect(() =>
+      validarConfiguracion({ ...base, PROXY_SECRETO: 'x'.repeat(32) }),
+    ).not.toThrow();
+  });
   it('rechaza un entorno de pagos real incluso en desarrollo', () => {
     expect(() => validarConfiguracion({ WOMPI_ENV: 'production' })).toThrow(
       'sandbox',

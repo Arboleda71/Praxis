@@ -37,17 +37,24 @@ test.describe("Crear cuenta", () => {
     await page
       .getByRole("checkbox", { name: /Autorizo el tratamiento/ })
       .check();
+    const inicio = Date.now();
     await page.getByRole("button", { name: "Crear cuenta" }).click();
 
     await expect(
       page.getByRole("heading", { name: "Revisa tu correo" }),
     ).toBeVisible();
+    // PM011 (spec 011): del envío del formulario a tener el correo disponible, en menos de un minuto.
+    // Con la bandeja local; el dato con Resend real lo da `npm run verificar:proveedores -- --correo`.
+    const token = tokenDe(correo);
+    const ms = Date.now() - inicio;
+    expect(ms).toBeLessThan(60_000);
+    console.log(`PM011 registro y correo disponibles: ${ms} ms`);
     await expect(
       page.getByRole("main").getByText(correo, { exact: true }),
     ).toBeVisible();
     await sinViolaciones(page);
 
-    await page.goto(`/confirmar-correo?token=${tokenDe(correo)}`);
+    await page.goto(`/confirmar-correo?token=${token}`);
     await page.getByRole("button", { name: "Confirmar mi correo" }).click();
     await expect(
       page.getByRole("heading", { name: "Tu correo quedó confirmado" }),

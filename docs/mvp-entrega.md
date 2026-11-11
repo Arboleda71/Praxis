@@ -113,3 +113,19 @@ Ramas locales encadenadas: `006-entorno-pruebas-seguro` → `003-endurecer-segur
 Next y eslint-config-next se actualizaron a **16.4.3**, dentro de Next 16, por los avisos [GHSA-2464-fhr4-w9xw](https://github.com/advisories/GHSA-2464-fhr4-w9xw) y [GHSA-673q-mjm6-r5xr](https://github.com/advisories/GHSA-673q-mjm6-r5xr). Las acciones de CI siguen la versión v7 documentada por sus repositorios oficiales; el workflow aún no se ejecutó en GitHub.
 
 Antes de publicar con datos reales: validar proxy/IP de infraestructura, proveedor de archivos privado, correo, tratamiento internacional de datos y controles operativos; obtener revisión humana y CI verde. La constitución no se modificó.
+
+## Actualización · 2026-11-10 (spec 011, rama `011-cabos-m1-integraciones`)
+
+Cabos de M1 e integraciones: detalle en `specs/011-cabos-m1-integraciones/` y `docs/produccion.md`.
+
+- Límite de intentos en Postgres (migración `20261110120000_intentos`, sexta del proyecto) y origen del visitante
+  con `PROXY_SECRETO` entre la web y la API.
+- `npm run db:test` levanta ahora dos contenedores: Postgres y un almacenamiento compatible con S3 (RustFS; MinIO
+  dejó de publicar imagen) en 127.0.0.1:59000.
+- Comandos nuevos: `npm run test:scripts` y `npm run verificar:proveedores`.
+
+Resultados locales de esta rama (pasada final del 2026-11-11, tras corregir lo que encontraron dos revisiones
+independientes; detalle en `specs/011-cabos-m1-integraciones/tasks.md`): **10** guardas, **83** contratos, **10**
+unitarias API, **85** integración API, **39** unitarias web, **8** del script de verificación y **69** Playwright:
+**304 pruebas aprobadas**. Lint y tipos de API, web y scripts sin errores. No hubo push, PR, despliegue ni conexión con proveedores reales; CI remoto y revisión
+humana siguen pendientes.

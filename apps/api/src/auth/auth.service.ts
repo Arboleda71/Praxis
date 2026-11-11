@@ -24,8 +24,21 @@ import {
 } from './sesion.js';
 
 const ENLACE_MS = 24 * 60 * 60_000;
-const DEMASIADOS =
-  'Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.';
+/** 429 con el tiempo real que falta (spec 011): la web reactiva el formulario al cumplirse. */
+const demasiados = (segundos: number, que = 'intentos') => {
+  const minutos = Math.ceil(segundos / 60);
+  const espera =
+    minutos >= 60
+      ? 'una hora'
+      : `${minutos} ${minutos === 1 ? 'minuto' : 'minutos'}`;
+  return new HttpException(
+    {
+      mensaje: `Demasiados ${que}. Espera ${espera} e inténtalo de nuevo.`,
+      segundos,
+    },
+    429,
+  );
+};
 type CuentaConPerfil = SesionActiva['cuenta'];
 export const publica = (c: CuentaConPerfil): SesionPublica => ({
   rol: c.rol === 'ESTUDIANTE' ? 'estudiante' : 'empresa',
@@ -59,8 +72,8 @@ export class AuthService {
   }
   async login(d: Login, ip: string) {
     const claves = [`correo:${d.correo}`, `ip:${ip}`];
-    if (!this.intentos.reservar(...claves))
-      throw new HttpException({ mensaje: DEMASIADOS }, 429);
+    const espera = await this.intentos.reservar(...claves);
+    if (espera) throw demasiados(espera);
     const cuenta = await this.prisma.cuenta.findUnique({
       where: { correo: d.correo },
       include: { estudiante: true, empresa: true },
@@ -73,7 +86,7 @@ export class AuthService {
       throw new UnauthorizedException({
         mensaje: 'Correo o contraseña incorrectos.',
       });
-    this.intentos.exito(...claves);
+    await this.intentos.exito(...claves);
     return this.abrirSesion(cuenta);
   }
   async cerrarSesion(token: string | undefined) {
@@ -141,10 +154,6 @@ export class AuthService {
           { mensaje: `Puedes pedir otro enlace en ${segundos} s.`, segundos },
           429,
         );
-      await tx.enlaceConfirmacion.updateMany({
-        where: { cuentaId: cuenta.id, usadoEn: null },
-        data: { usadoEn: new Date() },
-      });
       await tx.enlaceConfirmacion.create({
         data: {
           id: hashToken(token),
@@ -153,6 +162,9 @@ export class AuthService {
         },
       });
     });
+    // Los enlaces anteriores solo dejan de servir cuando el nuevo salió (spec 011, FR-016). Si el envío
+    // falla no se anula nada: el proveedor pudo aceptarlo y tardar en responder, y ese correo debe servir.
+    // El enlace nuevo conserva su fecha, así que el límite de un minuto sigue aplicando.
     try {
       await this.correo.enviarConfirmacion(cuenta.correo, token);
     } catch {
@@ -165,25 +177,26 @@ export class AuthService {
         503,
       );
     }
+    await this.prisma.enlaceConfirmacion.updateMany({
+      where: { cuentaId: cuenta.id, usadoEn: null, id: { not: hashToken(token) } },
+      data: { usadoEn: new Date() },
+    });
   }
   private async validarNuevo(ip: string, correo: string, nit?: string) {
-    if (this.intentos.bloqueado(`correo:${correo}`, `ip:${ip}`))
-      throw new HttpException({ mensaje: DEMASIADOS }, 429);
-    if (!this.intentos.registro(ip))
-      throw new HttpException(
-        {
-          mensaje:
-            'Demasiados registros. Espera una hora e inténtalo de nuevo.',
-        },
-        429,
-      );
+    const bloqueo = await this.intentos.bloqueado(
+      `correo:${correo}`,
+      `ip:${ip}`,
+    );
+    if (bloqueo) throw demasiados(bloqueo);
+    const espera = await this.intentos.registro(ip);
+    if (espera) throw demasiados(espera, 'registros');
     const errores: Record<string, string> = {};
     if (await this.prisma.cuenta.findUnique({ where: { correo } }))
       errores.correo = 'Este correo ya tiene una cuenta. Inicia sesión.';
     if (nit && (await this.prisma.empresa.findUnique({ where: { nit } })))
       errores.nit = 'Ya existe una cuenta para este NIT.';
     if (Object.keys(errores).length) {
-      this.intentos.fallo(`ip:${ip}`);
+      await this.intentos.fallo(`ip:${ip}`);
       throw new ConflictException({ errores });
     }
   }
@@ -221,7 +234,7 @@ export class AuthService {
       });
     } catch (e) {
       if ((e as { code?: string }).code === 'P2002') {
-        this.intentos.fallo(`ip:${ip}`);
+        await this.intentos.fallo(`ip:${ip}`);
         throw new ConflictException({
           errores: { correo: 'Este correo o NIT ya tiene una cuenta.' },
         });

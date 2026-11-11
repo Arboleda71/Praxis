@@ -194,6 +194,15 @@ model Notificacion {
   @@index([cuentaId, creadaEn])
 }
 
+/// Contador de intentos de ingreso y registro (spec 011). La clave es un SHA-256: no guarda correos ni IP.
+model Intento {
+  clave String   @id
+  n     Int
+  vence DateTime @db.Timestamptz(3)
+
+  @@index([vence])
+}
+
 /// El id es el hash SHA-256 del token de la cookie; el token nunca se guarda.
 model Sesion {
   id       String   @id

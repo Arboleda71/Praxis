@@ -22,13 +22,13 @@ La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (in
 
 ## B. Hallazgos de M1 que la spec 003 no cubre
 
-- [ ] PM005 [S3] Cerrar sesión cuando la API falla: la web debe avisar y no dejar al usuario creyendo que salió (`apps/web/src/components`, cierre de sesión)
-- [ ] PM006 [S4] Fallo del proveedor de correo al reenviar: mensaje claro y la cuenta sigue usable (`apps/api/src/auth/correo.ts`)
+- [x] PM005 [S3] Cerrar sesión cuando la API falla: la web debe avisar y no dejar al usuario creyendo que salió (`apps/web/src/components`, cierre de sesión) — spec 011, 2026-11-10: timeout y pruebas del camino de fallo
+- [x] PM006 [S4] Fallo del proveedor de correo al reenviar: mensaje claro y la cuenta sigue usable (`apps/api/src/auth/correo.ts`) — spec 011, 2026-11-10: timeout de 10 s y el reenvío fallido ya no invalida el enlace anterior
 - [x] PM007 [P3] Guarda en las pruebas: abortar si `DATABASE_URL` no apunta a `praxis_test`/`praxis_e2e` (`apps/api/test`, configuración de Playwright)
-- [ ] PM008 [R1] Confirmar el correo sin sesión abierta y distinguir error de red de enlace vencido (`apps/web/src/app/confirmar-correo`)
-- [ ] PM009 [R2] Reactivar el formulario de ingreso al terminar los 15 minutos de bloqueo, sin recargar (`apps/web/src/components/FormularioIngreso.tsx`)
+- [x] PM008 [R1] Confirmar el correo sin sesión abierta y distinguir error de red de enlace vencido (`apps/web/src/app/confirmar-correo`) — spec 011, 2026-11-10
+- [x] PM009 [R2] Reactivar el formulario de ingreso al terminar los 15 minutos de bloqueo, sin recargar (`apps/web/src/components/FormularioIngreso.tsx`) — spec 011, 2026-11-10: usa el tiempo restante real que informa la API
 - [ ] PM010 [P4] Revisión manual de teclado y lector de pantalla de M0 y M1 a 360 y 1080 px; registrar el resultado en `estado.md`
-- [ ] PM011 [P5] Medir el registro completo (SC de M1) y la entrega real de un correo en menos de un minuto con Resend
+- [ ] PM011 [P5] Medir el registro completo (SC de M1) y la entrega real de un correo en menos de un minuto con Resend — spec 011, 2026-11-10: medido en local (registro y correo disponibles en 159–289 ms); **falta el dato con Resend real**: `npm run verificar:proveedores -- --correo`
 
 ## C. Calidad y entrega
 
@@ -44,9 +44,9 @@ La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (in
 
 ## E. Producción (antes de salir del piloto)
 
-- [ ] PM018 `RESEND_API_KEY` y dominio remitente verificado
-- [ ] PM019 Límite de intentos fuera de memoria si la API corre en más de una instancia (`ponytail:` en el plan de M1)
-- [ ] PM020 Residencia de datos y Ley 1581, documento fuente faltante y Wompi en producción: ver `docs/pendientes-constitucion.md` §4
+- [ ] PM018 `RESEND_API_KEY` y dominio remitente verificado — código y verificación listos (spec 011, 2026-11-10); **faltan las credenciales**. Ver `docs/produccion.md` §1 y §4
+- [x] PM019 Límite de intentos fuera de memoria si la API corre en más de una instancia (`ponytail:` en el plan de M1) — spec 011, 2026-11-10: tabla `Intento` en Postgres
+- [ ] PM020 Residencia de datos y Ley 1581, documento fuente faltante y Wompi en producción: ver `docs/pendientes-constitucion.md` §4 — spec 011, 2026-11-10: documentado en `docs/produccion.md` §5 y §6; **falta la validación humana** y siguen fuera el documento fuente y el comercio de Wompi
 
 ## F. Features aplazadas
 
@@ -60,3 +60,15 @@ depende de otra persona. E y F antes de salir del piloto.
 ## Actualización de entrega local · 2026-10-23
 
 Seguridad implementada y verificada localmente en la rama 003; planes manuales y evidencia en specs/003. M4, M5, búsqueda, elegibilidad, postulación, seguimiento, notificaciones y Wompi sandbox implementados en ramas 007–010. PM012 corresponde a definir/validar el workflow; su ejecución en GitHub sigue pendiente. PM015: npm audit completo 0 vulnerabilidades tras Next 16.4.3. PM014: .nvmrc fija 24.22.1, usado en validación; el Node del sistema 24.14.1 no se cambió. Proxy de producción, proveedores externos, auditoría manual completa de accesibilidad, CI remoto y revisión por PR siguen pendientes. Ver docs/mvp-entrega.md.
+
+## Actualización · 2026-11-10 (spec 011)
+
+Rama `011-cabos-m1-integraciones`, sin fusionar ni publicar. Cerrados en código y pruebas: PM005, PM006, PM008,
+PM009 y PM019. Además se corrigió el origen del visitante detrás del proxy de despliegue (`PROXY_SECRETO`), que
+habría hecho que un bloqueo dejara fuera a todos los usuarios en producción, y los archivos en S3/R2 quedaron
+probados contra un almacenamiento compatible real en Docker.
+
+Siguen abiertos porque dependen de credenciales o de personas: PM011 (dato con Resend real), PM018 (llaves de
+Resend), S3/R2 y Wompi sandbox reales, la validación del origen en el primer despliegue y la validación legal de
+`docs/produccion.md` §5. El comando `npm run verificar:proveedores` cierra los tres primeros en minutos cuando
+existan las llaves.

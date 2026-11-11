@@ -2,7 +2,9 @@
 
 import KeyboardArrowDownRounded from "@mui/icons-material/KeyboardArrowDownRounded";
 import LogoutRounded from "@mui/icons-material/LogoutRounded";
+import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
+import Snackbar from "@mui/material/Snackbar";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
@@ -26,6 +28,8 @@ export default function AccountMenu({
 }) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [error, setError] = useState("");
+  // Cada fallo monta un aviso nuevo: si el anterior aún sale de pantalla, reutilizarlo no se anunciaría.
+  const [intento, setIntento] = useState(0);
   const [pending, startTransition] = useTransition();
   const open = Boolean(anchor);
   const trigger = {
@@ -97,15 +101,16 @@ export default function AccountMenu({
         </MenuItem>
         <MenuItem
           disabled={pending}
-          onClick={() =>
+          onClick={() => {
+            // Fuera de la transición, para que un segundo fallo vuelva a montar el aviso y se anuncie.
+            setError("");
+            setAnchor(null);
+            setIntento((n) => n + 1);
             startTransition(async () => {
               const r = await logout();
-              if (r?.error) {
-                setError(r.error);
-                setAnchor(null);
-              }
-            })
-          }
+              if (r?.error) setError(r.error);
+            });
+          }}
         >
           <ListItemIcon>
             <LogoutRounded fontSize="small" />
@@ -113,11 +118,17 @@ export default function AccountMenu({
           Cerrar sesión
         </MenuItem>
       </Menu>
-      {error && (
-        <Typography role="alert" color="error">
+      {/* Fuera de la barra: a 360 px no cabe junto al logo y las pestañas (WCAG 1.4.10). */}
+      <Snackbar
+        key={intento}
+        open={!!error}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        sx={{ bottom: { xs: 72, md: 24 } }}
+      >
+        <Alert severity="error" variant="filled" onClose={() => setError("")}>
           {error}
-        </Typography>
-      )}
+        </Alert>
+      </Snackbar>
     </>
   );
 }

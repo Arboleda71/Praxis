@@ -30,6 +30,9 @@ export function validarConfiguracion(env: NodeJS.ProcessEnv = process.env) {
   ]) {
     if (!env[key]) throw new Error(`Falta ${key} en producción.`);
   }
+  // Sin él, todos los visitantes compartirían un solo origen y un bloqueo los dejaría fuera a todos.
+  if ((env.PROXY_SECRETO?.length ?? 0) < 32)
+    throw new Error('PROXY_SECRETO debe tener al menos 32 caracteres en producción.');
   if (new URL(env.WEB_URL!).protocol !== 'https:')
     throw new Error('WEB_URL debe usar HTTPS en producción.');
   if (env.CORREOS_DIR)

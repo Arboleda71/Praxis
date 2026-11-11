@@ -27,6 +27,7 @@ import {
   SesionGuard,
   type RequestConSesion,
 } from './sesion.js';
+import { origenDe } from './origen.js';
 import { ZodPipe } from './zod.pipe.js';
 
 @Controller('auth')
@@ -41,7 +42,7 @@ export class AuthController {
   ) {
     return this.conCookie(
       res,
-      await this.auth.registrarEstudiante(datos, req.ip ?? ''),
+      await this.auth.registrarEstudiante(datos, origenDe(req)),
     );
   }
 
@@ -53,7 +54,7 @@ export class AuthController {
   ) {
     return this.conCookie(
       res,
-      await this.auth.registrarEmpresa(datos, req.ip ?? ''),
+      await this.auth.registrarEmpresa(datos, origenDe(req)),
     );
   }
 
@@ -64,7 +65,7 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    return this.conCookie(res, await this.auth.login(datos, req.ip ?? ''));
+    return this.conCookie(res, await this.auth.login(datos, origenDe(req)));
   }
 
   @Post('logout')

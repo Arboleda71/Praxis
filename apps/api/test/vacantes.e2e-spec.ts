@@ -48,7 +48,7 @@ describe('M5: publicación y postulación reales', () => {
   beforeEach(async () => {
     validarBasePruebas(process.env.DATABASE_URL);
     await prisma.$executeRawUnsafe('TRUNCATE "Cuenta" CASCADE');
-    app.get(Intentos).limpiar();
+    await app.get(Intentos).limpiar();
     empresa = request.agent(app.getHttpServer());
     estudiante = request.agent(app.getHttpServer());
     await empresa

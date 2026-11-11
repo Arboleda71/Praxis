@@ -29,7 +29,7 @@ describe('M4: propiedad de la ficha de empresa', () => {
   beforeEach(async () => {
     validarBasePruebas(process.env.DATABASE_URL);
     await prisma.$executeRawUnsafe('TRUNCATE "Cuenta" CASCADE');
-    app.get(Intentos).limpiar();
+    await app.get(Intentos).limpiar();
   });
   afterAll(async () => {
     await app.close();

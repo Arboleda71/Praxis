@@ -8,7 +8,7 @@ export function configurarApp<T extends INestApplication>(app: T): T {
   validarConfiguracion();
   app.useGlobalFilters(new ErroresSeguros());
   app.use(cookieParser());
-  // La web reenvía las peticiones (rewrite de Next); la IP real llega en X-Forwarded-For.
+  // No se confía en X-Forwarded-For. El origen real lo resuelve `auth/origen.ts` con el secreto de la web.
   app.getHttpAdapter().getInstance().set('trust proxy', false);
   app.getHttpAdapter().getInstance().disable('x-powered-by');
   const origen = new URL(process.env.WEB_URL || 'http://localhost:3000').origin;

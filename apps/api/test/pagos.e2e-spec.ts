@@ -44,7 +44,7 @@ describe('Planes: Postgres real, Wompi externo sustituido por fixture', () => {
   beforeEach(async () => {
     validarBasePruebas(process.env.DATABASE_URL);
     await prisma.$executeRawUnsafe('TRUNCATE "Cuenta" CASCADE');
-    app.get(Intentos).limpiar();
+    await app.get(Intentos).limpiar();
     empresa = request.agent(app.getHttpServer());
     await empresa
       .post('/auth/registro/empresa')

@@ -57,7 +57,7 @@ import { WompiClient } from './pagos/wompi.js';
     WompiClient,
     PerfilService,
     Archivos,
-    { provide: Intentos, useValue: new Intentos() },
+    Intentos,
   ],
 })
 export class AppModule {}

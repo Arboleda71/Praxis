@@ -69,10 +69,10 @@ No están en la constitución, pero las specs las necesitan.
 
 - [ ] **Documento fuente:** `docs/context(pre-constitucion).md` cita `docs/Praxis_Metodologia_Tradicional_Final_APA.docx`,
   que no está en el repo. Hay que subirlo o quitar la referencia.
-- [ ] **Residencia de datos (`TODO(DATA_RESIDENCY)` en la constitución):** Vercel, Railway, R2 y Resend
+- [ ] **Residencia de datos (`TODO(DATA_RESIDENCY)` en la constitución):** (insumo técnico con fuentes en `docs/produccion.md` §5, 2026-11-10; falta la validación de una persona responsable) Vercel, Railway, R2 y Resend
   pueden guardar datos fuera de Colombia. Antes de usar datos reales hay que revisar la transferencia
   internacional que exige la Ley 1581.
-- [ ] **Wompi en producción:** para cobrar de verdad hace falta un comercio registrado, con RUT y cuenta
+- [ ] **Wompi en producción:** (requisitos y enmienda necesaria en `docs/produccion.md` §6, 2026-11-10) para cobrar de verdad hace falta un comercio registrado, con RUT y cuenta
   bancaria. En modo de pruebas no hace falta.
 
 ## 5. Git

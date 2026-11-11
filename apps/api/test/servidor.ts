@@ -15,12 +15,12 @@ const app = configurarApp(
 );
 app
   .getHttpAdapter()
-  .post('/__pruebas/reiniciar', (req: Request, res: Response) => {
+  .post('/__pruebas/reiniciar', async (req: Request, res: Response) => {
     if (req.get('x-praxis-test') !== process.env.PRAXIS_TEST_CONTROL_SECRET) {
       res.sendStatus(403);
       return;
     }
-    app.get(Intentos).limpiar();
+    await app.get(Intentos).limpiar();
     res.sendStatus(204);
   });
 await app.listen(Number(process.env.PORT ?? 3101), '127.0.0.1');

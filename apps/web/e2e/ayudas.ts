@@ -31,6 +31,17 @@ export const test = base.extend<{ preparar: void }>({
   ],
 });
 export async function sinViolaciones(page: Page) {
+  // A mitad de una transición (avisos que aparecen con fundido) axe mide el contraste con opacidad parcial y
+  // da falsos fallos que dependen de la velocidad del equipo.
+  // Solo las finitas (un indicador de carga gira para siempre); una cancelada cuenta como terminada.
+  await page.evaluate(() =>
+    Promise.all(
+      document
+        .getAnimations()
+        .filter((a) => a.effect?.getComputedTiming().endTime !== Infinity)
+        .map((a) => a.finished.catch(() => {})),
+    ),
+  );
   const { violations } = await new AxeBuilder({ page })
     .withTags(WCAG)
     .analyze();

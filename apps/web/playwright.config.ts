@@ -69,6 +69,8 @@ export default defineConfig({
         ARCHIVOS_SECRETO: secreto,
         NODE_ENV: "test",
         PRAXIS_TEST_CONTROL_SECRET: secreto,
+        // Mismo secreto en la web y en la API: la API cree la IP que le declara la web (spec 011).
+        PROXY_SECRETO: secreto,
         PORT: String(API),
         DATABASE_URL,
         CORREOS_DIR,
@@ -88,6 +90,7 @@ export default defineConfig({
       env: {
         API_URL: `http://localhost:${API}`,
         WEB_URL: `http://localhost:${WEB}`,
+        PROXY_SECRETO: secreto,
       },
     },
   ],

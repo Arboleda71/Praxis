@@ -11,6 +11,8 @@ export async function logout() {
   if (token) {
     const res = await fetch(`${API_URL}/auth/logout`, {
       method: "POST",
+      // Una API colgada no deja el menú esperando para siempre: se trata como fallo y se avisa.
+      signal: AbortSignal.timeout(10_000),
       headers: {
         cookie: `${COOKIE}=${token}`,
         Origin: process.env.WEB_URL ?? "http://localhost:3000",

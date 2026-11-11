@@ -18,6 +18,8 @@
     "demo:api": "npm run build -w api && node scripts/demo-api.mts",
     "demo:api:wompi": "npm run build -w api && node scripts/demo-api.mts --wompi",
     "demo:web": "node scripts/demo-web.mts",
+    "verificar:proveedores": "npm run build -w api && node scripts/verificar-proveedores.mts",
+    "test:scripts": "node --test scripts/verificar-proveedores.test.mts",
     "test:seguridad-db": "node --test apps/api/test/seguridad/base-pruebas.test.ts",
     "db:test": "docker compose -p praxis-test -f docker-compose.test.yml up -d --wait"
   }

@@ -53,12 +53,12 @@ Se releyeron las instrucciones de `speckit-analyze` y se contrastaron constituci
 | C2 | Crítica, contradicción normativa | Constitución exige `Secure` sin excepción; plan y código lo activan solo en producción. Requiere decisión del equipo para entornos locales. |
 | C3 | Crítica, seguridad | Un fallo al escribir el correo puede incluir el destinatario en `error.message` registrado. No se reprodujo ese fallo ni se certificó sanitización de logs. |
 | C4 | Crítica, cierre | No existe `.github` en este clon. CI y revisión por otro integrante siguen pendientes del responsable. |
-| S1, S5 | Alta | Definir cómputo de intentos consecutivos por correo/IP y topología de proxies de despliegue; las suites locales no resuelven esas decisiones. |
+| S1, S5 | Alta | **Resuelto (specs 003 y 011):** contadores en Postgres y origen del visitante con secreto compartido; falta validarlo en el primer despliegue (`docs/produccion.md` §2). Texto original: Definir cómputo de intentos consecutivos por correo/IP y topología de proxies de despliegue; las suites locales no resuelven esas decisiones. |
 | S2 | Alta | No se verificaron confirmaciones y reenvíos simultáneos; el análisis estático señaló ausencia de garantía atómica entre lectura y actualización. |
-| S3, S4 | Alta | Recuperación ante fallo de API al cerrar sesión y ante fallo del proveedor de correo; los recorridos exitosos no cubren esas garantías. |
+| S3, S4 | Alta | **Resuelto (spec 011, 2026-11-10):** `AccountMenu.test.tsx`, `actions.test.ts` y «proveedor de correo caído» en `auth.e2e-spec.ts`. Texto original: Recuperación ante fallo de API al cerrar sesión y ante fallo del proveedor de correo; los recorridos exitosos no cubren esas garantías. |
 | P3 | Alta | Las conexiones de pruebas carecen de una guarda contra otra base configurada por error. Esta ejecución usó y comprobó las bases previstas. |
-| R1, R2 | Media | Confirmación sin sesión y diferenciación de errores de red/enlace; reactivación del formulario tras 15 minutos. No se resolvieron esos escenarios adicionales. |
-| P4, P5 | Media | Revisión humana completa de accesibilidad/teclado, medición del registro y entrega real de correo en menos de un minuto. Los E2E y archivos locales no certifican esos criterios completos. |
+| R1, R2 | Media | **Resuelto (spec 011, 2026-11-10):** `ConfirmacionCorreo.test.tsx` y `FormularioIngreso.test.tsx`. Texto original: Confirmación sin sesión y diferenciación de errores de red/enlace; reactivación del formulario tras 15 minutos. No se resolvieron esos escenarios adicionales. |
+| P4, P5 | Media | **P5 parcial (spec 011):** registro y correo disponibles en 159–289 ms en local (Playwright, 360 y 1080 px); el dato con Resend real sigue pendiente de credenciales. P4 sigue abierto. Texto original: Revisión humana completa de accesibilidad/teclado, medición del registro y entrega real de correo en menos de un minuto. Los E2E y archivos locales no certifican esos criterios completos. |
 
 ## Pendientes ajenos a esta ejecución
 

@@ -10,6 +10,8 @@ import { AppModule } from '../src/app.module.js';
 import { configurarApp } from '../src/configurar.js';
 import { Intentos } from '../src/auth/intentos.js';
 import { PrismaService } from '../src/prisma.service.js';
+import { jest } from '@jest/globals';
+import { Logger } from '@nestjs/common';
 
 const CORREOS = process.env.CORREOS_DIR!;
 
@@ -57,7 +59,7 @@ describe('/auth (integración, Postgres real)', () => {
   beforeEach(async () => {
     validarBasePruebas(process.env.DATABASE_URL);
     await prisma.$executeRawUnsafe('TRUNCATE "Cuenta" CASCADE');
-    app.get(Intentos).limpiar();
+    await app.get(Intentos).limpiar();
     rmSync(CORREOS, { recursive: true, force: true });
     agente = request.agent(app.getHttpServer());
   });
@@ -151,10 +153,12 @@ describe('/auth (integración, Postgres real)', () => {
           .post('/auth/registro/estudiante')
           .send(estudiante)
           .expect(409);
-      await agente
+      const bloqueo = await agente
         .post('/auth/registro/estudiante')
         .send({ ...estudiante, correo: 'otra@correo.co' })
         .expect(429);
+      // El registro también informa el tiempo real que falta (spec 011, FR-007).
+      expect(bloqueo.body.segundos).toBeGreaterThan(890);
     });
   });
 
@@ -202,6 +206,40 @@ describe('/auth (integración, Postgres real)', () => {
       expect(res.body.mensaje).toBe(
         'Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.',
       );
+      expect(res.body.segundos).toBeGreaterThan(890);
+      expect(res.body.segundos).toBeLessThanOrEqual(900);
+    });
+
+    it('el bloqueo informa el tiempo real que falta y termina solo (spec 011)', async () => {
+      const malo = { correo: 'laura@correo.co', contrasena: 'equivocada' };
+      for (let i = 0; i < 5; i++)
+        await agente.post('/auth/login').send(malo).expect(401);
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Intento" SET vence = now() + interval '90 seconds'`,
+      );
+      const res = await agente.post('/auth/login').send(malo).expect(429);
+      expect(res.body.segundos).toBeGreaterThan(85);
+      expect(res.body.segundos).toBeLessThanOrEqual(90);
+      expect(res.body.mensaje).toBe(
+        'Demasiados intentos. Espera 2 minutos e inténtalo de nuevo.',
+      );
+      await prisma.$executeRawUnsafe(
+        `UPDATE "Intento" SET vence = now() - interval '1 second'`,
+      );
+      await agente
+        .post('/auth/login')
+        .send({ correo: 'laura@correo.co', contrasena: estudiante.contrasena })
+        .expect(200);
+    });
+
+    it('cerrar una sesión que el servidor ya no reconoce no da error (spec 011)', async () => {
+      await agente
+        .post('/auth/login')
+        .send({ correo: 'laura@correo.co', contrasena: estudiante.contrasena })
+        .expect(200);
+      await prisma.sesion.deleteMany();
+      await agente.post('/auth/logout').expect(204);
+      await request(app.getHttpServer()).post('/auth/logout').expect(204);
     });
 
     it('un inicio de sesión correcto reinicia la cuenta de intentos', async () => {
@@ -286,6 +324,92 @@ describe('/auth (integración, Postgres real)', () => {
         .post('/auth/confirmar-correo')
         .send({ token: tokenDe('laura@correo.co') })
         .expect(200);
+    });
+
+    describe('proveedor de correo caído (spec 011)', () => {
+      let fetchFalso: jest.SpiedFunction<typeof fetch>;
+      const hace61s = () =>
+        prisma.enlaceConfirmacion.updateMany({
+          data: { creadoEn: new Date(Date.now() - 61_000) },
+        });
+      beforeEach(() => {
+        process.env.RESEND_API_KEY = 're_ficticia';
+        process.env.CORREO_REMITENTE = 'Praxis <no-responder@praxis.test>';
+        jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {});
+        fetchFalso = jest
+          .spyOn(globalThis, 'fetch')
+          .mockRejectedValue(new Error('sin red'));
+      });
+      afterEach(() => {
+        process.env.RESEND_API_KEY = '';
+        jest.restoreAllMocks();
+      });
+
+      it('al registrarse, la cuenta queda creada y con sesión', async () => {
+        const otro = request.agent(app.getHttpServer());
+        await otro.post('/auth/registro/empresa').send(empresa).expect(201);
+        await otro.get('/auth/sesion').expect(200);
+        expect(fetchFalso).toHaveBeenCalledTimes(1);
+      });
+
+      it('el envío lleva tiempo límite y un rechazo del proveedor es un fallo', async () => {
+        await hace61s();
+        fetchFalso.mockResolvedValue(new Response('{}', { status: 403 }));
+        await agente.post('/auth/reenviar-confirmacion').expect(503);
+        const [url, opciones] = fetchFalso.mock.calls[0];
+        expect(url).toBe('https://api.resend.com/emails');
+        expect(opciones?.signal).toBeInstanceOf(AbortSignal);
+      });
+
+      it('al reenviar avisa, conserva el límite de un minuto y se puede reintentar', async () => {
+        const viejo = tokenDe('laura@correo.co');
+        await hace61s();
+        const res = await agente
+          .post('/auth/reenviar-confirmacion')
+          .expect(503);
+        expect(res.body.mensaje).toBe(
+          'No pudimos enviar el correo. Inténtalo de nuevo en un minuto.',
+        );
+        expect(JSON.stringify(res.body)).not.toContain('laura@correo.co');
+        // El fallo no abre la puerta a martillar al proveedor.
+        await agente.post('/auth/reenviar-confirmacion').expect(429);
+        await agente.get('/auth/sesion').expect(200);
+        // Vuelve el proveedor: el reintento sale y recién entonces el anterior deja de servir.
+        await hace61s();
+        fetchFalso.mockResolvedValue(
+          new Response('{"id":"ficticio"}', { status: 200 }),
+        );
+        await agente.post('/auth/reenviar-confirmacion').expect(204);
+        expect(
+          await prisma.enlaceConfirmacion.count({ where: { usadoEn: null } }),
+        ).toBe(1);
+        await request(app.getHttpServer())
+          .post('/auth/confirmar-correo')
+          .send({ token: viejo })
+          .expect(410);
+      });
+
+      it('si el proveedor aceptó pero respondió tarde, el enlace que llegó también confirma', async () => {
+        await hace61s();
+        fetchFalso.mockRejectedValue(new DOMException('tarde', 'TimeoutError'));
+        await agente.post('/auth/reenviar-confirmacion').expect(503);
+        const cuerpo = JSON.parse(fetchFalso.mock.calls[0][1]?.body as string);
+        const enviado = String(cuerpo.html).match(/token=([A-Za-z0-9_-]+)/)![1];
+        await request(app.getHttpServer())
+          .post('/auth/confirmar-correo')
+          .send({ token: enviado })
+          .expect(200);
+      });
+
+      it('tras un reenvío fallido, el enlace que ya tenía confirma', async () => {
+        const viejo = tokenDe('laura@correo.co');
+        await hace61s();
+        await agente.post('/auth/reenviar-confirmacion').expect(503);
+        await request(app.getHttpServer())
+          .post('/auth/confirmar-correo')
+          .send({ token: viejo })
+          .expect(200);
+      });
     });
 
     it('reenviar exige sesión', async () => {

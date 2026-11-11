@@ -59,7 +59,7 @@ describe('/perfil (integración, Postgres real)', () => {
   beforeEach(async () => {
     validarBasePruebas(process.env.DATABASE_URL);
     await prisma.$executeRawUnsafe('TRUNCATE "Cuenta" CASCADE');
-    app.get(Intentos).limpiar();
+    await app.get(Intentos).limpiar();
     rmSync(process.env.ARCHIVOS_DIR!, { recursive: true, force: true });
     laura = request.agent(app.getHttpServer());
     await laura

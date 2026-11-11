@@ -132,6 +132,8 @@ export class Archivos {
       client: new S3Client({
         region: process.env.S3_REGION || 'auto',
         endpoint: process.env.S3_ENDPOINT || undefined,
+        // Un endpoint propio (R2, sustituto local) no resuelve `<bucket>.<host>`; AWS no lleva endpoint.
+        forcePathStyle: !!process.env.S3_ENDPOINT,
         credentials: {
           accessKeyId: process.env.S3_ACCESS_KEY_ID ?? '',
           secretAccessKey: process.env.S3_SECRET_ACCESS_KEY ?? '',
