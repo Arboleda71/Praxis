@@ -7,7 +7,7 @@ import { Intentos } from '../dist/auth/intentos.js';
 
 const moduloGuarda = './seguridad/base-pruebas.ts';
 const { validarBasePruebas } = await import(moduloGuarda);
-validarBasePruebas(process.env.DATABASE_URL, 'praxis_e2e');
+validarBasePruebas(process.env.DATABASE_URL);
 if (process.env.NODE_ENV !== 'test' || !process.env.PRAXIS_TEST_CONTROL_SECRET)
   throw new Error('Entrada exclusiva de pruebas aisladas.');
 const app = configurarApp(
@@ -15,12 +15,13 @@ const app = configurarApp(
 );
 app
   .getHttpAdapter()
-  .post('/__pruebas/reiniciar', async (req: Request, res: Response) => {
+  .post('/__pruebas/reiniciar', (req: Request, res: Response) => {
     if (req.get('x-praxis-test') !== process.env.PRAXIS_TEST_CONTROL_SECRET) {
       res.sendStatus(403);
       return;
     }
-    await app.get(Intentos).limpiar();
+    app.get(Intentos).limpiar();
     res.sendStatus(204);
   });
 await app.listen(Number(process.env.PORT ?? 3101), '127.0.0.1');
+
