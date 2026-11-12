@@ -1,3 +1,4 @@
+
 {
   "compilerOptions": {
     "module": "nodenext",
@@ -19,5 +20,11 @@
     "strict": true,
     "strictPropertyInitialization": false,
     "types": ["jest", "node"]
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test/servidor.ts"
+  ]
 }
+
