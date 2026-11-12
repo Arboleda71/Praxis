@@ -11,7 +11,7 @@ const hash = (clave: string) => createHash('sha256').update(clave).digest('hex')
 const regla = (clave: string) =>
   clave.startsWith('ip:')
     ? { limite: 30, ms: BLOQUEO_MS, reinicia: false }
-    : clave.startsWith('registro:')
+    : /^(registro|restablecer):/.test(clave)
       ? { limite: 10, ms: 3_600_000, reinicia: false }
       : { limite: MAX_INTENTOS, ms: BLOQUEO_MS, reinicia: true };
 const RECHAZADA = Symbol('rechazada');

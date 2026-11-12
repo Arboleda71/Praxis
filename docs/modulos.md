@@ -69,7 +69,8 @@
 - Correo ya registrado: mensaje que invita a iniciar sesión.
 - Límite de intentos en login y registro, con un mensaje que dice cuánto esperar (XIV).
 - El login fallido no revela si el correo existe.
-- La confirmación del correo es el único correo del MVP. La empresa no puede publicar sin confirmarlo (§4.3).
+- Los correos del MVP son dos, ambos de la cuenta: la confirmación y restablecer la contraseña (constitución
+  v4.1.0). La empresa no puede publicar sin confirmar su correo (§4.3).
 - *Técnico (no afecta el mockup):* contraseña con argon2, sesión en cookie `httpOnly`, `Secure`, `SameSite` (XIV).
 
 **Estados:** enviando (botón deshabilitado con texto), error por campo, error general, demasiados intentos,
@@ -250,8 +251,8 @@ cerrada (con motivo), publicación bloqueada.
 
 ## Feature pendiente: restablecer la contraseña
 
-> **No olvidar.** Decidido el 2026-10-16: se construye después de la primera muestra. Exige enmendar la
-> constitución, porque hoy el único correo del MVP es la confirmación de cuenta.
+> **Implementada el 2026-11-11** en `specs/012-restablecer-contrasena` (constitución v4.1.0). Pruebas en verde en
+> local; revisión por PR pendiente. Lo que sigue es la descripción original.
 
 - **Pantallas:** enlace «¿Olvidaste tu contraseña?» en Iniciar sesión; «Olvidé mi contraseña» (pide el correo y
   siempre responde «Si el correo está registrado, te enviamos un enlace»); «Nueva contraseña» desde el enlace del

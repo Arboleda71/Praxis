@@ -28,6 +28,7 @@ model Cuenta {
   empresa             Empresa?
   sesiones            Sesion[]
   enlaces             EnlaceConfirmacion[]
+  restablecimientos   EnlaceRestablecer[]
   notificaciones      Notificacion[]
 }
 
@@ -222,6 +223,18 @@ model EnlaceConfirmacion {
   usadoEn  DateTime?
   creadoEn DateTime  @default(now())
   cuenta   Cuenta    @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
+
+  @@index([cuentaId])
+}
+
+/// Enlace para restablecer la contraseña (spec 012). El id es el hash SHA-256 del token del correo.
+/// Una fila es un enlace vigente: al usarlo o al pedir otro se borra, así que no hace falta `usadoEn`.
+model EnlaceRestablecer {
+  id       String   @id
+  cuentaId String   @db.Uuid
+  expiraEn DateTime
+  creadoEn DateTime @default(now())
+  cuenta   Cuenta   @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
 
   @@index([cuentaId])
 }

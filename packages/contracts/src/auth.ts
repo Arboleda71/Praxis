@@ -104,9 +104,21 @@ export const tokenSchema = z.strictObject({
   token: z.string().min(16).max(128),
 });
 
+/** Pedir el enlace para restablecer la contraseña (spec 012). */
+export const olvideContrasenaSchema = z.strictObject({ correo });
+
+export const restablecerContrasenaSchema = z
+  .strictObject({
+    token: tokenSchema.shape.token,
+    contrasena,
+    confirmarContrasena: z.string(),
+  })
+  .refine(coinciden, noCoinciden);
+
 export type RegistroEstudiante = z.infer<typeof registroEstudianteSchema>;
 export type RegistroEmpresa = z.output<typeof registroEmpresaSchema>;
 export type Login = z.infer<typeof loginSchema>;
+export type RestablecerContrasena = z.infer<typeof restablecerContrasenaSchema>;
 
 export type Rol = "estudiante" | "empresa";
 

@@ -1,5 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { loginSchema, registroEmpresaSchema, registroEstudianteSchema } from "./auth.js";
+import {
+  loginSchema,
+  olvideContrasenaSchema,
+  registroEmpresaSchema,
+  registroEstudianteSchema,
+  restablecerContrasenaSchema,
+} from "./auth.js";
 
 const estudiante = {
   nombreCompleto: "Laura Gómez Restrepo",
@@ -84,6 +90,36 @@ describe("registroEmpresaSchema", () => {
     const r = registroEmpresaSchema.safeParse({ ...empresa, nit: "900123456-7", autorizaDatos: false });
     expect(errores(r).nit).toBe("El dígito de verificación no corresponde a este NIT. Revísalo en tu RUT.");
     expect(errores(r).autorizaDatos).toBe("Debes aceptar la política para continuar.");
+  });
+});
+
+describe("restablecerContrasenaSchema (spec 012)", () => {
+  const datos = { token: "t".repeat(43), contrasena: "contrasena-nueva", confirmarContrasena: "contrasena-nueva" };
+
+  test("acepta un enlace con contraseña válida y confirmada", () => {
+    expect(restablecerContrasenaSchema.safeParse(datos).success).toBe(true);
+  });
+
+  test("aplica las mismas reglas de contraseña que el registro", () => {
+    const corta = restablecerContrasenaSchema.safeParse({ ...datos, contrasena: "corta1", confirmarContrasena: "corta1" });
+    expect(errores(corta).contrasena).toBe("Debe tener al menos 10 caracteres. Llevas 6.");
+    const larga = "x".repeat(129);
+    const r = restablecerContrasenaSchema.safeParse({ ...datos, contrasena: larga, confirmarContrasena: larga });
+    expect(errores(r).contrasena).toBe("Usa como máximo 128 caracteres.");
+  });
+
+  test("exige que las contraseñas coincidan y rechaza campos de más", () => {
+    const r = restablecerContrasenaSchema.safeParse({ ...datos, confirmarContrasena: "otra-contrasena" });
+    expect(errores(r).confirmarContrasena).toBe("Las contraseñas no coinciden.");
+    expect(restablecerContrasenaSchema.safeParse({ ...datos, correo: "a@b.co" }).success).toBe(false);
+  });
+});
+
+describe("olvideContrasenaSchema (spec 012)", () => {
+  test("normaliza el correo y rechaza uno inválido", () => {
+    const r = olvideContrasenaSchema.safeParse({ correo: " Laura@Correo.co " });
+    expect(r.success && r.data.correo).toBe("laura@correo.co");
+    expect(olvideContrasenaSchema.safeParse({ correo: "laura" }).success).toBe(false);
   });
 });
 

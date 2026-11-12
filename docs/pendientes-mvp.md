@@ -50,7 +50,9 @@ La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (in
 
 ## F. Features aplazadas
 
-- [ ] PM021 Restablecer la contraseña: enmendar la constitución y crear su spec (ver `docs/modulos.md`, «Feature pendiente»)
+- [ ] PM021 Restablecer la contraseña: enmendar la constitución y crear su spec (ver `docs/modulos.md`, «Feature pendiente») — en `docs/backlog-specs.md` como S1. 2026-11-11: constitución v4.1.0 y
+  `specs/012-restablecer-contrasena` escritas e implementadas en la rama `012-restablecer-contrasena`; pruebas en verde en local; **faltan la
+  aprobación de la enmienda y el PR**
 
 ## Orden sugerido
 

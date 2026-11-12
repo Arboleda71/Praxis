@@ -61,7 +61,8 @@ No están en la constitución, pero las specs las necesitan.
 
 ## 3.1 Features pendientes (no olvidar)
 
-- [ ] **Restablecer la contraseña** (decidido el 2026-10-16): queda fuera de la primera muestra y se construye
+- [ ] **Restablecer la contraseña** (2026-11-11: enmienda v4.1.0 y `specs/012-restablecer-contrasena`
+  implementadas; pruebas en verde en local; falta aprobar la enmienda por PR. Decidido el 2026-10-16): queda fuera de la primera muestra y se construye
   después. Exige enmendar la constitución (hoy el único correo del MVP es la confirmación de cuenta). Detalle de
   pantallas y reglas en `docs/modulos.md`, sección «Feature pendiente: restablecer la contraseña».
 

@@ -7,7 +7,7 @@ import { Intentos } from '../dist/auth/intentos.js';
 
 const moduloGuarda = './seguridad/base-pruebas.ts';
 const { validarBasePruebas } = await import(moduloGuarda);
-validarBasePruebas(process.env.DATABASE_URL);
+validarBasePruebas(process.env.DATABASE_URL, 'praxis_e2e');
 if (process.env.NODE_ENV !== 'test' || !process.env.PRAXIS_TEST_CONTROL_SECRET)
   throw new Error('Entrada exclusiva de pruebas aisladas.');
 const app = configurarApp(

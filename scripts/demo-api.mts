@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
-  BASE_PRUEBAS,
+  BASE_DEMO,
   validarBasePruebas,
 } from "../apps/api/test/seguridad/base-pruebas.ts";
 const raiz = resolve(dirname(fileURLToPath(import.meta.url)), "..");
@@ -39,7 +39,7 @@ execFileSync(process.execPath, ["dist/main.js"], {
   stdio: "inherit",
   env: {
     ...process.env,
-    DATABASE_URL: validarBasePruebas(BASE_PRUEBAS),
+    DATABASE_URL: validarBasePruebas(BASE_DEMO, "praxis_demo"),
     NODE_ENV: "development",
     PORT: String(puertoApi),
     WEB_URL: `http://localhost:${puertoWeb}`,

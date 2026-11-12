@@ -1,4 +1,17 @@
 <!--
+Sync Impact Report (v4.1.0, 2026-11-11)
+- Versión: 4.0.0 → 4.1.0 (MENOR: se agrega una regla de producto y se amplía XIV; ningún principio se quita
+  ni se redefine)
+- Cambio: el MVP envía un segundo correo, el de restablecer la contraseña. Reglas de producto
+  («Notificaciones»), fila «Correo» del stack y XIV (límite de intentos también al pedir el enlace).
+- Motivo: sin restablecer la contraseña, quien la olvida pierde su cuenta; no hay administrador que la
+  recupere (decidido el 2026-10-16, se construye en specs/012-restablecer-contrasena).
+- No cambia: las notificaciones del producto (postulaciones, vacantes, planes) siguen dentro de la web.
+- Afecta: specs/012-restablecer-contrasena, docs/modulos.md (M1 y «Feature pendiente»),
+  docs/pendientes-mvp.md (PM021), docs/backlog-specs.md (S1)
+- Plantillas: sin cambios
+- Pendiente: aprobación por PR de otro integrante (Gobernanza)
+
 Sync Impact Report (v4.0.0, 2026-10-23)
 - Versión: 3.0.0 → 4.0.0 (MAYOR: se redefinen los principios II y IV)
 - Cambio: el programa académico deja de ser una lista cerrada. El estudiante escribe su programa y la vacante
@@ -150,7 +163,8 @@ del código MAY probarse después de implementarlo.
 Toda entrada externa MUST validarse en la API con los esquemas de `packages/contracts`. Cada endpoint
 MUST verificar el rol y la propiedad del recurso (una empresa solo toca sus vacantes; un estudiante,
 solo sus postulaciones). Las contraseñas MUST guardarse con argon2 y la sesión MUST ir en una cookie
-`httpOnly`, `Secure` y `SameSite`. El inicio de sesión y el registro MUST tener límite de intentos. Los
+`httpOnly`, `Secure` y `SameSite`. El inicio de sesión, el registro y la solicitud
+de restablecer la contraseña MUST tener límite de intentos. Los
 documentos MUST ser PDF de máximo 5 MB; la foto de perfil, JPG o PNG de máximo 2 MB. Todos los archivos
 MUST servirse solo con URLs firmadas de corta duración. Los secretos
 MUST vivir en variables de entorno, nunca en el repositorio. Los logs MUST NOT contener contraseñas,
@@ -172,7 +186,8 @@ El detalle vive en `docs/context(pre-constitucion).md`. Estas reglas son las que
   por estudiante y vacante, aunque se haya retirado, garantizada también con una restricción única en
   la base de datos. Al postularse se guarda una copia del perfil, del CV y del resultado de cada
   requisito, y se le advierte al estudiante.
-- **Notificaciones:** dentro de la web en el MVP. El único correo del MVP es la confirmación de cuenta.
+- **Notificaciones:** dentro de la web en el MVP. Los únicos correos del MVP son los
+  de la cuenta: confirmar el correo y restablecer la contraseña.
 - **Cobro (solo empresas):** 2 vacantes gratis cada 6 meses. Plan Básico de COP 29.900 (4 vacantes
   adicionales) y plan Ilimitado de COP 59.000, ambos de 6 meses con renovación manual. El plan se
   activa automáticamente cuando el pago queda aprobado.
@@ -192,7 +207,7 @@ Cambiar cualquier elemento de esta tabla es una enmienda a la constitución.
 | Autenticación | Propia en NestJS: sesión en cookie `httpOnly` y contraseñas con argon2. Sin proveedor externo |
 | Archivos (CV, soportes) | Almacenamiento compatible con S3 (Cloudflare R2 o AWS S3), privado, con URLs firmadas |
 | Pagos | Wompi, con pagos únicos en COP. Modo de pruebas mientras el piloto use datos ficticios |
-| Correo | Resend, solo para la confirmación de cuenta en el MVP |
+| Correo | Resend, solo para los correos de la cuenta en el MVP: confirmación y restablecer la contraseña |
 | Despliegue | Vercel para la web; Railway para la API y Postgres |
 | Pruebas | Jest en la API (unitarias e integración, modo ESM con SWC), Vitest en la web (unitarias), Postgres real en Docker para integración, Playwright con axe para E2E |
 | Calidad de código | oxlint y Prettier en la API, ESLint en la web, TypeScript en modo `strict` |
@@ -232,4 +247,4 @@ Cambiar cualquier elemento de esta tabla es una enmienda a la constitución.
   cada revisión de PR verifica que no se rompa ningún principio.
 - La guía de producto para el trabajo diario es `docs/context(pre-constitucion).md`.
 
-**Version**: 4.0.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-10-23
+**Version**: 4.1.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-11-11

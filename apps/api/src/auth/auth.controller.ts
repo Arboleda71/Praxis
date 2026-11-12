@@ -11,12 +11,15 @@ import {
 } from '@nestjs/common';
 import {
   loginSchema,
+  olvideContrasenaSchema,
   registroEmpresaSchema,
   registroEstudianteSchema,
+  restablecerContrasenaSchema,
   tokenSchema,
   type Login,
   type RegistroEmpresa,
   type RegistroEstudiante,
+  type RestablecerContrasena,
 } from '@praxis/contracts';
 import type { Request, Response } from 'express';
 import { AuthService, publica } from './auth.service.js';
@@ -96,6 +99,32 @@ export class AuthController {
   @UseGuards(SesionGuard)
   async reenviar(@Req() req: RequestConSesion) {
     await this.auth.reenviarConfirmacion(req.sesion.cuenta);
+  }
+
+  @Post('olvide-contrasena')
+  @HttpCode(204)
+  async olvide(
+    @Body(new ZodPipe(olvideContrasenaSchema)) { correo }: { correo: string },
+    @Req() req: Request,
+  ) {
+    await this.auth.olvideContrasena(correo, origenDe(req));
+  }
+
+  /** Abrir el enlace solo consulta su vigencia: un escáner de correo no lo gasta. */
+  @Get('restablecer-contrasena')
+  estadoRestablecer(
+    @Query(new ZodPipe(tokenSchema)) { token }: { token: string },
+  ) {
+    return this.auth.estadoRestablecer(token);
+  }
+
+  @Post('restablecer-contrasena')
+  @HttpCode(204)
+  async restablecer(
+    @Body(new ZodPipe(restablecerContrasenaSchema))
+    { token, contrasena }: RestablecerContrasena,
+  ) {
+    await this.auth.restablecerContrasena(token, contrasena);
   }
 
   private conCookie(

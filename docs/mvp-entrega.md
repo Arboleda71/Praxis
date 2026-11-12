@@ -40,7 +40,7 @@ npm run demo:web
 
 Abre http://localhost:3200. Sin esas variables, los puertos predeterminados son 3000/3001. La API de demostración usa la entrada real `main`, sin endpoints de control de pruebas. Los dos servidores de demo escuchan solo en loopback.
 
-Los lanzadores fijan el Postgres aislado en 127.0.0.1:55432/praxis_test y la API local; no heredan destinos de bases ni API externas. Por defecto deshabilitan Wompi, Resend y S3. Los documentos permanecen privados con firmas temporales. La base usa tmpfs: sus datos son ficticios y efímeros. No ejecutes pruebas y demo a la vez: comparten esta base. No uses `npm run db` ni una URL de desarrollo/Neon para las pruebas.
+Los lanzadores fijan el Postgres aislado en 127.0.0.1:55432, base `praxis_demo`, y la API local; no heredan destinos de bases ni API externas. Por defecto deshabilitan Wompi, Resend y S3. Los documentos permanecen privados con firmas temporales. La base usa tmpfs: sus datos son ficticios y efímeros. Cada uso tiene su base en ese mismo Postgres: `praxis_demo` (demo), `praxis_test` (integración de la API) y `praxis_e2e` (navegador); las dos últimas se crean solas al correr. La integración de la API se niega a arrancar si alguien más está conectado a `praxis_test`. La demo y las pruebas de navegador siguen sin poder correr a la vez: comparten la compilación de la web (`apps/web/.next`) y la bandeja de correos. No uses `npm run db` ni una URL de desarrollo/Neon para las pruebas.
 
 ## Probar el recorrido
 
@@ -68,7 +68,7 @@ Documentación usada: [Checkout oficial](https://docs.wompi.co/docs/colombia/wid
 
 ## Verificación reproducible
 
-Ejecuta las pruebas cuando la demo esté detenida:
+Ejecuta las pruebas (las de navegador, con la demo detenida):
 
 ```powershell
 npm run test:seguridad-db

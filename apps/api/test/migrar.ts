@@ -7,6 +7,9 @@ export default async function migrar() {
   const { validarBasePruebas, BASE_PRUEBAS } = await import(moduloGuarda);
   // Validar antes de iniciar Prisma o cargar su configuración.
   const url = validarBasePruebas(process.env.TEST_DATABASE_URL ?? BASE_PRUEBAS);
+  // Otra corrida conectada a esta base cambiaría datos y contadores a mitad de las pruebas.
+  const moduloLibre = './seguridad/base-libre.ts';
+  await (await import(moduloLibre)).prepararBase(url);
   const require = createRequire(join(process.cwd(), 'package.json'));
   execFileSync(
     process.execPath,

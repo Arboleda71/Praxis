@@ -140,6 +140,13 @@ export default function FormularioIngreso({ next }: { next?: string }) {
         helperText={errores.contrasena}
         fullWidth
       />
+      <Link
+        href="/olvide-contrasena"
+        variant="body2"
+        sx={{ fontWeight: 600, alignSelf: "flex-start", py: 1.5 }}
+      >
+        ¿Olvidaste tu contraseña?
+      </Link>
       <Button
         ref={boton}
         type="submit"

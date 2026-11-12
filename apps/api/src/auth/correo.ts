@@ -4,19 +4,52 @@ import { join } from 'node:path';
 import { createHash } from 'node:crypto';
 
 /**
- * Envía el único correo del MVP: la confirmación de cuenta.
+ * Envía los dos correos del MVP, ambos de la cuenta (constitución v4.1.0): confirmar el correo y
+ * restablecer la contraseña.
  * Con RESEND_API_KEY usa Resend; sin ella (desarrollo y pruebas) guarda el correo como archivo en
  * CORREOS_DIR. Nunca escribe el enlace en los logs (principio XIV).
  */
 @Injectable()
 export class Correo {
-  async enviarConfirmacion(destino: string, token: string): Promise<void> {
-    const enlace = `${process.env.WEB_URL ?? 'http://localhost:3000'}/confirmar-correo?token=${token}`;
+  enviarConfirmacion(destino: string, token: string): Promise<void> {
+    return this.enviar(
+      destino,
+      'Confirma tu correo en Praxis',
+      'confirmar-correo',
+      token,
+      [
+        'Confirma tu correo en Praxis abriendo este enlace. Vence en 24 horas y sirve una sola vez.',
+        'Si no creaste una cuenta en Praxis, ignora este mensaje.',
+      ],
+    );
+  }
+
+  enviarRestablecer(destino: string, token: string): Promise<void> {
+    return this.enviar(
+      destino,
+      'Restablece tu contraseña de Praxis',
+      'restablecer-contrasena',
+      token,
+      [
+        'Abre este enlace para escribir una contraseña nueva. Vence en 30 minutos y sirve una sola vez.',
+        'Si no pediste cambiar tu contraseña, ignora este mensaje: tu contraseña sigue igual.',
+      ],
+    );
+  }
+
+  private async enviar(
+    destino: string,
+    asunto: string,
+    ruta: string,
+    token: string,
+    [texto, pie]: [string, string],
+  ): Promise<void> {
+    const enlace = `${process.env.WEB_URL ?? 'http://localhost:3000'}/${ruta}?token=${token}`;
     const html = [
       '<p>Hola:</p>',
-      '<p>Confirma tu correo en Praxis abriendo este enlace. Vence en 24 horas y sirve una sola vez.</p>',
+      `<p>${texto}</p>`,
       `<p><a href="${enlace}">${enlace}</a></p>`,
-      '<p>Si no creaste una cuenta en Praxis, ignora este mensaje.</p>',
+      `<p>${pie}</p>`,
     ].join('\n');
 
     const clave = process.env.RESEND_API_KEY;
@@ -41,7 +74,7 @@ export class Correo {
       body: JSON.stringify({
         from: process.env.CORREO_REMITENTE,
         to: destino,
-        subject: 'Confirma tu correo en Praxis',
+        subject: asunto,
         html,
       }),
     });

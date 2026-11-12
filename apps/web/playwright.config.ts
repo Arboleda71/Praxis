@@ -1,7 +1,7 @@
 import { randomBytes } from "node:crypto";
 import {
   validarBasePruebas,
-  BASE_PRUEBAS,
+  BASE_E2E,
 } from "../api/test/seguridad/base-pruebas";
 import { defineConfig, devices } from "@playwright/test";
 import { tmpdir } from "node:os";
@@ -14,8 +14,10 @@ const WEB = 3100;
 const API = 3101;
 export const CORREOS_DIR = join(tmpdir(), "praxis-correos-e2e");
 const ARCHIVOS_DIR = join(tmpdir(), "praxis-archivos-e2e");
+// Base propia: la integración de la API y la demo usan otras (ver base-pruebas.ts).
 const DATABASE_URL = validarBasePruebas(
-  process.env.E2E_DATABASE_URL ?? BASE_PRUEBAS,
+  process.env.E2E_DATABASE_URL ?? BASE_E2E,
+  "praxis_e2e",
 );
 
 const movil = {

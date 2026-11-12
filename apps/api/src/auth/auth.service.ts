@@ -24,6 +24,10 @@ import {
 } from './sesion.js';
 
 const ENLACE_MS = 24 * 60 * 60_000;
+/** Corto a propósito: quien tenga el enlace puede cambiar la contraseña (spec 012). */
+const RESTABLECER_MS = 30 * 60_000;
+const enlaceInvalido = () =>
+  new GoneException({ mensaje: 'Este enlace ya no sirve.' });
 /** 429 con el tiempo real que falta (spec 011): la web reactiva el formulario al cumplirse. */
 const demasiados = (segundos: number, que = 'intentos') => {
   const minutos = Math.ceil(segundos / 60);
@@ -181,6 +185,82 @@ export class AuthService {
       where: { cuentaId: cuenta.id, usadoEn: null, id: { not: hashToken(token) } },
       data: { usadoEn: new Date() },
     });
+  }
+  /**
+   * Pide el enlace para restablecer la contraseña (spec 012). Termina igual exista o no la cuenta: quien
+   * llama no se entera de si el correo está registrado ni de si el envío falló.
+   *
+   * ponytail: el envío se espera, así que una cuenta que existe tarda más en responder. El registro ya
+   * dice si un correo existe (spec 003, FR-009) y el límite por origen frena medirlo; enviar en segundo
+   * plano si eso cambia.
+   */
+  async olvideContrasena(correo: string, ip: string) {
+    const espera = await this.intentos.reservar(`restablecer:${ip}`);
+    if (espera) throw demasiados(espera);
+    const token = nuevoToken();
+    const creado = await this.prisma.$transaction(async (tx) => {
+      await tx.enlaceRestablecer.deleteMany({
+        where: { expiraEn: { lte: new Date() } },
+      });
+      // El bloqueo de la cuenta serializa dos solicitudes simultáneas: sale un solo correo.
+      const [cuenta] = await tx.$queryRaw<
+        { id: string }[]
+      >`SELECT id FROM "Cuenta" WHERE correo = ${correo} FOR UPDATE`;
+      if (!cuenta) return false;
+      const ultimo = await tx.enlaceRestablecer.findFirst({
+        where: { cuentaId: cuenta.id },
+        orderBy: { creadoEn: 'desc' },
+      });
+      // Un correo por minuto y cuenta, sin avisar: un 429 aquí diría que la cuenta existe.
+      if (ultimo && Date.now() - ultimo.creadoEn.getTime() < 60_000)
+        return false;
+      // Solo sirve el último enlace pedido.
+      await tx.enlaceRestablecer.deleteMany({ where: { cuentaId: cuenta.id } });
+      await tx.enlaceRestablecer.create({
+        data: {
+          id: hashToken(token),
+          cuentaId: cuenta.id,
+          expiraEn: new Date(Date.now() + RESTABLECER_MS),
+        },
+      });
+      return true;
+    });
+    if (!creado) return;
+    try {
+      await this.correo.enviarRestablecer(correo, token);
+    } catch {
+      this.log.error('No se pudo enviar el restablecimiento.');
+    }
+  }
+  async estadoRestablecer(token: string) {
+    const enlace = await this.prisma.enlaceRestablecer.findUnique({
+      where: { id: hashToken(token) },
+    });
+    return { valido: !!enlace && enlace.expiraEn > new Date() };
+  }
+  async restablecerContrasena(token: string, contrasena: string) {
+    // Antes de argon2: un enlace inventado no le cuesta CPU a la API.
+    if (!(await this.estadoRestablecer(token)).valido) throw enlaceInvalido();
+    const contrasenaHash = await hash(contrasena);
+    const correo = await this.prisma.$transaction(async (tx) => {
+      const id = hashToken(token);
+      const enlace = await tx.enlaceRestablecer.findUnique({ where: { id } });
+      // El borrado decide: de dos peticiones simultáneas con el mismo enlace, solo una borra la fila.
+      const { count } = await tx.enlaceRestablecer.deleteMany({
+        where: { id, expiraEn: { gt: new Date() } },
+      });
+      if (!enlace || !count) throw enlaceInvalido();
+      const cuenta = await tx.cuenta.update({
+        where: { id: enlace.cuentaId },
+        data: { contrasenaHash },
+      });
+      // Quien conocía la contraseña anterior queda fuera: se cierran todas las sesiones.
+      await tx.sesion.deleteMany({ where: { cuentaId: cuenta.id } });
+      await tx.enlaceRestablecer.deleteMany({ where: { cuentaId: cuenta.id } });
+      return cuenta.correo;
+    });
+    // El dueño demostró que el correo es suyo: se levanta el bloqueo por fallos de su cuenta.
+    await this.intentos.exito(`correo:${correo}`);
   }
   private async validarNuevo(ip: string, correo: string, nit?: string) {
     const bloqueo = await this.intentos.bloqueado(
