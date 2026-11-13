@@ -1,4 +1,5 @@
 import type { TipoArchivo } from "@praxis/contracts";
+import { abrirEnPestana } from "./pestana";
 
 export type Errores = Record<string, string>;
 export type Resultado = { ok: true } | { ok: false; errores: Errores; mensaje?: string };
@@ -20,9 +21,22 @@ export const quitarArchivo = (tipo: TipoArchivo) =>
   fetch(`/api/perfil/archivos/${tipo}`, { method: "DELETE" }).catch(() => null).then(leer);
 
 /** Abre el archivo en otra pestaña con un enlace firmado de corta duración. */
-export async function verArchivo(tipo: TipoArchivo) {
-  const res = await fetch(`/api/perfil/archivos/${tipo}/enlace`).catch(() => null);
-  if (res?.ok) window.open((await res.json()).url, "_blank", "noopener");
+export type ResultadoVer = { ok: true } | { ok: false; sesionVencida: boolean; mensaje: string };
+const SESION_VENCIDA = "Tu sesión venció. Inicia sesión de nuevo para ver el archivo.";
+export async function verArchivo(tipo: TipoArchivo): Promise<ResultadoVer> {
+  try {
+    await abrirEnPestana(async () => {
+      const res = await fetch(`/api/perfil/archivos/${tipo}/enlace`).catch(() => null);
+      if (res?.status === 401) throw new Error(SESION_VENCIDA);
+      const url = res?.ok ? ((await res.json().catch(() => ({}))) as { url?: string }).url : undefined;
+      if (!url) throw new Error("No pudimos abrir el archivo. Inténtalo de nuevo.");
+      return url;
+    });
+    return { ok: true };
+  } catch (e) {
+    const mensaje = (e as Error).message;
+    return { ok: false, sesionVencida: mensaje === SESION_VENCIDA, mensaje };
+  }
 }
 
 /** Sube con XHR: fetch no informa el progreso de subida. */

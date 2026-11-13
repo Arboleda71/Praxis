@@ -1,11 +1,12 @@
+import WorkOutlineRounded from "@mui/icons-material/WorkOutlineRounded";
 import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
-import Paper from "@mui/material/Paper";
+import AlertTitle from "@mui/material/AlertTitle";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { MODALIDADES } from "@praxis/contracts";
+import { EstadoVacio, TarjetaVacante } from "@/components/mercado-ui";
+import { resumenVacante } from "@/lib/mercado";
 import { API_URL } from "@/lib/session";
-import { fechaLarga } from "@/lib/perfil-cliente";
+
 type Oferta = {
   id: string;
   titulo: string;
@@ -14,49 +15,50 @@ type Oferta = {
   vigencia: string;
   empresa: { razonSocial: string };
 };
-/** HTML del servidor: el visitante recibe solo las cinco ofertas básicas, sin cargar el buscador. */
+
+/**
+ * Bloque del inicio para el visitante (mockups M6 · Grupo 1): las cinco ofertas básicas, sin búsqueda ni
+ * filtros. HTML del servidor: no carga el buscador.
+ */
 export default async function VacantesRecientes() {
-  const res = await fetch(`${API_URL}/vacantes/recientes`, {
+  // Si la API no responde (o su cuerpo no llega o no es JSON), el inicio se muestra igual con el aviso en
+  // lugar de quedarse colgado o fallar entero. El límite cubre también la lectura del cuerpo.
+  const ofertas = await fetch(`${API_URL}/vacantes/recientes`, {
     cache: "no-store",
-  }).catch(() => null);
-  if (!res?.ok)
-    return (
-      <Alert severity="warning" sx={{ m: 2 }}>
-        No pudimos cargar las últimas prácticas. Inténtalo de nuevo en unos
-        momentos.
-      </Alert>
-    );
-  const ofertas = (await res.json()) as Oferta[];
+    signal: AbortSignal.timeout(5000),
+  })
+    .then((res) => (res.ok ? (res.json() as Promise<Oferta[]>) : null))
+    .then((d) => (Array.isArray(d) ? d : null))
+    .catch(() => null);
   return (
     <Stack
       component="section"
-      spacing={3}
-      sx={{ maxWidth: 960, mx: "auto", p: 2, py: 4 }}
+      spacing={{ xs: 2, md: 2.5 }}
+      sx={{ width: "100%", maxWidth: 720, mx: "auto", px: { xs: 2, md: 3 }, py: { xs: 3, md: 5 } }}
       aria-labelledby="ultimas-practicas"
     >
-      <Typography id="ultimas-practicas" variant="h2" sx={{ fontSize: 28 }}>
+      <Typography id="ultimas-practicas" variant="h2" sx={{ fontSize: 20 }}>
         Últimas cinco prácticas abiertas
       </Typography>
-      {ofertas.length === 0 && (
-        <Typography>No hay prácticas abiertas todavía.</Typography>
-      )}
-      {ofertas.map((v) => (
-        <Paper key={v.id} component="article" variant="outlined" sx={{ p: 2 }}>
-          <Typography variant="h3" sx={{ fontSize: 20 }}>
-            {v.titulo}
-          </Typography>
-          <Typography>
-            {v.empresa.razonSocial} ·{" "}
-            {MODALIDADES.find((m) => m.id === v.modalidad)?.nombre} {v.ciudad}.
-            Vigencia: {fechaLarga(v.vigencia.slice(0, 10))}
-          </Typography>
-          <Button
+      {!ofertas ? (
+        <Alert severity="warning">
+          <AlertTitle>No pudimos cargar las últimas prácticas.</AlertTitle>
+          Inténtalo de nuevo en unos momentos.
+        </Alert>
+      ) : ofertas.length === 0 ? (
+        <EstadoVacio icono={<WorkOutlineRounded fontSize="large" />} mensaje="No hay prácticas abiertas todavía." />
+      ) : (
+        ofertas.map((v) => (
+          <TarjetaVacante
+            key={v.id}
+            encabezado="h3"
+            titulo={v.titulo}
+            datos={resumenVacante(v)}
             href={`/ingresar?next=${encodeURIComponent(`/estudiante/vacantes/${v.id}`)}`}
-          >
-            Ingresar para consultar
-          </Button>
-        </Paper>
-      ))}
+            accion="Ingresar para consultar"
+          />
+        ))
+      )}
     </Stack>
   );
 }

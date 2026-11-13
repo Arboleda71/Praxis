@@ -1,12 +1,16 @@
 import { z } from "zod";
 import {
   AVANCES,
+  IDIOMAS,
   JORNADAS,
   MODALIDADES,
   NIVELES_FORMACION,
+  NIVELES_MCER,
   avanceDelNivel,
   idiomasSchema,
+  nombreDe,
   valorDe,
+  type Valor,
 } from "./catalogos.js";
 import {
   compararAvance,
@@ -87,6 +91,8 @@ export const vacanteSchema = z
     },
   );
 export type VacanteDatos = z.output<typeof vacanteSchema>;
+/** Elementos por página en todos los listados (vacantes, postulaciones, notificaciones, pagos). */
+export const TAMANO_PAGINA = 20;
 export const busquedaSchema = z.strictObject({
   pagina: z.coerce.number().int().min(1).max(10000).default(1),
   q: z.string().trim().max(120).optional(),
@@ -105,6 +111,9 @@ export type PerfilElegible = {
   disponibleDesde: string | null;
   idiomas: { idioma: string; nivel: string }[];
 };
+/** Nombre del catálogo para mostrar; si el id no está (dato viejo), se muestra el id antes que nada. */
+const nombre = (catalogo: readonly Valor[], id: string) =>
+  nombreDe(catalogo, id) ?? id;
 export function evaluarElegibilidad(
   v: Pick<
     VacanteDatos,
@@ -135,7 +144,7 @@ export function evaluarElegibilidad(
   );
   for (const a of v.avances)
     agregar(
-      `Avance ${a.nivel}: ${a.avance}`,
+      `Avance ${nombre(NIVELES_FORMACION, a.nivel).toLowerCase()}: ${nombre(AVANCES, a.avance)}`,
       compararAvance(a, {
         nivel: p.nivelFormacion ?? undefined,
         avance: p.avance ?? undefined,
@@ -146,7 +155,10 @@ export function evaluarElegibilidad(
       "Aval declarado",
       p.aval === null ? "falta_informacion" : p.aval ? "cumple" : "no_cumple",
     );
-  agregar("Jornada", coinciden(v.jornada, p.jornada ?? undefined));
+  agregar(
+    `Jornada: ${nombre(JORNADAS, v.jornada)}`,
+    coinciden(v.jornada, p.jornada ?? undefined),
+  );
   agregar(
     "Disponibilidad para la fecha de inicio",
     !p.disponibleDesde
@@ -156,7 +168,10 @@ export function evaluarElegibilidad(
         : "no_cumple",
   );
   for (const i of v.idiomas)
-    agregar(`Idioma ${i.idioma}: ${i.nivel}`, compararIdioma(i, p.idiomas));
+    agregar(
+      `Idioma ${nombre(IDIOMAS, i.idioma)}: ${nombre(NIVELES_MCER, i.nivel)}`,
+      compararIdioma(i, p.idiomas),
+    );
   const minimo = perfilMinimo(p);
   return {
     puedePostular:

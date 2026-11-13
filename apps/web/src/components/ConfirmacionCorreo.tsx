@@ -21,8 +21,9 @@ export default function ConfirmacionCorreo({ token }: { token?: string }) {
     pulsado.current = true;
     setEnviando(true);
     setError("");
-    // Tres resultados (spec 011): confirmado, enlace que ya no sirve (400/410) o fallo de conexión. Solo
-    // el segundo manda a pedir otro enlace; con el tercero el mismo enlace sigue sirviendo.
+    // Cuatro resultados: confirmado, enlace que ya no sirve (400/410), demasiadas solicitudes (429) o fallo
+    // de conexión (spec 011). Solo el segundo manda a pedir otro enlace; con los dos últimos el mismo
+    // enlace sigue sirviendo, pero el 429 pide esperar: reintentar enseguida no arregla nada.
     try {
       const res = await fetch("/api/auth/confirmar-correo", {
         method: "POST",
@@ -31,6 +32,14 @@ export default function ConfirmacionCorreo({ token }: { token?: string }) {
       });
       if (res.ok) setRol((await res.json()).rol);
       else if (res.status === 400 || res.status === 410) setVencido(true);
+      else if (res.status === 429) {
+        const cuerpo = (await res.json().catch(() => ({}))) as { mensaje?: unknown };
+        setError(
+          typeof cuerpo.mensaje === "string" && cuerpo.mensaje
+            ? cuerpo.mensaje
+            : "Demasiadas solicitudes. Espera unos minutos e inténtalo de nuevo.",
+        );
+      }
       else setError("No pudimos conectar. Inténtalo de nuevo.");
     } catch {
       setError("No pudimos conectar. Inténtalo de nuevo.");

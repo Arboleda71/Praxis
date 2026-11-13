@@ -15,6 +15,7 @@ import {
   type Busqueda,
   type EventoWompi,
   type Plan,
+  TAMANO_PAGINA,
 } from '@praxis/contracts';
 import { SoloEmpresaGuard, type RequestConSesion } from '../auth/sesion.js';
 import { ZodPipe } from '../auth/zod.pipe.js';
@@ -45,8 +46,8 @@ export class PagosEmpresaController {
       this.prisma.pago.findMany({
         where,
         orderBy: [{ creadaEn: 'desc' }, { id: 'desc' }],
-        skip: (b.pagina - 1) * 20,
-        take: 20,
+        skip: (b.pagina - 1) * TAMANO_PAGINA,
+        take: TAMANO_PAGINA,
       }),
       this.prisma.pago.count({ where }),
     ]);

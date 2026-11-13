@@ -19,3 +19,6 @@ export const paginaCuenta: SxProps<Theme> = {
   bgcolor: { xs: "background.paper", md: "background.default" },
   flex: 1,
 };
+
+/** Objetivo táctil de 44 px en móvil; en escritorio, el alto normal del botón (guía de diseño, «Base»). */
+export const tactil = { minHeight: { xs: 44, md: 0 } } as const;

@@ -15,6 +15,7 @@ import {
   busquedaSchema,
   idSchema,
   type Busqueda,
+  TAMANO_PAGINA,
 } from '@praxis/contracts';
 import { SesionGuard, type RequestConSesion } from '../auth/sesion.js';
 import { ZodPipe } from '../auth/zod.pipe.js';
@@ -31,8 +32,8 @@ export class NotificacionesController {
     const [items, total, sinLeer] = await Promise.all([
       this.prisma.notificacion.findMany({
         where,
-        skip: (b.pagina - 1) * 20,
-        take: 20,
+        skip: (b.pagina - 1) * TAMANO_PAGINA,
+        take: TAMANO_PAGINA,
         orderBy: [{ creadaEn: 'desc' }, { id: 'desc' }],
       }),
       this.prisma.notificacion.count({ where }),

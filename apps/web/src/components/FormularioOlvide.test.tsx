@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import FormularioOlvide from "./FormularioOlvide";
 
@@ -21,7 +21,7 @@ describe("FormularioOlvide", () => {
     const fetchFalso = pedir(new Response(null, { status: 204 }), " Laura@Correo.co ");
     const titulo = await screen.findByRole("heading", { name: "Revisa tu correo" });
     expect(screen.getByText(/Si el correo está registrado, te enviamos un enlace/)).toBeTruthy();
-    expect(document.activeElement).toBe(titulo);
+    await waitFor(() => expect(document.activeElement).toBe(titulo));
     expect(screen.queryByLabelText("Correo")).toBeNull();
     expect(fetchFalso).toHaveBeenCalledWith(
       "/api/auth/olvide-contrasena",

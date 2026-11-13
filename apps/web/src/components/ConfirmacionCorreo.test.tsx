@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import ConfirmacionCorreo from "./ConfirmacionCorreo";
 
@@ -22,7 +22,6 @@ describe("ConfirmacionCorreo", () => {
     ["sin red", new TypeError("Failed to fetch")],
     ["error del servidor", new Response('{"mensaje":"No pudimos completar la operación."}', { status: 500 })],
     ["respuesta que no es JSON", new Response("<html>502</html>", { status: 502 })],
-    ["demasiadas peticiones", new Response("{}", { status: 429 })],
   ])("%s: avisa del fallo de conexión y deja reintentar con el mismo enlace", async (_, respuesta) => {
     pulsar(respuesta);
     expect((await screen.findByRole("alert")).textContent).toBe(SIN_CONEXION);
@@ -31,13 +30,41 @@ describe("ConfirmacionCorreo", () => {
     expect(screen.queryByText("Inicia sesión para pedir otro")).toBeNull();
   });
 
+  // Un 429 no es un fallo de conexión: reintentar enseguida no sirve, hay que esperar. El enlace sigue sirviendo.
+  const ESPERA = "Demasiadas solicitudes. Espera unos minutos e inténtalo de nuevo.";
+  test.each([
+    [
+      "con el mensaje de la API",
+      '{"mensaje":"Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.","segundos":900}',
+      "Demasiados intentos. Espera 15 minutos e inténtalo de nuevo.",
+    ],
+    ["sin mensaje", "{}", ESPERA],
+    ["con un cuerpo que no es JSON", "<html>429</html>", ESPERA],
+  ])("429 %s: pide esperar, no habla de conexión y conserva el enlace", async (_, cuerpo, aviso) => {
+    pulsar(new Response(cuerpo, { status: 429 }));
+    expect((await screen.findByRole("alert")).textContent).toBe(aviso);
+    expect(screen.getByRole("heading").textContent).toBe("Confirma tu correo");
+    expect((confirmar() as HTMLButtonElement).disabled).toBe(false);
+    expect(screen.queryByText("Inicia sesión para pedir otro")).toBeNull();
+  });
+
+  test("tras un 429, un fallo de red avisa de la conexión y deja reintentar con el mismo enlace", async () => {
+    const fetchFalso = pulsar(new Response("{}", { status: 429 }));
+    expect((await screen.findByRole("alert")).textContent).toBe(ESPERA);
+    fetchFalso.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    fireEvent.click(confirmar()!);
+    await waitFor(() => expect(screen.getByRole("alert").textContent).toBe(SIN_CONEXION));
+    expect((confirmar() as HTMLButtonElement).disabled).toBe(false);
+    expect(fetchFalso.mock.calls[1]).toEqual(fetchFalso.mock.calls[0]);
+  });
+
   test.each([410, 400])("%i: el enlace ya no sirve y se ofrece pedir otro", async (estado) => {
     pulsar(new Response('{"mensaje":"Este enlace ya no sirve."}', { status: estado }));
     expect((await screen.findByRole("heading", { name: "Este enlace ya no sirve" })).textContent).toBeTruthy();
     expect(confirmar()).toBeNull();
     expect(screen.queryByRole("alert")).toBeNull();
     // El botón pulsado desapareció: el foco va al título que dice el resultado, no a la nada.
-    expect(document.activeElement).toBe(screen.getByRole("heading"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("heading")));
     expect(screen.getByRole("link", { name: "Inicia sesión para pedir otro" }).getAttribute("href")).toBe(
       "/ingresar?next=/revisa-tu-correo",
     );
@@ -50,7 +77,7 @@ describe("ConfirmacionCorreo", () => {
     fireEvent.click(confirmar()!);
     expect((await screen.findByRole("heading", { name: "Tu correo quedó confirmado" })).textContent).toBeTruthy();
     expect(screen.queryByRole("alert")).toBeNull();
-    expect(document.activeElement).toBe(screen.getByRole("heading"));
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByRole("heading")));
     expect(screen.getByRole("link", { name: "Ir al perfil de la empresa" }).getAttribute("href")).toBe("/empresa/perfil");
     expect(fetchFalso).toHaveBeenCalledTimes(2);
   });

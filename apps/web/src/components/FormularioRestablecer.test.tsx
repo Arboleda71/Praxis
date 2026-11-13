@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import FormularioRestablecer from "./FormularioRestablecer";
 
@@ -34,7 +34,7 @@ describe("FormularioRestablecer", () => {
   test("cambia la contraseña, lleva el foco al resultado y manda a iniciar sesión", async () => {
     const fetchFalso = cambiar(new Response(null, { status: 204 }));
     const titulo = await screen.findByRole("heading", { name: "Tu contraseña quedó cambiada" });
-    expect(document.activeElement).toBe(titulo);
+    await waitFor(() => expect(document.activeElement).toBe(titulo));
     expect(screen.getByRole("link", { name: "Iniciar sesión" }).getAttribute("href")).toBe("/ingresar");
     expect(refresh).toHaveBeenCalled();
     expect(fetchFalso).toHaveBeenCalledWith(

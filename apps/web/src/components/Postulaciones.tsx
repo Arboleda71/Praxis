@@ -12,11 +12,16 @@ import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import {
   puedeRetirar,
+  TAMANO_PAGINA,
   TRANSICIONES,
   type evaluarElegibilidad,
 } from "@praxis/contracts";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { AvisoError } from "@/components/mercado-ui";
+import { useCarga } from "@/lib/carga";
 import { solicitar, type Lista } from "@/lib/mercado";
+import { abrirEnPestana } from "@/lib/pestana";
+import { fechaLarga } from "@/lib/perfil-cliente";
 
 type Entrada = { estado: string; fecha: string };
 type Postulacion = {
@@ -26,6 +31,7 @@ type Postulacion = {
   historial: Entrada[];
   vacante: { titulo: string; empresa: { razonSocial: string } };
 };
+/** Instante con hora (envío, cambio de estado), en hora de Bogotá. No sirve para fechas de calendario. */
 const fecha = (d: string) =>
   new Date(d).toLocaleString("es-CO", { timeZone: "America/Bogota" });
 function Historial({ items }: { items: Entrada[] }) {
@@ -43,29 +49,27 @@ function Historial({ items }: { items: Entrada[] }) {
 }
 
 export function MisPostulaciones() {
-  const [lista, setLista] = useState<Lista<Postulacion> | null>(null);
   const [pagina, setPagina] = useState(1);
-  const [error, setError] = useState("");
+  const {
+    datos: lista,
+    error,
+    setError,
+    recargar,
+  } = useCarga<Lista<Postulacion>>(`/postulaciones?pagina=${pagina}`);
   const [retirar, setRetirar] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  useEffect(() => {
-    void solicitar<Lista<Postulacion>>(`/postulaciones?pagina=${pagina}`)
-      .then(setLista)
-      .catch((e) => setError(e.message));
-  }, [pagina]);
   async function confirmar() {
     if (!retirar) return;
     setOcupado(true);
     try {
       await solicitar(`/postulaciones/${retirar}/retirar`, "POST");
-      const datos = await solicitar<Lista<Postulacion>>(
-        `/postulaciones?pagina=${pagina}`,
-      );
-      setLista(datos);
-      setRetirar(null);
+      // Se vuelve a pedir la lista: el estado y el historial de la postulación cambiaron.
+      recargar();
     } catch (e) {
       setError((e as Error).message);
     } finally {
+      // El diálogo se cierra también si falla: abierto, taparía el aviso con el motivo.
+      setRetirar(null);
       setOcupado(false);
     }
   }
@@ -78,9 +82,9 @@ export function MisPostulaciones() {
         <Button href="/estudiante/vacantes">Buscar prácticas</Button>
         <Button href="/notificaciones">Notificaciones</Button>
       </Stack>
-      {error && <Alert severity="error">{error}</Alert>}
+      {error && <AvisoError mensaje={error} reintentar={lista ? undefined : recargar} />}
       {!lista ? (
-        <Typography role="status">Cargando postulaciones…</Typography>
+        !error && <Typography role="status">Cargando postulaciones…</Typography>
       ) : lista.items.length === 0 ? (
         <Typography>Aún no te has postulado a una práctica.</Typography>
       ) : (
@@ -105,10 +109,13 @@ export function MisPostulaciones() {
             <Button
               onClick={async () => {
                 try {
-                  const d = await solicitar<{ url: string }>(
-                    `/postulaciones/${p.id}/archivos/hoja-de-vida`,
+                  await abrirEnPestana(async () =>
+                    (
+                      await solicitar<{ url: string }>(
+                        `/postulaciones/${p.id}/archivos/hoja-de-vida`,
+                      )
+                    ).url,
                   );
-                  window.open(d.url, "_blank", "noopener");
                 } catch (e) {
                   setError((e as Error).message);
                 }
@@ -130,7 +137,7 @@ export function MisPostulaciones() {
         </Button>
         <Typography>Página {pagina}</Typography>
         <Button
-          disabled={!lista || pagina * 20 >= lista.total}
+          disabled={!lista || pagina * TAMANO_PAGINA >= lista.total}
           onClick={() => setPagina(pagina + 1)}
         >
           Siguiente
@@ -160,16 +167,12 @@ export function MisPostulaciones() {
 }
 
 export function Candidatos({ vacanteId }: { vacanteId: string }) {
-  const [lista, setLista] = useState<Lista<Postulacion> | null>(null);
   const [pagina, setPagina] = useState(1);
-  const [error, setError] = useState("");
-  useEffect(() => {
-    void solicitar<Lista<Postulacion>>(
-      `/empresa/vacantes/${vacanteId}/postulaciones?pagina=${pagina}`,
-    )
-      .then(setLista)
-      .catch((e) => setError(e.message));
-  }, [vacanteId, pagina]);
+  const {
+    datos: lista,
+    error,
+    recargar,
+  } = useCarga<Lista<Postulacion>>(`/empresa/vacantes/${vacanteId}/postulaciones?pagina=${pagina}`);
   return (
     <Stack spacing={3} sx={{ maxWidth: 900, mx: "auto", p: 2, py: 4 }}>
       <Typography variant="h1" sx={{ fontSize: 28 }}>
@@ -180,7 +183,8 @@ export function Candidatos({ vacanteId }: { vacanteId: string }) {
         archivos enviados.
       </Typography>
       <Button href="/empresa/vacantes">Volver a mis vacantes</Button>
-      {error && <Alert severity="error">{error}</Alert>}
+      {error && <AvisoError mensaje={error} reintentar={recargar} />}
+      {!lista && !error && <Typography role="status">Cargando postulaciones…</Typography>}
       {lista?.items.length === 0 && (
         <Typography>Aún no hay postulaciones.</Typography>
       )}
@@ -201,7 +205,7 @@ export function Candidatos({ vacanteId }: { vacanteId: string }) {
         </Button>
         <Typography>Página {pagina}</Typography>
         <Button
-          disabled={!lista || pagina * 20 >= lista.total}
+          disabled={!lista || pagina * TAMANO_PAGINA >= lista.total}
           onClick={() => setPagina(pagina + 1)}
         >
           Siguiente
@@ -227,15 +231,16 @@ type Candidatura = Postulacion & {
   archivos: { tipo: string; nombre: string; bytes: number }[];
 };
 export function DetalleCandidato({ id }: { id: string }) {
-  const [p, setP] = useState<Candidatura | null>(null);
-  const [error, setError] = useState("");
+  // Carga inicial: cargando (sin `p` ni error), error (sin `p`, con error y «Reintentar») o éxito (`p`).
+  const {
+    datos: p,
+    setDatos: setP,
+    error,
+    setError,
+    recargar,
+  } = useCarga<Candidatura>(`/empresa/postulaciones/${id}`);
   const [estado, setEstado] = useState("");
   const [ocupado, setOcupado] = useState(false);
-  useEffect(() => {
-    void solicitar<Candidatura>(`/empresa/postulaciones/${id}`)
-      .then(setP)
-      .catch((e) => setError(e.message));
-  }, [id]);
   async function cambiar() {
     if (!estado) return;
     setOcupado(true);
@@ -246,6 +251,7 @@ export function DetalleCandidato({ id }: { id: string }) {
       const d = await solicitar<Candidatura>(`/empresa/postulaciones/${id}`);
       setP(d);
       setEstado("");
+      setError("");
     } catch (e) {
       setError((e as Error).message);
     } finally {
@@ -254,10 +260,13 @@ export function DetalleCandidato({ id }: { id: string }) {
   }
   async function archivo(tipo: string) {
     try {
-      const d = await solicitar<{ url: string }>(
-        `/empresa/postulaciones/${id}/archivos/${{ HOJA_DE_VIDA: "hoja-de-vida", SOPORTE_AVAL: "soporte-aval", FOTO: "foto" }[tipo]}`,
+      await abrirEnPestana(async () =>
+        (
+          await solicitar<{ url: string }>(
+            `/empresa/postulaciones/${id}/archivos/${{ HOJA_DE_VIDA: "hoja-de-vida", SOPORTE_AVAL: "soporte-aval", FOTO: "foto" }[tipo]}`,
+          )
+        ).url,
       );
-      window.open(d.url, "_blank", "noopener");
     } catch (e) {
       setError((e as Error).message);
     }
@@ -270,9 +279,15 @@ export function DetalleCandidato({ id }: { id: string }) {
   return (
     <Stack spacing={3} sx={{ maxWidth: 900, mx: "auto", p: 2, py: 4 }}>
       <Button href="/empresa/vacantes">Volver a mis vacantes</Button>
-      {error && <Alert severity="error">{error}</Alert>}
+      {/* Mientras carga o si falla, la página también tiene su encabezado (el mismo título de la pestaña). */}
+      {!p && (
+        <Typography variant="h1" sx={{ fontSize: 28 }}>
+          Detalle de postulación
+        </Typography>
+      )}
+      {error && <AvisoError mensaje={error} reintentar={p ? undefined : recargar} />}
       {!p ? (
-        <Typography role="status">Cargando postulación…</Typography>
+        !error && <Typography role="status">Cargando postulación…</Typography>
       ) : (
         <>
           <Typography variant="h1" sx={{ fontSize: 28 }}>
@@ -305,7 +320,8 @@ export function DetalleCandidato({ id }: { id: string }) {
           <Typography>
             Disponibilidad:{" "}
             {p.perfil.disponibleDesde
-              ? fecha(p.perfil.disponibleDesde)
+              ? // Fecha de calendario guardada a medianoche UTC: se muestra el día, sin pasarlo a hora de Bogotá.
+                fechaLarga(p.perfil.disponibleDesde.slice(0, 10))
               : "Falta información"}
             . Idiomas:{" "}
             {p.perfil.idiomas.map((i) => `${i.idioma} ${i.nivel}`).join(", ") ||

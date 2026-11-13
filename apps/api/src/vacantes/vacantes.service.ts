@@ -9,15 +9,50 @@ import {
   evaluarElegibilidad,
   hoyBogota,
   leerNit,
+  TAMANO_PAGINA,
   type Busqueda,
   type VacanteDatos,
 } from '@praxis/contracts';
 import { randomUUID } from 'node:crypto';
-import type { Prisma, Vacante } from '../generated/prisma/client.js';
+import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
 import { Archivos } from '../perfil/archivos.js';
 
-const TAMANO = 20;
+const TAMANO = TAMANO_PAGINA;
+/**
+ * Lo que el estudiante ve de una vacante, campo por campo. Lista de permitidos: un campo interno que se agregue
+ * después (cupos, dueño, notas) no se expone solo.
+ */
+const VACANTE_PUBLICA = {
+  id: true,
+  titulo: true,
+  descripcion: true,
+  modalidad: true,
+  ciudad: true,
+  duracionMeses: true,
+  fechaInicio: true,
+  vigencia: true,
+  niveles: true,
+  programas: true,
+  avances: true,
+  aval: true,
+  jornada: true,
+  idiomas: true,
+  estado: true,
+  motivoCierre: true,
+  publicadaEn: true,
+} as const;
+/** Lo que el estudiante ve de la empresa: sus datos declarados. Nunca NIT, plan ni ids internos. */
+const EMPRESA_PUBLICA = {
+  razonSocial: true,
+  descripcion: true,
+  ciudad: true,
+  sitioWeb: true,
+  correoContacto: true,
+  telefono: true,
+} as const;
+/** En LIKE, `%`, `_` y `\` son comodines o escape: se buscan como texto. */
+const literalLike = (texto: string) => texto.replace(/[\\%_]/g, '\\$&');
 type Perfil = Prisma.EstudianteGetPayload<{
   include: { idiomas: true; archivos: true };
 }>;
@@ -37,7 +72,9 @@ export const periodoGratis = (creada: Date, ahora = new Date()) => {
   while (sumarMeses(creada, meses + 6) <= ahora) meses += 6;
   return sumarMeses(creada, meses);
 };
-export const datosVacante = (v: Vacante): VacanteDatos => ({
+export const datosVacante = (
+  v: Prisma.VacanteGetPayload<{ select: typeof VACANTE_PUBLICA }>,
+): VacanteDatos => ({
   ...v,
   fechaInicio: v.fechaInicio.toISOString().slice(0, 10),
   vigencia: v.vigencia.toISOString().slice(0, 10),
@@ -251,7 +288,9 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     await this.cerrarVencidas();
     const where: Prisma.VacanteWhereInput = {
       estado: 'Abierta',
-      ...(b.q ? { titulo: { contains: b.q, mode: 'insensitive' } } : {}),
+      ...(b.q
+        ? { titulo: { contains: literalLike(b.q), mode: 'insensitive' } }
+        : {}),
       ...(b.nivel ? { niveles: { has: b.nivel } } : {}),
       ...(b.modalidad ? { modalidad: b.modalidad } : {}),
       ...(b.ciudad
@@ -287,7 +326,7 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     await this.cerrarVencidas();
     const v = await this.prisma.vacante.findFirst({
       where: { id, estado: { not: 'Borrador' } },
-      include: { empresa: true },
+      select: { ...VACANTE_PUBLICA, empresa: { select: EMPRESA_PUBLICA } },
     });
     if (!v) throw new NotFoundException();
     const p = await this.perfil(this.prisma, estudianteId);

@@ -1,76 +1,110 @@
 "use client";
-import Alert from "@mui/material/Alert";
+import SearchOffRounded from "@mui/icons-material/SearchOffRounded";
+import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import MenuItem from "@mui/material/MenuItem";
-import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
-import { MODALIDADES, NIVELES_FORMACION } from "@praxis/contracts";
-import { useEffect, useState } from "react";
-import { solicitar, type Lista, type Vacante } from "@/lib/mercado";
-import { fechaLarga } from "@/lib/perfil-cliente";
-export default function BuscarVacantes({
-  visitante = false,
-}: {
-  visitante?: boolean;
-}) {
+import { MODALIDADES, NIVELES_FORMACION, TAMANO_PAGINA } from "@praxis/contracts";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AvisoError, EstadoVacio, TarjetaVacante } from "@/components/mercado-ui";
+import { tactil } from "@/lib/estilos";
+import { resumenVacante, solicitar, type Lista, type Vacante } from "@/lib/mercado";
+
+const SIN_FILTROS = { q: "", nivel: "", modalidad: "", ciudad: "" };
+type Filtros = typeof SIN_FILTROS;
+
+function pedir(filtros: Filtros, pagina: number) {
+  const q = new URLSearchParams({ pagina: String(pagina) });
+  for (const [k, v] of Object.entries(filtros)) if (v) q.set(k, v);
+  return solicitar<Lista<Vacante>>(`/vacantes?${q}`);
+}
+
+/** Búsqueda del estudiante (mockups M6 · Grupo 2): título y filtros de nivel, modalidad y ciudad; 20 por página. */
+export default function BuscarVacantes() {
   const [lista, setLista] = useState<Lista<Vacante> | null>(null);
   const [error, setError] = useState("");
-  const [f, setF] = useState({ q: "", nivel: "", modalidad: "", ciudad: "" });
-  async function buscar(pagina = 1) {
-    setError("");
-    try {
-      if (visitante) {
-        const items = await solicitar<Vacante[]>("/vacantes/recientes");
-        setLista({ items, total: items.length, pagina: 1 });
-      } else {
-        const q = new URLSearchParams({ pagina: String(pagina) });
-        for (const [k, v] of Object.entries(f)) if (v) q.set(k, v);
-        setLista(await solicitar(`/vacantes?${q}`));
-      }
-    } catch (e) {
-      setError((e as Error).message);
-    }
+  // `f` es lo que se está escribiendo; `aplicados`, lo último que se buscó. La paginación usa `aplicados`:
+  // «Siguiente» no debe aplicar un filtro que todavía no se ha enviado con «Buscar».
+  const [f, setF] = useState(SIN_FILTROS);
+  const [aplicados, setAplicados] = useState(SIN_FILTROS);
+  // Turno de la petición más reciente. Una respuesta que llega tarde (p. ej. la carga inicial después de
+  // una búsqueda) ya no es la última y no toca ni los resultados ni el error.
+  const turno = useRef(0);
+  const [cargando, setCargando] = useState(true);
+  // Al cambiar de página el botón pulsado puede desaparecer o deshabilitarse: el foco pasa al resumen de
+  // resultados, que además dice en qué página se está (WCAG 2.4.3).
+  const resumen = useRef<HTMLParagraphElement>(null);
+  const enfocarResumen = useRef(false);
+  // Lo último que se pidió, para reintentarlo tal cual (misma página y filtros) si falla.
+  const ultima = useRef<[Filtros, number]>([SIN_FILTROS, 1]);
+  const cargar = useCallback((filtros: Filtros, pagina: number) => {
+    const mio = ++turno.current;
+    ultima.current = [filtros, pagina];
+    return pedir(filtros, pagina).then(
+      (datos) => {
+        if (mio !== turno.current) return;
+        setLista(datos);
+        setError("");
+        setCargando(false);
+      },
+      (e: Error) => {
+        if (mio !== turno.current) return;
+        // Los resultados anteriores ya no corresponden a lo pedido: no se dejan bajo el aviso como si lo fueran.
+        setLista(null);
+        setError(e.message);
+        setCargando(false);
+      },
+    );
+  }, []);
+  useEffect(() => {
+    if (!enfocarResumen.current || cargando || !lista) return;
+    enfocarResumen.current = false;
+    resumen.current?.focus();
+  }, [cargando, lista]);
+  function paginar(pagina: number) {
+    enfocarResumen.current = true;
+    setCargando(true);
+    void cargar(aplicados, pagina);
   }
   // Carga inicial; los filtros se aplican al enviar el formulario.
   useEffect(() => {
-    const inicial = visitante
-      ? solicitar<Vacante[]>("/vacantes/recientes").then((items) => ({
-          items,
-          total: items.length,
-          pagina: 1,
-        }))
-      : solicitar<Lista<Vacante>>("/vacantes?pagina=1");
-    void inicial.then(setLista).catch((e) => setError(e.message));
-  }, [visitante]);
+    void cargar(SIN_FILTROS, 1);
+  }, [cargar]);
+  function buscar(filtros: Filtros) {
+    setCargando(true);
+    setF(filtros);
+    setAplicados(filtros);
+    void cargar(filtros, 1);
+  }
+  const conFiltros = Object.values(aplicados).some(Boolean);
+  const campo = (clave: keyof Filtros) => ({
+    value: f[clave],
+    onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+      const valor = e.target.value;
+      setF((previo) => ({ ...previo, [clave]: valor }));
+    },
+    sx: { flex: 1 },
+  });
+
   return (
-    <Stack spacing={3} sx={{ maxWidth: 960, mx: "auto", p: 2, py: 4 }}>
-      <Typography variant={visitante ? "h2" : "h1"} sx={{ fontSize: 28 }}>
-        {visitante ? "Últimas cinco prácticas abiertas" : "Buscar prácticas"}
+    <Stack spacing={{ xs: 2, md: 2.5 }} sx={{ width: "100%", maxWidth: 960, mx: "auto", px: { xs: 2, md: 3 }, pt: { xs: 3, md: 5 }, pb: { xs: 4, md: 5 } }}>
+      <Typography variant="h1" sx={{ fontSize: 28 }}>
+        Buscar prácticas
       </Typography>
-      {!visitante && (
-        <Stack
-          component="form"
-          spacing={2}
-          onSubmit={(e) => {
-            e.preventDefault();
-            void buscar();
-          }}
-        >
-          <TextField
-            id="buscar-titulo"
-            label="Buscar por título"
-            value={f.q}
-            onChange={(e) => setF({ ...f, q: e.target.value })}
-          />
-          <TextField
-            id="buscar-nivel"
-            select
-            label="Nivel de formación"
-            value={f.nivel}
-            onChange={(e) => setF({ ...f, nivel: e.target.value })}
-          >
+      <Stack
+        component="form"
+        spacing={{ xs: 2, md: 2.5 }}
+        sx={{ alignItems: { md: "flex-start" } }}
+        onSubmit={(e) => {
+          e.preventDefault();
+          buscar(f);
+        }}
+      >
+        <Stack direction={{ xs: "column", md: "row" }} spacing={1.5} sx={{ width: "100%" }}>
+          <TextField id="buscar-titulo" label="Buscar por título" {...campo("q")} />
+          <TextField id="buscar-nivel" select label="Nivel de formación" {...campo("nivel")}>
             <MenuItem value="">Todos</MenuItem>
             {NIVELES_FORMACION.map((n) => (
               <MenuItem key={n.id} value={n.id}>
@@ -78,13 +112,7 @@ export default function BuscarVacantes({
               </MenuItem>
             ))}
           </TextField>
-          <TextField
-            id="buscar-modalidad"
-            select
-            label="Modalidad"
-            value={f.modalidad}
-            onChange={(e) => setF({ ...f, modalidad: e.target.value })}
-          >
+          <TextField id="buscar-modalidad" select label="Modalidad" {...campo("modalidad")}>
             <MenuItem value="">Todas</MenuItem>
             {MODALIDADES.map((n) => (
               <MenuItem key={n.id} value={n.id}>
@@ -92,68 +120,60 @@ export default function BuscarVacantes({
               </MenuItem>
             ))}
           </TextField>
-          <TextField
-            id="buscar-ciudad"
-            label="Ciudad (ubicación de la práctica)"
-            value={f.ciudad}
-            onChange={(e) => setF({ ...f, ciudad: e.target.value })}
-          />
-          <Button type="submit" variant="contained">
-            Buscar
-          </Button>
+          <TextField id="buscar-ciudad" label="Ciudad (ubicación de la práctica)" {...campo("ciudad")} />
         </Stack>
+        <Button type="submit" variant="contained" sx={{ ...tactil, width: { xs: "100%", md: "auto" } }}>
+          {cargando && lista ? "Buscando…" : "Buscar"}
+        </Button>
+      </Stack>
+      {error && (
+        <AvisoError
+          mensaje={error}
+          reintentar={() => {
+            setCargando(true);
+            void cargar(...ultima.current);
+          }}
+        />
       )}
-      {error && <Alert severity="error">{error}</Alert>}
       {!lista ? (
-        <Typography role="status">Cargando prácticas…</Typography>
-      ) : lista.items.length === 0 ? (
-        <Typography>No hay prácticas abiertas con estos criterios.</Typography>
+        !error && <Typography role="status">Cargando prácticas…</Typography>
+      ) : lista.total === 0 ? (
+        <EstadoVacio icono={<SearchOffRounded fontSize="large" />} mensaje="No hay prácticas abiertas con estos criterios.">
+          {conFiltros && (
+            <>
+              <Typography color="text.secondary">Prueba con menos filtros o con otra palabra del título.</Typography>
+              <Button variant="outlined" sx={tactil} onClick={() => buscar(SIN_FILTROS)}>
+                Limpiar búsqueda
+              </Button>
+            </>
+          )}
+        </EstadoVacio>
       ) : (
-        lista.items.map((v) => (
-          <Paper
-            key={v.id}
-            component="article"
-            variant="outlined"
-            sx={{ p: 2 }}
-          >
-            <Typography variant="h2" sx={{ fontSize: 20 }}>
-              {v.titulo}
-            </Typography>
-            <Typography>
-              {v.empresa?.razonSocial} ·{" "}
-              {MODALIDADES.find((m) => m.id === v.modalidad)?.nombre} {v.ciudad}{" "}
-              · Vigencia: {fechaLarga(v.vigencia.slice(0, 10))}
-            </Typography>
-            <Button
-              href={
-                visitante
-                  ? `/ingresar?next=${encodeURIComponent(`/estudiante/vacantes/${v.id}`)}`
-                  : `/estudiante/vacantes/${v.id}`
-              }
-            >
-              {visitante ? "Ingresar para consultar" : "Ver requisitos"}
-            </Button>
-          </Paper>
-        ))
-      )}
-      {!visitante && lista && (
-        <Stack direction="row" spacing={2}>
-          <Button
-            disabled={lista.pagina === 1}
-            onClick={() => buscar(lista.pagina - 1)}
-          >
-            Anterior
-          </Button>
-          <Typography>
-            Página {lista.pagina}. {lista.total} resultados.
+        <>
+          <Typography ref={resumen} tabIndex={-1} role="status" variant="body2" color="text.secondary" sx={{ outline: "none", scrollMarginTop: 80 }}>
+            Página {lista.pagina}. {lista.total} {lista.total === 1 ? "resultado" : "resultados"}.
           </Typography>
-          <Button
-            disabled={lista.pagina * 20 >= lista.total}
-            onClick={() => buscar(lista.pagina + 1)}
-          >
-            Siguiente
-          </Button>
-        </Stack>
+          {lista.items.map((v) => (
+            <TarjetaVacante
+              key={v.id}
+              titulo={v.titulo}
+              datos={resumenVacante(v)}
+              href={`/estudiante/vacantes/${v.id}`}
+              accion="Ver requisitos"
+            />
+          ))}
+          <Stack component="nav" aria-label="Páginas de resultados" direction="row" spacing={1} sx={{ alignItems: "center", justifyContent: "center" }}>
+            <Button sx={tactil} disabled={cargando || lista.pagina === 1} onClick={() => paginar(lista.pagina - 1)}>
+              Anterior
+            </Button>
+            <Box component="span" sx={{ color: "text.secondary" }}>
+              Página {lista.pagina}
+            </Box>
+            <Button sx={tactil} disabled={cargando || lista.pagina * TAMANO_PAGINA >= lista.total} onClick={() => paginar(lista.pagina + 1)}>
+              Siguiente
+            </Button>
+          </Stack>
+        </>
       )}
     </Stack>
   );

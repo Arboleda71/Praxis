@@ -1,4 +1,5 @@
-import type { VacanteDatos } from "@praxis/contracts";
+import { MODALIDADES, nombreDe, type VacanteDatos } from "@praxis/contracts";
+import { fechaLarga } from "./perfil-cliente";
 export type Vacante = VacanteDatos & {
   id: string;
   estado: string;
@@ -38,4 +39,35 @@ export async function solicitar<T>(
     );
   }
   return r.status === 204 ? (undefined as T) : r.json();
+}
+
+/** «Híbrida Medellín», «Remota». */
+export const ubicacion = (v: { modalidad: string; ciudad?: string | null }) =>
+  [nombreDe(MODALIDADES, v.modalidad), v.ciudad].filter(Boolean).join(" ");
+
+/** «Andina Soft S.A.S. · Híbrida Medellín · Vigencia: 15 de abril de 2026»: los datos básicos de una tarjeta. */
+export const resumenVacante = (v: {
+  modalidad: string;
+  ciudad?: string | null;
+  vigencia: string;
+  empresa?: { razonSocial: string };
+}) =>
+  [
+    v.empresa?.razonSocial,
+    ubicacion(v),
+    `Vigencia: ${fechaLarga(v.vigencia.slice(0, 10))}`,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+/**
+ * La dirección si es http(s); si no, `undefined`. La API ya lo exige al guardar, pero un dato antiguo o
+ * sembrado podría ser `javascript:` y no debe llegar a un `href`.
+ */
+export function enlaceWeb(url?: string | null) {
+  try {
+    return url && ["http:", "https:"].includes(new URL(url).protocol) ? url : undefined;
+  } catch {
+    return undefined;
+  }
 }

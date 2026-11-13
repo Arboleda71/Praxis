@@ -1,5 +1,4 @@
 "use client";
-import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -8,34 +7,34 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { TAMANO_PAGINA } from "@praxis/contracts";
+import { AvisoError } from "@/components/mercado-ui";
+import { useCarga } from "@/lib/carga";
 import { solicitar, type Lista, type Vacante } from "@/lib/mercado";
 import { fechaLarga } from "@/lib/perfil-cliente";
 
+
 export default function MisVacantes() {
-  const [lista, setLista] = useState<Lista<Vacante> | null>(null);
   const [pagina, setPagina] = useState(1);
-  const [error, setError] = useState("");
   const [accion, setAccion] = useState<{
     id: string;
     tipo: "publicar" | "cerrar" | "eliminar";
   } | null>(null);
   const [ocupado, setOcupado] = useState(false);
-  async function cargar(p: number) {
-    try {
-      const datos = await solicitar<Lista<Vacante>>(
-        `/empresa/vacantes?pagina=${p}`,
-      );
-      setLista(datos);
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }
-  useEffect(() => {
-    void solicitar<Lista<Vacante>>(`/empresa/vacantes?pagina=${pagina}`)
-      .then(setLista)
-      .catch((e) => setError(e.message));
-  }, [pagina]);
+  // Se recarga la página actual después de publicar, cerrar o eliminar. Al cargar con éxito se quita el
+  // aviso de una acción anterior fallida: los datos ya son los actuales.
+  const { datos: lista, error, setError, recargar } = useCarga<Lista<Vacante>>(
+    `/empresa/vacantes?pagina=${pagina}`,
+    (datos) => {
+      // La página quedó fuera de rango (se eliminó su último borrador): se va a la última que existe en
+      // lugar de mostrar una lista vacía cuando todavía hay vacantes.
+      const ultima = Math.max(1, Math.ceil(datos.total / TAMANO_PAGINA));
+      if (pagina <= ultima) return true;
+      setPagina(ultima);
+      return false;
+    },
+  );
   async function confirmar() {
     if (!accion) return;
     setOcupado(true);
@@ -46,7 +45,7 @@ export default function MisVacantes() {
         accion.tipo === "eliminar" ? "DELETE" : "POST",
       );
       setAccion(null);
-      await cargar(pagina);
+      recargar();
     } catch (e) {
       setError((e as Error).message);
       setAccion(null);
@@ -70,14 +69,19 @@ export default function MisVacantes() {
         <Button href="/empresa/planes">Planes y pagos</Button>
         <Button href="/notificaciones">Notificaciones</Button>
       </Stack>
-      {error && (
-        <Alert severity="error">
-          {error} <Button href="/empresa/perfil">Revisar mi empresa</Button>
-        </Alert>
-      )}
+      {/* Sin lista, el error es de la carga: se reintenta. Con lista, es de una acción (publicar exige correo,
+          NIT y cupos): se lleva a revisar la empresa. */}
+      {error &&
+        (lista ? (
+          <AvisoError mensaje={error}>
+            <Button href="/empresa/perfil">Revisar mi empresa</Button>
+          </AvisoError>
+        ) : (
+          <AvisoError mensaje={error} reintentar={recargar} />
+        ))}
       {!lista ? (
-        <Typography role="status">Cargando vacantes…</Typography>
-      ) : lista.items.length === 0 ? (
+        !error && <Typography role="status">Cargando vacantes…</Typography>
+      ) : lista.total === 0 ? (
         <Typography>
           Aún no tienes vacantes. Crea tu primer borrador.
         </Typography>
@@ -139,7 +143,7 @@ export default function MisVacantes() {
         </Button>
         <Typography>Página {pagina}</Typography>
         <Button
-          disabled={!lista || pagina * 20 >= lista.total}
+          disabled={!lista || pagina * TAMANO_PAGINA >= lista.total}
           onClick={() => setPagina(pagina + 1)}
         >
           Siguiente

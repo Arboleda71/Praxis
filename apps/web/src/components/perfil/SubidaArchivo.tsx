@@ -10,10 +10,10 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { LIMITES_ARCHIVO, errorArchivo, formatoDeMime, type TipoArchivo } from "@praxis/contracts";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useId, useRef, useState } from "react";
 import type { ArchivoMeta } from "@/lib/perfil";
-import { fechaCorta, subirArchivo, tamano, verArchivo } from "@/lib/perfil-cliente";
+import { fechaCorta, subirArchivo, tamano, verArchivo, type ResultadoVer } from "@/lib/perfil-cliente";
 
 type Estado =
   | { fase: "quieto" }
@@ -29,12 +29,26 @@ export default function SubidaArchivo({ tipo, actual, etiqueta }: { tipo: TipoAr
   const input = useRef<HTMLInputElement>(null);
   const id = useId();
   const [estado, setEstado] = useState<Estado>({ fase: "quieto" });
+  // «Ver» pide un enlace firmado a la API: puede fallar (sesión vencida, error del servidor, sin red) y la
+  // persona tiene que enterarse, no quedarse mirando un botón que no hace nada.
+  const [abriendo, setAbriendo] = useState(false);
+  const [falloVer, setFalloVer] = useState<Extract<ResultadoVer, { ok: false }> | null>(null);
+  const ruta = usePathname();
   const limite = LIMITES_ARCHIVO[tipo];
+
+  async function ver() {
+    setAbriendo(true);
+    setFalloVer(null);
+    const r = await verArchivo(tipo);
+    setAbriendo(false);
+    if (!r.ok) setFalloVer(r);
+  }
 
   async function elegido(e: React.ChangeEvent<HTMLInputElement>) {
     const archivo = e.target.files?.[0];
     e.target.value = "";
     if (!archivo) return;
+    setFalloVer(null);
     // Aviso inmediato; la API vuelve a comprobar por contenido.
     const previo = errorArchivo(tipo, { formato: formatoDeMime(archivo.type), bytes: archivo.size });
     if (previo) return setEstado({ fase: "rechazado", nombre: archivo.name, mensaje: previo });
@@ -103,11 +117,30 @@ export default function SubidaArchivo({ tipo, actual, etiqueta }: { tipo: TipoAr
             </div>
           </Stack>
           <Stack direction="row" spacing={1}>
-            <Button variant="outlined" onClick={() => verArchivo(tipo)}>
-              Ver<span className="sr-only"> {etiqueta} (se abre en otra pestaña)</span>
+            <Button variant="outlined" onClick={ver} disabled={abriendo}>
+              {abriendo ? "Abriendo…" : "Ver"}
+              <span className="sr-only"> {etiqueta} (se abre en otra pestaña)</span>
             </Button>
             {elegir("Reemplazar", "text")}
           </Stack>
+          {falloVer && (
+            <Alert
+              severity="error"
+              action={
+                falloVer.sesionVencida ? (
+                  <Button color="inherit" href={`/ingresar?next=${encodeURIComponent(ruta)}`}>
+                    Iniciar sesión
+                  </Button>
+                ) : (
+                  <Button color="inherit" onClick={ver}>
+                    Reintentar
+                  </Button>
+                )
+              }
+            >
+              {falloVer.mensaje}
+            </Alert>
+          )}
         </>
       ) : (
         <Box sx={{ p: 2.5, border: 1, borderColor: "divider", borderRadius: 2, bgcolor: "background.default", textAlign: "center" }}>

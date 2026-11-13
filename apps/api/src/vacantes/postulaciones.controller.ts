@@ -18,6 +18,7 @@ import {
   tipoArchivoSchema,
   type Busqueda,
   type TipoArchivo,
+  TAMANO_PAGINA,
 } from '@praxis/contracts';
 import {
   SoloEmpresaGuard,
@@ -81,8 +82,8 @@ export class PostulacionesEstudianteController {
       this.prisma.postulacion.findMany({
         where,
         orderBy: [{ creadaEn: 'desc' }, { id: 'desc' }],
-        skip: (b.pagina - 1) * 20,
-        take: 20,
+        skip: (b.pagina - 1) * TAMANO_PAGINA,
+        take: TAMANO_PAGINA,
         include: {
           vacante: {
             select: {
@@ -136,8 +137,8 @@ export class CandidatosController {
     const [items, total] = await Promise.all([
       this.prisma.postulacion.findMany({
         where,
-        skip: (b.pagina - 1) * 20,
-        take: 20,
+        skip: (b.pagina - 1) * TAMANO_PAGINA,
+        take: TAMANO_PAGINA,
         orderBy: [{ creadaEn: 'asc' }, { id: 'asc' }],
         select: { id: true, estado: true, creadaEn: true },
       }),

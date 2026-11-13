@@ -1,10 +1,12 @@
 "use client";
-import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { TAMANO_PAGINA } from "@praxis/contracts";
+import { AvisoError } from "@/components/mercado-ui";
+import { useCarga } from "@/lib/carga";
 import { solicitar, type Lista } from "@/lib/mercado";
 type Aviso = {
   id: string;
@@ -13,32 +15,17 @@ type Aviso = {
   leidaEn: string | null;
 };
 export default function Notificaciones() {
-  const [lista, setLista] = useState<
-    (Lista<Aviso> & { sinLeer: number }) | null
-  >(null);
   const [pagina, setPagina] = useState(1);
-  const [error, setError] = useState("");
-  useEffect(() => {
-    void solicitar<Lista<Aviso> & { sinLeer: number }>(
-      `/notificaciones?pagina=${pagina}`,
-    )
-      .then(setLista)
-      .catch((e) => setError(e.message));
-  }, [pagina]);
-  async function actualizar() {
-    try {
-      const d = await solicitar<Lista<Aviso> & { sinLeer: number }>(
-        `/notificaciones?pagina=${pagina}`,
-      );
-      setLista(d);
-    } catch (e) {
-      setError((e as Error).message);
-    }
-  }
+  const {
+    datos: lista,
+    error,
+    setError,
+    recargar: actualizar,
+  } = useCarga<Lista<Aviso> & { sinLeer: number }>(`/notificaciones?pagina=${pagina}`);
   async function leer(id: string) {
     try {
       await solicitar(`/notificaciones/${id}/leer`, "POST");
-      await actualizar();
+      actualizar();
     } catch (e) {
       setError((e as Error).message);
     }
@@ -49,10 +36,10 @@ export default function Notificaciones() {
         Notificaciones
       </Typography>
       <Typography role="status">
-        {lista ? `${lista.sinLeer} sin leer` : "Cargando…"}
+        {lista ? `${lista.sinLeer} sin leer` : error ? "" : "Cargando…"}
       </Typography>
       <Button onClick={actualizar}>Actualizar notificaciones</Button>
-      {error && <Alert severity="error">{error}</Alert>}
+      {error && <AvisoError mensaje={error} reintentar={lista ? undefined : actualizar} />}
       {lista?.items.length === 0 && (
         <Typography>No tienes notificaciones todavía.</Typography>
       )}
@@ -76,7 +63,7 @@ export default function Notificaciones() {
         </Button>
         <Typography>Página {pagina}</Typography>
         <Button
-          disabled={!lista || pagina * 20 >= lista.total}
+          disabled={!lista || pagina * TAMANO_PAGINA >= lista.total}
           onClick={() => setPagina(pagina + 1)}
         >
           Siguiente

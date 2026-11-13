@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { PLANES, type Plan } from "@praxis/contracts";
+import { PLANES, type Plan, TAMANO_PAGINA } from "@praxis/contracts";
 import { useEffect, useState } from "react";
 import { solicitar, type Lista } from "@/lib/mercado";
 type Configuracion = {
@@ -157,7 +157,7 @@ export default function PlanesEmpresa() {
         </Button>
         <Typography>Página {pagina}</Typography>
         <Button
-          disabled={!lista || pagina * 20 >= lista.total}
+          disabled={!lista || pagina * TAMANO_PAGINA >= lista.total}
           onClick={() => setPagina(pagina + 1)}
         >
           Siguiente

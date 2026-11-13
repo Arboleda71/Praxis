@@ -97,9 +97,29 @@ test("MVP: publicar → buscar → comprobar → postular → seguir → notific
         buffer: Buffer.from("%PDF-1.4\nHoja de vida ficticia"),
       });
     await expect(alumno.getByText("Perfil mínimo completo")).toBeVisible();
+    // Fecha de calendario: la empresa debe ver el mismo día, no el anterior por la hora de Bogotá.
+    await alumno.goto("/estudiante/perfil/disponibilidad");
+    await alumno.getByLabel("Disponible desde").fill("2027-02-01");
+    await alumno.getByRole("button", { name: "Guardar" }).click();
+    await expect(
+      alumno.getByText("Guardamos tu disponibilidad e idiomas."),
+    ).toBeVisible();
     await alumno.goto("/estudiante/vacantes");
+    // Sin resultados: lo dice y deja limpiar la búsqueda.
+    await alumno.getByLabel("Buscar por título").fill(`sin-resultados-${titulo}`);
+    await alumno.getByRole("button", { name: "Buscar", exact: true }).click();
+    await expect(
+      alumno.getByText("No hay prácticas abiertas con estos criterios."),
+    ).toBeVisible();
+    await sinViolaciones(alumno);
+    await sinDesborde(alumno);
+    await alumno.getByRole("button", { name: "Limpiar búsqueda" }).click();
+    await expect(alumno.getByLabel("Buscar por título")).toHaveValue("");
     await alumno.getByLabel("Buscar por título").fill(titulo);
     await alumno.getByRole("button", { name: "Buscar", exact: true }).click();
+    await expect(alumno.getByRole("status")).toHaveText("Página 1. 1 resultado.");
+    await sinViolaciones(alumno);
+    await sinDesborde(alumno);
     await alumno
       .getByRole("article")
       .filter({ hasText: titulo })
@@ -108,6 +128,19 @@ test("MVP: publicar → buscar → comprobar → postular → seguir → notific
     await expect(
       alumno.getByText(/La empresa revisa la afinidad/),
     ).toBeVisible();
+    // Cada requisito con el nombre del catálogo y su resultado; solo el nivel es excluyente.
+    const requisito = (nombre: string) =>
+      alumno.getByRole("listitem").filter({ hasText: nombre });
+    await expect(requisito("Nivel de formación")).toContainText(
+      "Excluyente · Niveles aceptados: Tecnólogo",
+    );
+    await expect(requisito("Nivel de formación")).toContainText("Cumple");
+    await expect(requisito("Aval declarado")).toContainText(
+      "Falta información",
+    );
+    await expect(requisito("Jornada: Tiempo completo")).toContainText(
+      "Deseable",
+    );
     await expect(
       alumno.getByRole("button", { name: "Postularme", exact: true }),
     ).toBeEnabled();
@@ -116,6 +149,11 @@ test("MVP: publicar → buscar → comprobar → postular → seguir → notific
     await alumno
       .getByRole("button", { name: "Postularme", exact: true })
       .click();
+    await expect(alumno.getByRole("dialog")).toContainText(
+      "Solo puedes postularte una vez a esta vacante",
+    );
+    await sinViolaciones(alumno);
+    await sinDesborde(alumno);
     await alumno
       .getByRole("dialog")
       .getByRole("button", { name: "Enviar postulación", exact: true })
@@ -139,6 +177,9 @@ test("MVP: publicar → buscar → comprobar → postular → seguir → notific
     await page.getByRole("link", { name: "Abrir postulación" }).click();
     await expect(
       page.getByRole("heading", { name: "Laura Gómez Restrepo", exact: true }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/Disponibilidad: 1 de febrero de 2027\./),
     ).toBeVisible();
     await elegir(page, "Nuevo estado", "En revisión");
     await page.getByRole("button", { name: "Actualizar estado" }).click();
