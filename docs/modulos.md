@@ -1,5 +1,9 @@
 # Módulos de la primera muestra académica
 
+> Alcance ampliado el 2026-11-13 por instrucción del usuario: S3, S4 y
+> Administración de los mockups se implementan en `specs/014-praxis-completo`.
+> Estado actual y límites de validación: `docs/cierre-mvp.md`.
+
 > Estado al 2026-10-23. Base: `.specify/memory/constitution.md` v4.0.0 y `docs/context(pre-constitucion).md`.
 > Los números romanos citan principios de la constitución; «§» cita secciones del contexto de producto.
 >

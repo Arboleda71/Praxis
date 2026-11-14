@@ -19,10 +19,10 @@ Estado vigente y evidencia: `docs/mvp-entrega.md`. Las secciones siguientes cons
 La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (intentos y proxies), S2
 (confirmaciones simultáneas) y el fallo al crear el enlace (parte de S4).
 
-- [ ] PM001 Crear la rama `003-endurecer-seguridad-acceso` desde `main`
-- [ ] PM002 `/speckit-plan` sobre `specs/003-endurecer-seguridad-acceso`
-- [ ] PM003 `/speckit-tasks` y `/speckit-implement` de la spec 003
-- [ ] PM004 Al cerrar 003, marcar como resueltos C2, C3, S1, S2 y S5 en `specs/002-cuentas-acceso/estado.md`
+- [x] PM001 Tarea histórica superada: seguridad 003 ya está integrada en main; no crear otra rama para repetir código.
+- [x] PM002 Plan 003 existente y contrastado con la implementación. No se afirma haber vuelto a ejecutar spec-kit.
+- [x] PM003 Código 003 implementado; tasks.md documental completado el 2026-11-13 y pruebas actuales aprobadas.
+- [x] PM004 Estado M1 actualizado: C2, C3, S1, S2 y S5 resueltos en código; proxy remoto sigue pendiente de despliegue.
 
 ## B. Hallazgos de M1 que la spec 003 no cubre
 
@@ -38,7 +38,7 @@ La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (in
 
 - [x] PM012 [C4] Crear `.github/workflows/ci.yml`: lint, tipos, pruebas (con Postgres de servicio) y build en cada PR (constitución, «CI»)
 - [ ] PM013 Proteger `main` en GitHub: PR obligatorio con revisión y CI en verde
-- [ ] PM014 Alinear Node a ≥ 24.15 (lo piden dependencias) y fijarlo en `engines` del `package.json` raíz y en el CI
+- [x] PM014 Engines y CI alineados a Node 24 ≥24.15; .nvmrc 24.22.1 usado en validación. Node del sistema no se modificó.
 - [x] PM015 Revisar las 24 vulnerabilidades de `npm audit` (5 altas); actualizar solo lo que no rompa, sin `audit fix --force`
 
 ## D. Gobernanza
@@ -54,7 +54,7 @@ La spec 003 cubre C2 (cookie `Secure`), C3 (datos personales en logs), S1/S5 (in
 
 ## F. Features aplazadas
 
-- [ ] PM021 Restablecer la contraseña: enmendar la constitución y crear su spec (ver `docs/modulos.md`, «Feature pendiente») — en `docs/backlog-specs.md` como S1. 2026-11-11: constitución v4.1.0 y
+- [x] PM021 Implementación y spec 012 de recuperación completadas y probadas; la revisión humana sigue pendiente. 2026-11-11: constitución v4.1.0 y
   `specs/012-restablecer-contrasena` escritas e implementadas en la rama `012-restablecer-contrasena`; pruebas en verde en local; **faltan la
   aprobación de la enmienda y el PR**
 

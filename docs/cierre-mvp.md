@@ -1,5 +1,67 @@
 # Cierre del MVP · 2026-11-13
 
+## Estado vigente · alcance completo de los mockups
+
+El usuario amplió el alcance el 2026-11-13 para completar también S3, S4 y
+Administración. La entrega permanece en 013-cierre-mvp, sin mezclar ramas ajenas.
+El trabajo previo de 013 se guardó en 51b455d. Constitución 5.0.0 preparada para
+revisión: no se inventa aprobación del equipo.
+
+| Área | Estado local | Evidencia |
+|---|---|---|
+| M0–M2: navegación, cuentas, recuperación y catálogos | Implementado | Guardas, contratos, auth y recorridos de navegador |
+| M3: perfil estudiante y documentos | Implementado | Postgres real, archivos privados y pruebas S3 compatible local |
+| M4: perfil empresa y logo opcional | Implementado | Ficha, NIT, logo JPG/PNG privado, reemplazo y borrado probados |
+| M5–M6: vacantes, búsqueda, elegibilidad y postulación | Implementado | Cupos, propiedad, congelación de requisitos y copia del perfil/CV |
+| M7–M8: seguimiento, candidatos y notificaciones | Implementado | Estados, revisión explícita, historial, avisos de cierre/CV/planes |
+| M9: planes y Wompi sandbox | Implementado en modo local | Firmas, importes, idempotencia y activación con fixture externo; no pagos reales |
+| S2: vencimiento de planes | Implementado | Aviso siete días antes y al vencer, en Planes/Mis vacantes/bandeja |
+| S3: cambiar CV de candidatura Enviada | Implementado | Carrera con revisión, permiso, copia independiente, fecha e historial |
+| S4: supresión de cuenta | Implementado | Contraseña/confirmación, anonimización, retirada/cierre, sesiones y limpieza durable |
+| Administrador | Implementado | Lista/filtros/detalle mínimo, revocar/restaurar con motivo, sesiones y permisos |
+
+### Specs y backlog
+
+Specs propias de mockups: 015-aviso-vencimiento-plan, 016-cambiar-cv-postulacion,
+017-supresion-cuenta y 018-administrar-acceso. Cada una tiene spec, plan y tareas.
+Se completaron las specs ausentes 006–010 y tareas documentales 003/006–010.
+No se afirma que estas reconstrucciones documentales precedieron al código.
+El plan 014 explica la entrega conjunta. Backlog S1–S5 tiene implementación;
+las aprobaciones/credenciales pendientes quedan separadas de las tareas de código.
+
+### Verificación vigente
+
+**450 pruebas locales aprobadas**: 129 integración API, 10 unitarias API, 111 web,
+88 contratos, 17 guardas, 8 scripts y 87 casos únicos de navegador. Playwright:
+80 aprobados en la corrida conjunta; tras corregir selectores accesibles se
+aprobaron los cuatro afectados y tres de bloqueo pendientes. No quedan fallos
+conocidos de esta validación. Los últimos cambios de acceso tuvieron además 26
+casos afectados de API revalidados.
+
+Postgres real y S3 compatible local en Docker; nueve migraciones aplicadas solo a
+bases aisladas. Tipos API/web/scripts, lint y builds aprobados. Auditoría de
+producción: 0 vulnerabilidades. Auditoría completa: 25 avisos de desarrollo
+(3 bajos, 22 moderados), ninguno alto/crítico; no se hizo downgrade forzado de Jest.
+Wompi externo queda **aplazado por decisión explícita del usuario** hasta registrar
+el proyecto. Se conserva sandbox deshabilitado sin llaves, sin fingir pagos.
+
+### Bloqueos externos y pasos exactos
+
+| Bloqueo | Responsable y desbloqueo |
+|---|---|
+| Resend y S3/R2 remotos sin credenciales | Responsable de infraestructura configura variables de docs/produccion.md y ejecuta npm run verificar:proveedores. Para correo, proporcionar destinatario autorizado y usar -- --correo destino; no se enviaron correos externos. |
+| Revisión manual con lector sin completar | El control Windows se detuvo automáticamente al no poder determinar la URL del navegador con suficiente confianza. No se continuó la automatización nativa ni se certificó la revisión. Una persona del equipo debe ejecutar la revisión de docs/accesibilidad-2026-11-13.md. Axe y teclado automatizado sí se verificaron. |
+| Publicación de rama/PR y CI remoto | Git Credential Manager está instalado pero no tiene una credencial disponible sin interacción. El usuario ejecuta git credential-manager github login; después git push -u origin 013-cierre-mvp. Con acceso, node scripts/github-entrega.mts pr abre el PR usando specs/014-praxis-completo/pr.md y node scripts/github-entrega.mts ci consulta Actions. |
+| Revisión del equipo/enmienda 5.0.0 | Otro integrante revisa el PR, las decisiones documentadas y el resultado de CI. No se marca aprobada una revisión ajena. |
+| Administrador de despliegue | Tras migrar y compilar la API, responsable configura ADMIN_CORREO y ADMIN_CONTRASENA (>=16 caracteres) en entorno y ejecuta node scripts/crear-admin.mts. No promueve cuentas existentes ni imprime secretos. |
+
+Antes de usar datos reales permanece la revisión responsable de privacidad y
+alojamiento descrita en docs/produccion.md. No se hizo despliegue ni migración sobre
+Neon/desarrollo/producción. Esta entrega no declara cerrado el producto mientras
+las validaciones requeridas sigan pendientes.
+
+## Registro histórico de la fase 013 (superado por el estado vigente)
+
 Estado del repositorio revisado en `main` (`2d9bb8f`) y cambios locales en
 `013-cierre-mvp`. Este documento actualiza las referencias históricas de
 `mvp-entrega.md` y `pendientes-mvp.md`: los módulos 003–012 ya están en `main`.

@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-15
 
-**Status**: Draft
+**Status**: Implementado localmente; revisión manual y PR pendientes.
 
 **Input**: User description: "M0 de docs/modulos.md: esqueleto común del sitio (cabecera pública y por rol, inicio mínimo, páginas 404 y sin permiso) para que todos los módulos compartan layout, mobile first y escritorio."
 

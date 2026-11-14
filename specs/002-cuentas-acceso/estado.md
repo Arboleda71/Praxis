@@ -1,5 +1,12 @@
 # Estado de M1 · Cuentas y acceso
 
+> Actualización 2026-11-13: el detalle histórico siguiente no representa pendientes
+> actuales de código. C2 (cookie Secure), C3 (logs sanitizados), S2 (confirmaciones
+> concurrentes) y P3 (guardas de base) están resueltos y probados en specs 003/006/011.
+> Recuperación de contraseña está implementada (012) y los intentos están en Postgres.
+> CI existe como workflow; faltan ejecución remota y revisión. Estado vigente:
+> `docs/cierre-mvp.md`. Se conserva el registro original para trazabilidad.
+
 > Verificación local: 2026-10-16, America/Bogota. Las tareas originales pasaron las comprobaciones descritas abajo. La aceptación final por el equipo sigue pendiente.
 
 ## Entorno y migración T003

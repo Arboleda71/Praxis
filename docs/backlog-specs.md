@@ -17,7 +17,7 @@
 
 ## S2 · Aviso de vencimiento del plan
 
-- [x] Spec creada: `specs/013-cierre-mvp/spec.md` (2026-11-13). Implementación local
+- [x] Spec propia: `specs/015-aviso-vencimiento-plan` (2026-11-13), amplía `013-cierre-mvp`. Implementación local
   en `013-cierre-mvp`: siete días de antelación, aviso persistente por periodo y
   mensaje en Planes y pagos. Estado de validación en `docs/cierre-mvp.md`.
 - **Fuente:** `docs/pendientes-constitucion.md` §2 (§7 del contexto). Hoy Planes y pagos solo muestra la fecha
@@ -30,7 +30,8 @@
 
 ## S3 · Reemplazar el CV de una postulación Enviada
 
-- [ ] Spec creada:
+- [x] Spec propia e implementada: `specs/016-cambiar-cv-postulacion` (2026-11-13), entrega 014,
+  alcance ampliado solicitado expresamente por el usuario. Falta revisión del PR.
 - **Fuente:** `docs/pendientes-constitucion.md` §3.
 - **Antes:** decisión de producto: ¿entra ahora o queda para una fase posterior?
 
@@ -40,7 +41,8 @@
 
 ## S4 · Supresión de la cuenta
 
-- [ ] Spec creada:
+- [x] Spec propia e implementada: `specs/017-supresion-cuenta` (2026-11-13), entrega 014,
+  alcance ampliado solicitado expresamente por el usuario. Falta revisión del PR.
 - **Fuente:** `docs/produccion.md` §5 (flujo de supresión), Ley 1581.
 - **Antes:** se dejó fuera del MVP el 2026-10-08; hace falta antes de usar datos reales. El esquema ya separa los
   datos personales del historial.
@@ -48,3 +50,12 @@
 > Supresión de la cuenta (Ley 1581). El usuario pide eliminar su cuenta. Se anonimizan sus datos personales, se
 > conserva el historial de postulaciones y vacantes sin identificarlo (V), y se borran del bucket el CV, el soporte
 > del aval y la foto, incluidas las copias que quedaron en las postulaciones. Cierra todas las sesiones.
+
+## S5 · Administrador de acceso (mockup propio)
+
+- [x] Spec propia e implementada: `specs/018-administrar-acceso`, ampliación
+  explícita solicitada por el usuario el 2026-11-13. Enmienda 5.0.0 para revisión.
+- Lista y detalle mínimo de cuentas, búsqueda/filtros, revocar/restaurar con motivo
+  e historial. Nunca perfiles, CV o contenido. Alta operativa, sin registro público.
+- Pendientes operativos: alta del administrador por responsable de despliegue,
+  publicación/revisión del PR y CI. Evidencia y comandos: `docs/cierre-mvp.md`.

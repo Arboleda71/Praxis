@@ -4,7 +4,11 @@
 
 **Created**: 2026-10-17
 
-**Status**: Draft
+**Status**: Implementado localmente; revisión de PR y Resend real pendientes.
+
+Actualización 2026-11-13: las specs 003/011/012 amplían esta base. Abrir el enlace
+solo consulta vigencia; confirmar correo requiere botón y POST explícitos. La
+recuperación de contraseña está implementada. Los intentos viven en Postgres.
 
 **Input**: User description: "M1 de docs/modulos.md: que estudiantes y empresas creen su cuenta, confirmen el correo e inicien sesión. Restablecer la contraseña queda fuera (feature pendiente)."
 
