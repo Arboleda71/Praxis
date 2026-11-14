@@ -281,7 +281,7 @@ describe('M6: buscar, comprobar y postular', () => {
       const id = await abierta();
       const { body } = await estudiante.get(`/vacantes/${id}`).expect(200);
       expect(Object.keys(body.empresa).sort()).toEqual(
-        ['ciudad', 'correoContacto', 'descripcion', 'razonSocial', 'sitioWeb', 'telefono'].sort(),
+        ['ciudad', 'correoContacto', 'descripcion', 'logoUrl', 'razonSocial', 'sitioWeb', 'telefono'].sort(),
       );
       const texto = JSON.stringify(body);
       for (const privado of ['900123456', 'nit', 'basico', 'planVenceEn', 'cupoTipo', 'cupoPeriodo', 'empresaId', 'cuentaId'])

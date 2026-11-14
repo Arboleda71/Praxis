@@ -16,7 +16,7 @@ test("empresa guarda su ficha declarada y conserva los datos al recargar", async
     .getByLabel("Descripción", { exact: true })
     .fill("Empresa ficticia que ofrece prácticas académicas.");
   await page.getByRole("button", { name: "Guardar perfil de empresa" }).click();
-  await expect(page.getByRole("status")).toHaveText(
+  await expect(page.locator("form").getByRole("status")).toHaveText(
     "Guardamos el perfil de la empresa.",
   );
   await page.reload();

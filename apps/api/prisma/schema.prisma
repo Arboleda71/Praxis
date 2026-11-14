@@ -12,6 +12,7 @@ datasource db {
 enum Rol {
   ESTUDIANTE
   EMPRESA
+  ADMIN
 }
 
 /// Credenciales y estado de la cuenta. Los datos de cada rol viven aparte (anonimizar sin rehacer el modelo).
@@ -30,6 +31,10 @@ model Cuenta {
   enlaces             EnlaceConfirmacion[]
   restablecimientos   EnlaceRestablecer[]
   notificaciones      Notificacion[]
+  accesoRevocadoEn    DateTime?
+  eliminadaEn         DateTime?
+  cambiosAcceso       HistorialAcceso[] @relation("CuentaAcceso")
+  accionesAdmin       HistorialAcceso[] @relation("ResponsableAcceso")
 }
 
 /// Perfil del estudiante (M3). Los campos de catálogo guardan el id de @praxis/contracts (M2).
@@ -100,6 +105,9 @@ model Empresa {
   plan        String?
   planInicioEn DateTime?
   planVenceEn DateTime?
+  logoClave String? @unique
+  logoNombre String?
+  logoBytes Int?
   pagos       Pago[]
   cuenta      Cuenta @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
   @@index([planVenceEn])
@@ -159,6 +167,7 @@ model Postulacion {
   perfil Json
   evaluacion Json
   creadaEn DateTime @default(now())
+  cvReemplazadoEn DateTime?
   archivos ArchivoPostulacion[]
   historial HistorialPostulacion[]
   @@unique([vacanteId, estudianteId])
@@ -181,8 +190,32 @@ model HistorialPostulacion {
   postulacionId String @db.Uuid
   postulacion Postulacion @relation(fields: [postulacionId], references: [id], onDelete: Restrict)
   estado String
+  detalle String?
   fecha DateTime @default(now())
   @@index([postulacionId, fecha])
+}
+
+model HistorialAcceso {
+  id String @id @default(uuid()) @db.Uuid
+  cuentaId String @db.Uuid
+  responsableId String @db.Uuid
+  accion String
+  motivo String @db.VarChar(1000)
+  fecha DateTime @default(now())
+  cuenta Cuenta @relation("CuentaAcceso", fields: [cuentaId], references: [id], onDelete: Restrict)
+  responsable Cuenta @relation("ResponsableAcceso", fields: [responsableId], references: [id], onDelete: Restrict)
+  @@index([cuentaId, fecha])
+}
+
+/// Huella del NIT normalizado. Impide volver a registrar una empresa suprimida.
+model NitReservado {
+  huella String @id
+}
+
+/// Eliminaciones físicas reintentables; nunca contiene nombres originales ni datos personales.
+model ArchivoPorBorrar {
+  clave String @id
+  creadoEn DateTime @default(now())
 }
 
 model Notificacion {

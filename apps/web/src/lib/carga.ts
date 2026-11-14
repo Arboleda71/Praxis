@@ -15,7 +15,7 @@ import { solicitar } from "./mercado";
  * Se devuelven `setDatos` y `setError` porque los componentes también los cambian desde sus acciones
  * (guardar, vaciar los datos viejos antes de recargar).
  */
-export function useCarga<T>(ruta: string, aceptar?: (datos: T) => boolean) {
+export function useCarga<T>(ruta: string, aceptar?: (datos: T) => boolean, metodo = "GET") {
   const [datos, setDatos] = useState<T | null>(null);
   const [error, setError] = useState("");
   const [intento, setIntento] = useState(0);
@@ -27,7 +27,7 @@ export function useCarga<T>(ruta: string, aceptar?: (datos: T) => boolean) {
   });
   useEffect(() => {
     let vigente = true;
-    void solicitar<T>(ruta).then(
+    void solicitar<T>(ruta, metodo).then(
       (d) => {
         if (vigente) alLlegar(d);
       },
@@ -40,7 +40,7 @@ export function useCarga<T>(ruta: string, aceptar?: (datos: T) => boolean) {
     return () => {
       vigente = false;
     };
-  }, [ruta, intento]);
+  }, [ruta, intento, metodo]);
   function recargar() {
     setError("");
     setIntento((n) => n + 1);

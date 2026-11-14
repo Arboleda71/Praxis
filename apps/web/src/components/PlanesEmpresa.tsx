@@ -13,6 +13,9 @@ type Configuracion = {
   plan: Plan | null;
   planVenceEn: string | null;
   avisoVencimiento: string | null;
+  avisoPlan?: string | null;
+  publicacionesRestantes?: number | null;
+  publicacionesUsadas?: number;
 };
 type Pago = {
   id: string;
@@ -103,9 +106,10 @@ export default function PlanesEmpresa() {
           . Renovación manual al vencer.
         </Alert>
       )}
-      {config?.avisoVencimiento && (
-        <Alert severity="warning">{config.avisoVencimiento}</Alert>
+      {(config?.avisoPlan || config?.avisoVencimiento) && (
+        <Alert severity="warning">{config.avisoPlan || config.avisoVencimiento}</Alert>
       )}
+      {config?.activo && <Typography>{config.plan === "basico" ? `Publicaciones adicionales disponibles: ${config.publicacionesRestantes ?? 0} de 4.` : "Publicaciones ilimitadas mientras el plan esté activo."}</Typography>}
       {(Object.keys(PLANES) as Plan[]).map((k) => (
         <Paper component="section" variant="outlined" sx={{ p: 2 }} key={k}>
           <Typography variant="h2" sx={{ fontSize: 24 }}>

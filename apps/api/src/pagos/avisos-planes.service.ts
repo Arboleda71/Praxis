@@ -28,6 +28,16 @@ export function avisoVencimiento(
   return `Tu plan ${PLANES[plan as Plan].nombre} vence el ${fecha}. Puedes renovar manualmente al vencer en Planes y pagos. No hay cobro automático.`;
 }
 
+export function avisoPlan(
+  plan: string | null,
+  vence: Date | null,
+  ahora = new Date(),
+) {
+  if (!plan || !Object.hasOwn(PLANES, plan) || !vence) return null;
+  if (vence > ahora) return avisoVencimiento(plan, vence, ahora);
+  return `Tu plan ${PLANES[plan as Plan].nombre} venció el ${vence.toLocaleDateString('es-CO', { timeZone: 'America/Bogota' })}. Puedes renovar manualmente en Planes y pagos. Vuelves al cupo gratuito de dos publicaciones cada seis meses. Tus vacantes abiertas no se cierran y no hay cobro automático.`;
+}
+
 @Injectable()
 export class AvisosPlanesService implements OnModuleInit, OnModuleDestroy {
   private temporizador?: ReturnType<typeof setInterval>;
@@ -55,21 +65,21 @@ export class AvisosPlanesService implements OnModuleInit, OnModuleDestroy {
       where: {
         cuentaId,
         plan: { in: ['basico', 'ilimitado'] },
+        cuenta: { eliminadaEn: null, accesoRevocadoEn: null },
         planVenceEn: {
-          gt: ahora,
           lte: new Date(ahora.getTime() + ANTICIPACION_PLAN_MS),
         },
       },
       select: { cuentaId: true, plan: true, planVenceEn: true },
     });
     const data = empresas.flatMap((e) => {
-      const texto = avisoVencimiento(e.plan, e.planVenceEn, ahora);
+      const texto = avisoPlan(e.plan, e.planVenceEn, ahora);
       return texto && e.planVenceEn
         ? [
             {
               cuentaId: e.cuentaId,
               texto,
-              clave: `plan:${e.cuentaId}:${e.planVenceEn.toISOString()}`,
+              clave: `plan${e.planVenceEn <= ahora ? '-vencido' : ''}:${e.cuentaId}:${e.planVenceEn.toISOString()}`,
             },
           ]
         : [];

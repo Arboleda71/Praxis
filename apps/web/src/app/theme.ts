@@ -34,6 +34,8 @@ const theme = createTheme({
     overline: { fontWeight: 600, letterSpacing: "0.08em" },
   },
   components: {
+    MuiButton: { styleOverrides: { root: { minHeight: 44 } } },
+    MuiIconButton: { styleOverrides: { root: { minHeight: 44, minWidth: 44 } } },
     // Enlaces de MUI navegan en cliente con next/link.
     MuiButtonBase: { defaultProps: { LinkComponent: NextLink } },
     MuiLink: { defaultProps: { component: NextLink } },

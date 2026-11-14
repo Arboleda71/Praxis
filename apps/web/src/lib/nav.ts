@@ -4,10 +4,13 @@ import PersonRounded from "@mui/icons-material/PersonRounded";
 import WorkRounded from "@mui/icons-material/WorkRounded";
 import type { SvgIconComponent } from "@mui/icons-material";
 
-export type Role = "estudiante" | "empresa";
+export type Role = "estudiante" | "empresa" | "admin";
 export type NavItem = { href: string; label: string; Icon: SvgIconComponent };
 
 export const NAV: Record<Role, NavItem[]> = {
+  admin: [
+    { href: "/admin/cuentas", label: "Cuentas", Icon: ApartmentRounded },
+  ],
   estudiante: [
     { href: "/", label: "Inicio", Icon: HomeRounded },
     { href: "/estudiante/perfil", label: "Mi perfil", Icon: PersonRounded },

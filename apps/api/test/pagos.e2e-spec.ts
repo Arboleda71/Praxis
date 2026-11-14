@@ -120,7 +120,7 @@ describe('Planes: Postgres real, Wompi externo sustituido por fixture', () => {
     await empresa.get('/notificaciones').expect(200);
     expect(await prisma.notificacion.count()).toBe(2);
   });
-  it('no avisa para planes lejanos, vencidos o gratuitos', async () => {
+  it('solo emite un aviso de vencido, sin avisar para planes lejanos o gratuitos', async () => {
     const e = await prisma.empresa.findFirstOrThrow();
     for (const [plan, dias] of [
       ['basico', 8],
@@ -135,7 +135,10 @@ describe('Planes: Postgres real, Wompi externo sustituido por fixture', () => {
       expect(r.body.avisoVencimiento).toBeNull();
       await empresa.get('/notificaciones').expect(200);
     }
-    expect(await prisma.notificacion.count()).toBe(0);
+    expect(await prisma.notificacion.count()).toBe(1);
+    expect((await prisma.notificacion.findFirstOrThrow()).texto).toContain(
+      'venció',
+    );
   });
   it('importe fijado por el servidor y modo sandbox obligatorio', async () => {
     await empresa

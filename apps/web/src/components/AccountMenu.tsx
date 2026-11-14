@@ -16,15 +16,18 @@ import Typography from "@mui/material/Typography";
 import { useState, useTransition } from "react";
 import { logout } from "@/lib/actions";
 import Link from "next/link";
+import type { Rol } from "@praxis/contracts";
 
 const MENU_ID = "menu-cuenta";
 
 export default function AccountMenu({
   name,
   email,
+  role,
 }: {
   name: string;
   email: string;
+  role?: Rol;
 }) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   const [error, setError] = useState("");
@@ -92,6 +95,7 @@ export default function AccountMenu({
           </Typography>
         </Box>
         <Divider />
+        {role !== "admin" && <MenuItem component={Link} href="/cuenta/eliminar" onClick={() => setAnchor(null)}>Eliminar mi cuenta</MenuItem>}
         <MenuItem
           component={Link}
           href="/notificaciones"

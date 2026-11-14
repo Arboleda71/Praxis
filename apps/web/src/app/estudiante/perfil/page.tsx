@@ -119,6 +119,10 @@ export default async function MiPerfil() {
           </Box>
         </Stack>
       )}
+      <SeccionPerfil titulo="Tu cuenta y tus datos">
+        <Typography>Puedes corregir tu perfil cuando quieras. Si ya no quieres usar Praxis, puedes eliminar tu cuenta y tus datos personales.</Typography>
+        <Link href="/cuenta/eliminar" color="error" sx={{ display: "inline-block", py: 1.5 }}>Eliminar mi cuenta</Link>
+      </SeccionPerfil>
       <Suspense>
         <AvisoGuardado />
       </Suspense>

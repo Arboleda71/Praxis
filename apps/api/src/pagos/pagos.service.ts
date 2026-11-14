@@ -13,9 +13,11 @@ import {
 } from '@praxis/contracts';
 import { PrismaService } from '../prisma.service.js';
 import { sumarMeses } from '../vacantes/vacantes.service.js';
+import { cuentaActiva } from '../auth/sesion.js';
 import {
   AvisosPlanesService,
   avisoVencimiento,
+  avisoPlan,
 } from './avisos-planes.service.js';
 import {
   configuracionSandbox,
@@ -36,6 +38,16 @@ export class PagosService {
     const empresa = await this.prisma.empresa.findUniqueOrThrow({
       where: { cuentaId: empresaId },
     });
+    const usadas =
+      empresa.planInicioEn && empresa.plan
+        ? await this.prisma.vacante.count({
+            where: {
+              empresaId,
+              cupoTipo: empresa.plan,
+              cupoPeriodo: empresa.planInicioEn,
+            },
+          })
+        : 0;
     let disponible = true;
     try {
       configuracionSandbox();
@@ -50,12 +62,16 @@ export class PagosService {
       planVenceEn: empresa.planVenceEn,
       activo: !!empresa.planVenceEn && empresa.planVenceEn > new Date(),
       avisoVencimiento: avisoVencimiento(empresa.plan, empresa.planVenceEn),
+      avisoPlan: avisoPlan(empresa.plan, empresa.planVenceEn),
+      publicacionesUsadas: usadas,
+      publicacionesRestantes:
+        empresa.plan === 'basico' ? Math.max(0, 4 - usadas) : null,
     };
   }
   async crear(empresaId: string, plan: Plan) {
     const c = configuracionSandbox();
     const pago = await this.prisma.$transaction(async (tx) => {
-      await tx.$queryRaw`SELECT id FROM "Cuenta" WHERE id = ${empresaId}::uuid FOR UPDATE`;
+      await cuentaActiva(tx, empresaId);
       const e = await tx.empresa.findUniqueOrThrow({
         where: { cuentaId: empresaId },
       });

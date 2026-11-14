@@ -20,4 +20,4 @@ export function safeNext(next: unknown): string | null {
 
 /** Sección a la que llega cada rol al iniciar sesión. */
 export const inicioDe = (rol: Rol) =>
-  rol === "estudiante" ? "/estudiante/perfil" : "/empresa/vacantes";
+  rol === "admin" ? "/admin/cuentas" : rol === "estudiante" ? "/estudiante/perfil" : "/empresa/vacantes";
