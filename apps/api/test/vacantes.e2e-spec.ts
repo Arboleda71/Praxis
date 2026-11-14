@@ -268,4 +268,42 @@ describe('M5: publicación y postulación reales', () => {
     expect(propia.body.estado).toBe('Cerrada');
     expect(propia.body.motivoCierre).toBe('venció');
   });
+  it.each(['manual', 'vencimiento'])(
+    'el cierre %s avisa una vez al candidato sin cambiar su estado',
+    async (modo) => {
+      const id = await publicar();
+      const alumno = await prisma.estudiante.findFirstOrThrow();
+      const p = await prisma.postulacion.create({
+        data: {
+          vacanteId: id,
+          estudianteId: alumno.cuentaId,
+          perfil: {},
+          evaluacion: {},
+        },
+      });
+      if (modo === 'manual') {
+        const r = await Promise.all([
+          empresa.post(`/empresa/vacantes/${id}/cerrar`),
+          empresa.post(`/empresa/vacantes/${id}/cerrar`),
+        ]);
+        expect(r.map((v) => v.status).sort((a, b) => a - b)).toEqual([201, 409]);
+      } else {
+        await prisma.vacante.update({
+          where: { id },
+          data: { vigencia: new Date(0) },
+        });
+        await Promise.all([
+          estudiante.get('/vacantes'),
+          estudiante.get('/vacantes'),
+        ]);
+      }
+      const avisos = await estudiante.get('/notificaciones').expect(200);
+      expect(avisos.body.items).toHaveLength(1);
+      expect(avisos.body.items[0].texto).toContain('cerrada');
+      expect(
+        (await prisma.postulacion.findUniqueOrThrow({ where: { id: p.id } }))
+          .estado,
+      ).toBe('Enviada');
+    },
+  );
 });

@@ -184,7 +184,6 @@ export default async function Inicio() {
               <Typography sx={{ color: "#DBEAFE", lineHeight: 1.5 }}>
                 Publica vacantes con requisitos claros y recibe postulaciones
                 solo de estudiantes que cumplen los requisitos obligatorios.
-                Empieza gratis.
               </Typography>
             </Stack>
             <Button

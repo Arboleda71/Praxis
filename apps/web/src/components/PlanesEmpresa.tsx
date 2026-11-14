@@ -12,6 +12,7 @@ type Configuracion = {
   activo: boolean;
   plan: Plan | null;
   planVenceEn: string | null;
+  avisoVencimiento: string | null;
 };
 type Pago = {
   id: string;
@@ -101,6 +102,9 @@ export default function PlanesEmpresa() {
             : ""}
           . Renovación manual al vencer.
         </Alert>
+      )}
+      {config?.avisoVencimiento && (
+        <Alert severity="warning">{config.avisoVencimiento}</Alert>
       )}
       {(Object.keys(PLANES) as Plan[]).map((k) => (
         <Paper component="section" variant="outlined" sx={{ p: 2 }} key={k}>

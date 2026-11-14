@@ -28,6 +28,7 @@ import {
 } from './pagos/pagos.controller.js';
 import { PagosService } from './pagos/pagos.service.js';
 import { WompiClient } from './pagos/wompi.js';
+import { AvisosPlanesService } from './pagos/avisos-planes.service.js';
 
 @Module({
   imports: [],
@@ -55,6 +56,7 @@ import { WompiClient } from './pagos/wompi.js';
     SeguimientoService,
     PagosService,
     WompiClient,
+    AvisosPlanesService,
     PerfilService,
     Archivos,
     Intentos,

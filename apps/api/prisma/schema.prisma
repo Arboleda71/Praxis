@@ -102,6 +102,7 @@ model Empresa {
   planVenceEn DateTime?
   pagos       Pago[]
   cuenta      Cuenta @relation(fields: [cuentaId], references: [id], onDelete: Cascade)
+  @@index([planVenceEn])
 }
 
 model Pago {
@@ -188,7 +189,8 @@ model Notificacion {
   id String @id @default(uuid()) @db.Uuid
   cuentaId String @db.Uuid
   cuenta Cuenta @relation(fields: [cuentaId], references: [id], onDelete: Restrict)
-  postulacionId String @db.Uuid
+  postulacionId String? @db.Uuid
+  clave String? @unique
   texto String
   creadaEn DateTime @default(now())
   leidaEn DateTime?

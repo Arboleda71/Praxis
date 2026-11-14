@@ -104,9 +104,34 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     if (this.reloj) clearInterval(this.reloj);
   }
   cerrarVencidas() {
-    return this.prisma.vacante.updateMany({
-      where: { estado: 'Abierta', vigencia: { lt: new Date(hoyBogota()) } },
-      data: { estado: 'Cerrada', motivoCierre: 'venció' },
+    return this.cerrarConAvisos(
+      { estado: 'Abierta', vigencia: { lt: new Date(hoyBogota()) } },
+      'venció',
+    );
+  }
+  private cerrarConAvisos(where: Prisma.VacanteWhereInput, motivo: string) {
+    return this.prisma.$transaction(async (tx) => {
+      // UPDATE toma el bloqueo de fila: solo la transacción que cierra crea avisos.
+      const cerradas = await tx.vacante.updateManyAndReturn({
+        where,
+        data: { estado: 'Cerrada', motivoCierre: motivo },
+        select: { id: true, titulo: true },
+      });
+      for (const v of cerradas) {
+        const candidaturas = await tx.postulacion.findMany({
+          where: { vacanteId: v.id },
+          select: { id: true, estudianteId: true },
+        });
+        if (candidaturas.length)
+          await tx.notificacion.createMany({
+            data: candidaturas.map((p) => ({
+              cuentaId: p.estudianteId,
+              postulacionId: p.id,
+              texto: `La vacante ${v.titulo} está cerrada: ${motivo}. Tu postulación conserva su estado y su historial.`,
+            })),
+          });
+      }
+      return { count: cerradas.length };
     });
   }
   async propias(empresaId: string, b: Busqueda) {
@@ -248,10 +273,10 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     });
   }
   async cerrar(empresaId: string, id: string) {
-    const r = await this.prisma.vacante.updateMany({
-      where: { id, empresaId, estado: 'Abierta' },
-      data: { estado: 'Cerrada', motivoCierre: 'cerrada por la empresa' },
-    });
+    const r = await this.cerrarConAvisos(
+      { id, empresaId, estado: 'Abierta' },
+      'cerrada por la empresa',
+    );
     if (!r.count)
       throw new ConflictException({
         mensaje:

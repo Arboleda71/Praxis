@@ -20,14 +20,19 @@ import {
 import { SesionGuard, type RequestConSesion } from '../auth/sesion.js';
 import { ZodPipe } from '../auth/zod.pipe.js';
 import { PrismaService } from '../prisma.service.js';
+import { AvisosPlanesService } from '../pagos/avisos-planes.service.js';
 @Controller('notificaciones')
 @UseGuards(SesionGuard)
 export class NotificacionesController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly avisos: AvisosPlanesService,
+  ) {}
   @Get() async lista(
     @Req() req: RequestConSesion,
     @Query(new ZodPipe(busquedaSchema)) b: Busqueda,
   ) {
+    await this.avisos.generar(req.sesion.cuentaId);
     const where = { cuentaId: req.sesion.cuentaId };
     const [items, total, sinLeer] = await Promise.all([
       this.prisma.notificacion.findMany({

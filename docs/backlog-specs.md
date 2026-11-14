@@ -17,10 +17,12 @@
 
 ## S2 · Aviso de vencimiento del plan
 
-- [ ] Spec creada:
+- [x] Spec creada: `specs/013-cierre-mvp/spec.md` (2026-11-13). Implementación local
+  en `013-cierre-mvp`: siete días de antelación, aviso persistente por periodo y
+  mensaje en Planes y pagos. Estado de validación en `docs/cierre-mvp.md`.
 - **Fuente:** `docs/pendientes-constitucion.md` §2 (§7 del contexto). Hoy Planes y pagos solo muestra la fecha
   (`apps/web/src/components/PlanesEmpresa.tsx`).
-- **Antes:** decidir cuántos días antes se avisa.
+- **Antelación adoptada:** siete días (168 horas), renovación manual al vencer.
 
 > Aviso de vencimiento del plan de empresa. N días antes de que venza el plan Básico o Ilimitado, la empresa recibe
 > una notificación dentro de la web y ve un aviso en Planes y pagos con la fecha y cómo renovar. No hay cobro

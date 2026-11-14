@@ -14,6 +14,10 @@ import {
 import { PrismaService } from '../prisma.service.js';
 import { sumarMeses } from '../vacantes/vacantes.service.js';
 import {
+  AvisosPlanesService,
+  avisoVencimiento,
+} from './avisos-planes.service.js';
+import {
   configuracionSandbox,
   firmarIntegridad,
   validarFirmaEvento,
@@ -25,8 +29,10 @@ export class PagosService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly wompi: WompiClient,
+    private readonly avisos: AvisosPlanesService,
   ) {}
   async planes(empresaId: string) {
+    await this.avisos.generar(empresaId);
     const empresa = await this.prisma.empresa.findUniqueOrThrow({
       where: { cuentaId: empresaId },
     });
@@ -43,6 +49,7 @@ export class PagosService {
       plan: empresa.plan,
       planVenceEn: empresa.planVenceEn,
       activo: !!empresa.planVenceEn && empresa.planVenceEn > new Date(),
+      avisoVencimiento: avisoVencimiento(empresa.plan, empresa.planVenceEn),
     };
   }
   async crear(empresaId: string, plan: Plan) {

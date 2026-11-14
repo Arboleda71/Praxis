@@ -1,5 +1,9 @@
 # Pendientes del MVP anteriores a M2
 
+> Actualización 2026-11-13: consultar `docs/cierre-mvp.md` para el estado actual.
+> Las casillas y referencias a ramas de las secciones históricas no describen
+> por sí solas el código que ya está integrado en main.
+
 > Creado el 2026-10-23. Cabos sueltos de M0/M1 que se aplazan para avanzar con M2, pero siguen siendo parte del
 > MVP. Fuentes: `specs/002-cuentas-acceso/estado.md` (hallazgos C, S, P, R), `specs/003-endurecer-seguridad-acceso/spec.md`
 > y `docs/pendientes-constitucion.md`. Al cerrar una tarea, márcala y deja el commit o PR.

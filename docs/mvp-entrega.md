@@ -1,5 +1,8 @@
 # Praxis · MVP local
 
+> Estado vigente al 2026-11-13: ver `docs/cierre-mvp.md`. Las referencias de este
+> documento a ramas 003–012 sin integrar son históricas: su código ya está en main.
+
 Actualizado el 23 de octubre de 2026, America/Bogota. Constitución 4.0.0.
 
 El recorrido funcional está implementado y probado localmente: cuenta → perfil → vacante → búsqueda → elegibilidad → postulación → seguimiento → notificaciones. Los planes y Wompi sandbox tienen implementación y pruebas con Postgres real y respuesta externa ficticia. La conexión real con Wompi/Resend/S3, CI remoto y revisión humana siguen pendientes; no se declara cerrado el MVP según la definición formal de terminado.

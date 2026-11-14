@@ -92,6 +92,51 @@ describe('Planes: Postgres real, Wompi externo sustituido por fixture', () => {
       },
     };
   }
+  it('avisa a siete días, una vez por periodo incluso con consultas concurrentes', async () => {
+    const e = await prisma.empresa.findFirstOrThrow();
+    const vence = new Date(Date.now() + 6 * 86400000);
+    await prisma.empresa.update({
+      where: { cuentaId: e.cuentaId },
+      data: { plan: 'basico', planVenceEn: vence },
+    });
+    const respuestas = await Promise.all([
+      empresa.get('/empresa/planes').expect(200),
+      empresa.get('/empresa/planes').expect(200),
+    ]);
+    expect(respuestas[0].body.avisoVencimiento).toContain('renovar');
+    const lista = await empresa.get('/notificaciones').expect(200);
+    expect(lista.body.items).toHaveLength(1);
+    expect(lista.body.items[0].texto).toContain('renovar');
+    await empresa
+      .post(`/notificaciones/${lista.body.items[0].id}/leer`)
+      .send({})
+      .expect(204);
+    await empresa.get('/empresa/planes').expect(200);
+    expect(await prisma.notificacion.count()).toBe(1);
+    await prisma.empresa.update({
+      where: { cuentaId: e.cuentaId },
+      data: { planVenceEn: new Date(Date.now() + 5 * 86400000) },
+    });
+    await empresa.get('/notificaciones').expect(200);
+    expect(await prisma.notificacion.count()).toBe(2);
+  });
+  it('no avisa para planes lejanos, vencidos o gratuitos', async () => {
+    const e = await prisma.empresa.findFirstOrThrow();
+    for (const [plan, dias] of [
+      ['basico', 8],
+      ['ilimitado', -1],
+      [null, 3],
+    ] as const) {
+      await prisma.empresa.update({
+        where: { cuentaId: e.cuentaId },
+        data: { plan, planVenceEn: new Date(Date.now() + dias * 86400000) },
+      });
+      const r = await empresa.get('/empresa/planes').expect(200);
+      expect(r.body.avisoVencimiento).toBeNull();
+      await empresa.get('/notificaciones').expect(200);
+    }
+    expect(await prisma.notificacion.count()).toBe(0);
+  });
   it('importe fijado por el servidor y modo sandbox obligatorio', async () => {
     await empresa
       .post('/empresa/pagos')
