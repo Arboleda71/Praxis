@@ -1,5 +1,6 @@
 "use client";
 import Alert from "@mui/material/Alert";
+import Chip from "@mui/material/Chip";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -15,6 +16,7 @@ import {
   TAMANO_PAGINA,
   TRANSICIONES,
   type evaluarElegibilidad,
+  nombreDe, NIVELES_FORMACION, AVANCES, JORNADAS, IDIOMAS, NIVELES_MCER,
 } from "@praxis/contracts";
 import { useState } from "react";
 import { AvisoError } from "@/components/mercado-ui";
@@ -23,11 +25,12 @@ import { solicitar, type Lista } from "@/lib/mercado";
 import { abrirEnPestana } from "@/lib/pestana";
 import { fechaLarga } from "@/lib/perfil-cliente";
 
-type Entrada = { estado: string; fecha: string };
+type Entrada = { estado: string; fecha: string; detalle?: string | null };
 type Postulacion = {
   id: string;
   estado: string;
   creadaEn: string;
+  cvReemplazadoEn?: string | null;
   historial: Entrada[];
   vacante: { titulo: string; empresa: { razonSocial: string } };
 };
@@ -36,11 +39,11 @@ const fecha = (d: string) =>
   new Date(d).toLocaleString("es-CO", { timeZone: "America/Bogota" });
 function Historial({ items }: { items: Entrada[] }) {
   return (
-    <Stack component="ol" spacing={1} sx={{ pl: 3 }}>
+    <Stack component="ol" spacing={2} sx={{ pl: 3, borderLeft: 2, borderColor: "primary.main", "& li::marker": { color: "primary.main" } }}>
       {items.map((h, n) => (
         <li key={n}>
           <Typography>
-            {h.estado} · {fecha(h.fecha)}
+            {h.estado} · {fecha(h.fecha)}{h.detalle ? ` (${h.detalle})` : ""}
           </Typography>
         </li>
       ))}
@@ -100,12 +103,17 @@ export function MisPostulaciones() {
             </Typography>
             <Typography>{p.vacante.empresa.razonSocial}</Typography>
             <Typography>
-              Estado: <strong>{p.estado}</strong>
+              Estado: <Chip label={p.estado} color={p.estado === "Seleccionada" ? "success" : p.estado === "Rechazada" || p.estado === "Retirada" ? "default" : "primary"} size="small" />
             </Typography>
             <Typography variant="h3" sx={{ fontSize: 18, mt: 2 }}>
               Historial de la postulación
             </Typography>
             <Historial items={p.historial} />
+            {p.estado === "Enviada" ? <>
+              <Typography>Puedes cambiar el CV enviado mientras la empresa no empiece a revisarla.</Typography>
+              <Button href={`/estudiante/postulaciones/${p.id}/cv`}>Cambiar CV de esta postulación</Button>
+            </> : <Typography>El CV enviado no se puede cambiar en este estado.</Typography>}
+            {p.cvReemplazadoEn && <Typography>CV reemplazado el {fecha(p.cvReemplazadoEn)}.</Typography>}
             <Button
               onClick={async () => {
                 try {
@@ -157,7 +165,7 @@ export function MisPostulaciones() {
           <Button disabled={ocupado} onClick={() => setRetirar(null)}>
             Cancelar
           </Button>
-          <Button disabled={ocupado} onClick={confirmar}>
+              <Button color="error" disabled={ocupado} onClick={confirmar}>
             {ocupado ? "Retirando…" : "Confirmar retirada"}
           </Button>
         </DialogActions>
@@ -238,7 +246,7 @@ export function DetalleCandidato({ id }: { id: string }) {
     error,
     setError,
     recargar,
-  } = useCarga<Candidatura>(`/empresa/postulaciones/${id}`);
+  } = useCarga<Candidatura>(`/empresa/postulaciones/${id}/revisar`, undefined, "POST");
   const [estado, setEstado] = useState("");
   const [ocupado, setOcupado] = useState(false);
   async function cambiar() {
@@ -294,7 +302,7 @@ export function DetalleCandidato({ id }: { id: string }) {
             {p.perfil.nombreCompleto}
           </Typography>
           <Typography>
-            Estado: <strong>{p.estado}</strong>
+            Estado: <Chip label={p.estado} color={p.estado === "Seleccionada" ? "success" : "default"} size="small" />
           </Typography>
           <Alert severity="info">
             Copia del perfil y archivos al postularse. Los datos son declarados
@@ -304,12 +312,12 @@ export function DetalleCandidato({ id }: { id: string }) {
             Perfil enviado
           </Typography>
           <Typography>
-            Programa: {p.perfil.programa}. Nivel: {p.perfil.nivelFormacion}.
+            Programa: {p.perfil.programa || "Datos eliminados"}. Nivel: {nombreDe(NIVELES_FORMACION, p.perfil.nivelFormacion) || "Datos eliminados"}.
             Institución: {p.perfil.institucion || "Falta información"}.
           </Typography>
           <Typography>
-            Avance: {p.perfil.avance || "Falta información"}. Jornada:{" "}
-            {p.perfil.jornada || "Falta información"}. Aval declarado:{" "}
+            Avance: {nombreDe(AVANCES, p.perfil.avance ?? "") || "Falta información"}. Jornada:{" "}
+            {nombreDe(JORNADAS, p.perfil.jornada ?? "") || "Falta información"}. Aval declarado:{" "}
             {p.perfil.aval === null
               ? "Falta información"
               : p.perfil.aval
@@ -324,7 +332,7 @@ export function DetalleCandidato({ id }: { id: string }) {
                 fechaLarga(p.perfil.disponibleDesde.slice(0, 10))
               : "Falta información"}
             . Idiomas:{" "}
-            {p.perfil.idiomas.map((i) => `${i.idioma} ${i.nivel}`).join(", ") ||
+            {p.perfil.idiomas.map((i) => `${nombreDe(IDIOMAS, i.idioma)} ${nombreDe(NIVELES_MCER, i.nivel)}`).join(", ") ||
               "Falta información"}
             .
           </Typography>
@@ -346,6 +354,7 @@ export function DetalleCandidato({ id }: { id: string }) {
             ))}
           </Stack>
           <Stack spacing={1}>
+            {p.cvReemplazadoEn && <Typography>Hoja de vida reemplazada por el estudiante el {fecha(p.cvReemplazadoEn)}.</Typography>}
             {p.archivos.map((a) => (
               <Button key={a.tipo} onClick={() => archivo(a.tipo)}>
                 Ver{" "}

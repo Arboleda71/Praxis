@@ -28,11 +28,19 @@ import {
 } from './pagos/pagos.controller.js';
 import { PagosService } from './pagos/pagos.service.js';
 import { WompiClient } from './pagos/wompi.js';
+import { AvisosPlanesService } from './pagos/avisos-planes.service.js';
+import { SoloAdminGuard } from './auth/sesion.js';
+import { CuentaController, AdminController } from './cuenta/cuenta.controller.js';
+import { CuentaService } from './cuenta/cuenta.service.js';
+import { LimpiezaService } from './cuenta/limpieza.service.js';
+import { CvService } from './vacantes/cv.service.js';
 
 @Module({
   imports: [],
   controllers: [
     AuthController,
+    CuentaController,
+    AdminController,
     PerfilController,
     ArchivosController,
     EmpresaController,
@@ -46,6 +54,10 @@ import { WompiClient } from './pagos/wompi.js';
   ],
   providers: [
     PrismaService,
+    CuentaService,
+    CvService,
+    LimpiezaService,
+    SoloAdminGuard,
     AuthService,
     Correo,
     SesionGuard,
@@ -55,6 +67,7 @@ import { WompiClient } from './pagos/wompi.js';
     SeguimientoService,
     PagosService,
     WompiClient,
+    AvisosPlanesService,
     PerfilService,
     Archivos,
     Intentos,

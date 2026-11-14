@@ -42,6 +42,7 @@ export function NoEncontrada() {
 }
 
 const HOME: Record<Role, { href: string; action: string; otra: string; propia: string }> = {
+  admin: { href: "/admin/cuentas", action: "Ir a cuentas", otra: "otro rol", propia: "administración" },
   estudiante: { href: "/estudiante/perfil", action: "Ir a mi perfil", otra: "empresa", propia: "estudiante" },
   empresa: { href: "/empresa/vacantes", action: "Ir a mis vacantes", otra: "estudiante", propia: "empresa" },
 };

@@ -28,7 +28,7 @@ test.describe("Visitante", () => {
     ).toBeVisible();
     await expect(
       page.getByText("Empieza gratis.", { exact: false }),
-    ).toBeVisible();
+    ).toHaveCount(0);
     await expect(
       page.getByRole("link", { name: "Soy estudiante" }),
     ).toBeVisible();

@@ -6,5 +6,6 @@ export * from "./perfil.js";
 export * from "./empresa.js";
 export * from "./vacantes.js";
 export * from "./pagos.js";
+export * from "./cuenta.js";
 import { z } from "zod";
 z.config(z.locales.es());

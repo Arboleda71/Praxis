@@ -6,10 +6,16 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import type { ArchivoSubido } from '../perfil/perfil.service.js';
+import { CvService } from './cv.service.js';
 import {
   accionSchema,
   busquedaSchema,
@@ -37,7 +43,41 @@ export class PostulacionesEstudianteController {
     private readonly prisma: PrismaService,
     private readonly seguimiento: SeguimientoService,
     private readonly archivos: Archivos,
+    private readonly cv: CvService,
   ) {}
+  @Put(':id/cv')
+  @UseInterceptors(
+    FileInterceptor('archivo', {
+      limits: { fileSize: 5 * 1024 * 1024, files: 1 },
+    }),
+  )
+  reemplazar(
+    @Req() req: RequestConSesion,
+    @Param('id', new ZodPipe(idSchema)) id: string,
+    @UploadedFile() a?: ArchivoSubido,
+  ) {
+    return this.cv.reemplazar(req.sesion.cuentaId, id, a);
+  }
+  @Get(':id')
+  async detalle(
+    @Req() req: RequestConSesion,
+    @Param('id', new ZodPipe(idSchema)) id: string,
+  ) {
+    const p = await this.prisma.postulacion.findFirst({
+      where: { id, estudianteId: req.sesion.cuentaId },
+      select: {
+        id: true,
+        estado: true,
+        cvReemplazadoEn: true,
+        archivos: { select: { tipo: true, nombre: true, bytes: true } },
+        vacante: {
+          select: { titulo: true, empresa: { select: { razonSocial: true } } },
+        },
+      },
+    });
+    if (!p) throw new NotFoundException();
+    return p;
+  }
   @Post(':id/retirar')
   @HttpCode(200)
   retirar(
@@ -92,6 +132,7 @@ export class PostulacionesEstudianteController {
             },
           },
           historial: { orderBy: [{ fecha: 'asc' }, { id: 'asc' }] },
+          archivos: { select: { tipo: true, nombre: true, bytes: true } },
         },
       }),
       this.prisma.postulacion.count({ where }),
@@ -107,6 +148,16 @@ export class CandidatosController {
     private readonly archivos: Archivos,
     private readonly seguimiento: SeguimientoService,
   ) {}
+  @Post('postulaciones/:id/revisar')
+  @HttpCode(200)
+  async revisar(
+    @Req() req: RequestConSesion,
+    @Param('id', new ZodPipe(idSchema)) id: string,
+    @Body(new ZodPipe(accionSchema)) _d: object,
+  ) {
+    await this.seguimiento.revisar(req.sesion.cuentaId, id);
+    return this.detalle(req, id);
+  }
   @Post('postulaciones/:id/estado')
   @HttpCode(200)
   cambiar(

@@ -5,6 +5,7 @@ export type Vacante = VacanteDatos & {
   estado: string;
   motivoCierre?: string | null;
   empresa?: {
+    logoUrl?: string | null;
     razonSocial: string;
     descripcion?: string;
     ciudad?: string;
@@ -18,6 +19,7 @@ export type Lista<T> = {
   total: number;
   pagina: number;
   cuposGratis?: number;
+  estadoPlan?: { avisoPlan: string | null; activo: boolean; plan: string | null; publicacionesRestantes: number | null; publicacionesUsadas: number; planVenceEn: string | null };
 };
 export async function solicitar<T>(
   ruta: string,

@@ -8,6 +8,7 @@ import {
 import { createHash, randomBytes } from 'node:crypto';
 import type { Request } from 'express';
 import { PrismaService } from '../prisma.service.js';
+import type { Prisma } from '../generated/prisma/client.js';
 
 export const COOKIE = 'praxis_sesion';
 export const SESION_MS = 30 * 24 * 60 * 60_000;
@@ -34,7 +35,12 @@ async function buscarSesion(prisma: PrismaService, token: string | undefined) {
   });
   if (s && s.expiraEn <= new Date())
     await prisma.sesion.deleteMany({ where: { id: s.id } });
-  return s && s.expiraEn > new Date() ? s : null;
+  return s &&
+    s.expiraEn > new Date() &&
+    !s.cuenta.eliminadaEn &&
+    !s.cuenta.accesoRevocadoEn
+    ? s
+    : null;
 }
 
 export type SesionActiva = NonNullable<
@@ -85,4 +91,30 @@ export class SoloEmpresaGuard extends SesionGuard {
       });
     return true;
   }
+}
+
+@Injectable()
+export class SoloAdminGuard extends SesionGuard {
+  async canActivate(ctx: ExecutionContext): Promise<boolean> {
+    await super.canActivate(ctx);
+    if (
+      ctx.switchToHttp().getRequest<RequestConSesion>().sesion.cuenta.rol !==
+      'ADMIN'
+    )
+      throw new ForbiddenException({
+        mensaje: 'Esta sección es solo para administración.',
+      });
+    return true;
+  }
+}
+
+/** Serializa operaciones sensibles con revocación y supresión. */
+export async function cuentaActiva(tx: Prisma.TransactionClient, id: string) {
+  await tx.$queryRaw`SELECT id FROM "Cuenta" WHERE id = ${id}::uuid FOR NO KEY UPDATE`;
+  const cuenta = await tx.cuenta.findUnique({ where: { id } });
+  if (!cuenta || cuenta.eliminadaEn || cuenta.accesoRevocadoEn)
+    throw new UnauthorizedException({
+      mensaje: 'Tu sesión ya no está disponible. Inicia sesión para continuar.',
+    });
+  return cuenta;
 }

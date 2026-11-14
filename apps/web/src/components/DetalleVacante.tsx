@@ -101,6 +101,7 @@ export default function DetalleVacante({ id }: { id: string }) {
           </Typography>
 
           <Paper variant="outlined" sx={{ ...tarjeta, bgcolor: "background.default" }}>
+            {v.empresa?.logoUrl && <Box component="img" src={v.empresa.logoUrl} alt={`Logo de ${v.empresa.razonSocial}`} sx={{ width: 72, height: 72, objectFit: "contain", mb: 1 }} />}
             <Stack spacing={0.75} sx={{ alignItems: "flex-start" }}>
               <Typography variant="h2" sx={{ fontSize: 18, overflowWrap: "anywhere" }}>
                 Empresa: {v.empresa?.razonSocial}

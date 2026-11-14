@@ -5,10 +5,37 @@ import {
 } from '@nestjs/common';
 import { puedeRetirar, TRANSICIONES } from '@praxis/contracts';
 import { PrismaService } from '../prisma.service.js';
+import { cuentaActiva } from '../auth/sesion.js';
 
 @Injectable()
 export class SeguimientoService {
   constructor(private readonly prisma: PrismaService) {}
+  async revisar(empresaId: string, id: string) {
+    return this.prisma.$transaction(async (tx) => {
+      await cuentaActiva(tx, empresaId);
+      await tx.$queryRaw`SELECT id FROM "Postulacion" WHERE id = ${id}::uuid FOR UPDATE`;
+      const p = await tx.postulacion.findFirst({
+        where: { id, vacante: { empresaId } },
+        include: { vacante: true },
+      });
+      if (!p) throw new NotFoundException();
+      if (p.estado !== 'Enviada') return;
+      await tx.postulacion.update({
+        where: { id },
+        data: { estado: 'En revisión' },
+      });
+      await tx.historialPostulacion.create({
+        data: { postulacionId: id, estado: 'En revisión' },
+      });
+      await tx.notificacion.createMany({
+        data: [p.estudianteId, empresaId].map((cuentaId) => ({
+          cuentaId,
+          postulacionId: id,
+          texto: `Postulación a ${p.vacante.titulo}: En revisión.`,
+        })),
+      });
+    });
+  }
   async cambiar(
     cuentaId: string,
     rol: 'ESTUDIANTE' | 'EMPRESA',
@@ -16,6 +43,7 @@ export class SeguimientoService {
     estado: string,
   ) {
     return this.prisma.$transaction(async (tx) => {
+      await cuentaActiva(tx, cuentaId);
       await tx.$queryRaw`SELECT id FROM "Postulacion" WHERE id = ${id}::uuid FOR UPDATE`;
       const p = await tx.postulacion.findUnique({
         where: { id },

@@ -1,4 +1,13 @@
 <!--
+Sync Impact Report (v5.0.0, 2026-11-13)
+- El usuario amplía explícitamente el alcance a todos los mockups, incluidos S3,
+  S4 y Administrador. Spec: specs/014-praxis-completo.
+- VI admite reemplazar solo el CV de una candidatura Enviada antes de revisión;
+  se conserva historial y se notifica. No cambia el perfil ni la elegibilidad.
+- Se agrega administración limitada a cuentas y acceso, sin perfiles ni contenido.
+- Se concreta supresión inmediata, historial anonimizado y huella del NIT.
+- Pendiente: revisión y aprobación de la enmienda por otro integrante en el PR.
+
 Sync Impact Report (v4.1.0, 2026-11-11)
 - Versión: 4.0.0 → 4.1.0 (MENOR: se agrega una regla de producto y se amplía XIV; ningún principio se quita
   ni se redefine)
@@ -116,6 +125,10 @@ en ese caso el historial se anonimiza, no se borra.
 ### VI. Mínimo acceso a los datos
 Cada usuario MUST ver solo lo que necesita para su rol. El perfil y el CV del estudiante solo los ven él
 mismo y las empresas a cuyas vacantes se postuló, en la versión que tenían al postularse. Praxis MUST
+permitir al estudiante reemplazar únicamente el CV copiado mientras la postulación siga Enviada;
+iniciar la revisión lo bloquea, el cambio se registra y notifica a la empresa. La administración
+solo consulta datos de cuenta y controla acceso con motivo e historial, nunca perfiles, CV ni contenido.
+Praxis MUST
 NOT ofrecer una base de talento abierta ni vender datos de estudiantes.
 
 ### VII. No discriminación
@@ -174,7 +187,12 @@ tokens ni datos personales.
 
 El detalle vive en `docs/context(pre-constitucion).md`. Estas reglas son las que ninguna spec puede contradecir:
 
-- **Roles del MVP:** visitante, estudiante y empresa. El administrador es una fase posterior.
+- **Roles del alcance ampliado:** visitante, estudiante, empresa y administrador limitado al acceso.
+  No hay registro público de administradores; su alta es operativa. No aprueban empresas para publicar.
+- **Supresión:** inmediata con contraseña y confirmación explícita; cierra sesiones y enlaces,
+  borra archivos y datos personales, anonimiza historial, retira candidaturas en curso y cierra
+  vacantes de una empresa eliminada. Conserva solo una huella del NIT para evitar duplicados.
+  Un fallo del almacenamiento deja una eliminación pendiente durable que se reintenta.
 - **Visitante:** solo ve las 5 últimas vacantes abiertas, con datos básicos; no busca ni filtra.
 - **Estudiante:** gratis siempre. Declara su aval y puede subir un soporte; Praxis no lo verifica.
 - **Empresa:** una única cuenta por empresa. Recibe candidatos; no busca perfiles ni vacantes de otras
@@ -247,4 +265,4 @@ Cambiar cualquier elemento de esta tabla es una enmienda a la constitución.
   cada revisión de PR verifica que no se rompa ningún principio.
 - La guía de producto para el trabajo diario es `docs/context(pre-constitucion).md`.
 
-**Version**: 4.1.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-11-11
+**Version**: 5.0.0 | **Ratified**: 2026-10-15 | **Last Amended**: 2026-11-13

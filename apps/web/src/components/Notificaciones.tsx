@@ -1,5 +1,7 @@
 "use client";
 import Button from "@mui/material/Button";
+import NotificationsRounded from "@mui/icons-material/NotificationsRounded";
+import Avatar from "@mui/material/Avatar";
 import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
@@ -44,7 +46,8 @@ export default function Notificaciones() {
         <Typography>No tienes notificaciones todavía.</Typography>
       )}
       {lista?.items.map((n) => (
-        <Paper component="article" variant="outlined" sx={{ p: 2 }} key={n.id}>
+        <Paper component="article" variant="outlined" sx={{ p: 2, bgcolor: n.leidaEn ? "background.paper" : "#EFF6FF", borderColor: n.leidaEn ? "divider" : "primary.main" }} key={n.id}>
+          <Avatar aria-hidden sx={{ bgcolor: "#DBEAFE", color: "primary.main", mb: 1 }}><NotificationsRounded /></Avatar>
           <Typography>{n.texto}</Typography>
           <Typography>
             {n.leidaEn ? "Leída" : "Sin leer"} ·{" "}

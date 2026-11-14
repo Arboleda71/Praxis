@@ -1,5 +1,6 @@
 import {
   ConflictException,
+  ForbiddenException,
   GoneException,
   HttpException,
   Injectable,
@@ -16,10 +17,12 @@ import type {
 import { PrismaService } from '../prisma.service.js';
 import { Correo } from './correo.js';
 import { Intentos } from './intentos.js';
+import { huellaNit } from '../cuenta/cuenta.service.js';
 import {
   hashToken,
   nuevoToken,
   SESION_MS,
+  cuentaActiva,
   type SesionActiva,
 } from './sesion.js';
 
@@ -45,8 +48,14 @@ const demasiados = (segundos: number, que = 'intentos') => {
 };
 type CuentaConPerfil = SesionActiva['cuenta'];
 export const publica = (c: CuentaConPerfil): SesionPublica => ({
-  rol: c.rol === 'ESTUDIANTE' ? 'estudiante' : 'empresa',
-  nombre: c.estudiante?.nombreCompleto ?? c.empresa?.razonSocial ?? '',
+  rol:
+    c.rol === 'ADMIN'
+      ? 'admin'
+      : c.rol === 'ESTUDIANTE'
+        ? 'estudiante'
+        : 'empresa',
+  nombre:
+    c.estudiante?.nombreCompleto ?? c.empresa?.razonSocial ?? 'Administración',
   correo: c.correo,
   correoConfirmado: !!c.correoConfirmadoEn,
 });
@@ -69,10 +78,17 @@ export class AuthService {
   }
   async registrarEmpresa(d: RegistroEmpresa, ip: string) {
     await this.validarNuevo(ip, d.correo, d.nit);
-    return this.crear(d, ip, {
-      rol: 'EMPRESA',
-      empresa: { create: { razonSocial: d.razonSocial, nit: d.nit, dv: d.dv } },
-    });
+    return this.crear(
+      d,
+      ip,
+      {
+        rol: 'EMPRESA',
+        empresa: {
+          create: { razonSocial: d.razonSocial, nit: d.nit, dv: d.dv },
+        },
+      },
+      d.nit,
+    );
   }
   async login(d: Login, ip: string) {
     const claves = [`correo:${d.correo}`, `ip:${ip}`];
@@ -86,9 +102,14 @@ export class AuthService {
       cuenta?.contrasenaHash ?? (await this.hashFicticio),
       d.contrasena,
     );
-    if (!cuenta || !ok)
+    if (!cuenta || !ok || cuenta.eliminadaEn)
       throw new UnauthorizedException({
         mensaje: 'Correo o contraseña incorrectos.',
+      });
+    if (cuenta.accesoRevocadoEn)
+      throw new ForbiddenException({
+        mensaje:
+          'Tu acceso está revocado. Contacta con el equipo de Praxis para consultar tu caso.',
       });
     await this.intentos.exito(...claves);
     return this.abrirSesion(cuenta);
@@ -142,6 +163,10 @@ export class AuthService {
       const actual = await tx.cuenta.findUniqueOrThrow({
         where: { id: cuenta.id },
       });
+      if (actual.eliminadaEn || actual.accesoRevocadoEn)
+        throw new UnauthorizedException({
+          mensaje: 'Inicia sesión para continuar.',
+        });
       if (actual.correoConfirmadoEn)
         throw new ConflictException({
           mensaje: 'Tu correo ya está confirmado.',
@@ -182,7 +207,11 @@ export class AuthService {
       );
     }
     await this.prisma.enlaceConfirmacion.updateMany({
-      where: { cuentaId: cuenta.id, usadoEn: null, id: { not: hashToken(token) } },
+      where: {
+        cuentaId: cuenta.id,
+        usadoEn: null,
+        id: { not: hashToken(token) },
+      },
       data: { usadoEn: new Date() },
     });
   }
@@ -273,7 +302,13 @@ export class AuthService {
     const errores: Record<string, string> = {};
     if (await this.prisma.cuenta.findUnique({ where: { correo } }))
       errores.correo = 'Este correo ya tiene una cuenta. Inicia sesión.';
-    if (nit && (await this.prisma.empresa.findUnique({ where: { nit } })))
+    if (
+      nit &&
+      ((await this.prisma.empresa.findUnique({ where: { nit } })) ||
+        (await this.prisma.nitReservado.findUnique({
+          where: { huella: huellaNit(nit) },
+        })))
+    )
       errores.nit = 'Ya existe una cuenta para este NIT.';
     if (Object.keys(errores).length) {
       await this.intentos.fallo(`ip:${ip}`);
@@ -288,12 +323,24 @@ export class AuthService {
       estudiante?: object;
       empresa?: object;
     },
+    nit?: string,
   ) {
     const token = nuevoToken();
     const contrasenaHash = await hash(d.contrasena);
     let cuenta: CuentaConPerfil;
     try {
       cuenta = await this.prisma.$transaction(async (tx) => {
+        if (nit) {
+          await tx.$queryRaw`SELECT 1 AS bloqueado FROM pg_advisory_xact_lock(hashtextextended(${nit}, 0))`;
+          if (
+            await tx.nitReservado.findUnique({
+              where: { huella: huellaNit(nit) },
+            })
+          )
+            throw new ConflictException({
+              errores: { nit: 'Ya existe una cuenta para este NIT.' },
+            });
+        }
         const c = await tx.cuenta.create({
           data: {
             correo: d.correo,
@@ -330,15 +377,22 @@ export class AuthService {
   }
   private async abrirSesion(cuenta: CuentaConPerfil) {
     const token = nuevoToken();
-    await this.prisma.sesion.deleteMany({
-      where: { expiraEn: { lte: new Date() } },
-    });
-    await this.prisma.sesion.create({
-      data: {
-        id: hashToken(token),
-        cuentaId: cuenta.id,
-        expiraEn: new Date(Date.now() + SESION_MS),
-      },
+    await this.prisma.$transaction(async (tx) => {
+      const actual = await cuentaActiva(tx, cuenta.id);
+      if (actual.contrasenaHash !== cuenta.contrasenaHash)
+        throw new UnauthorizedException({
+          mensaje: 'La contraseña cambió. Inicia sesión de nuevo.',
+        });
+      await tx.sesion.deleteMany({
+        where: { expiraEn: { lte: new Date() } },
+      });
+      await tx.sesion.create({
+        data: {
+          id: hashToken(token),
+          cuentaId: cuenta.id,
+          expiraEn: new Date(Date.now() + SESION_MS),
+        },
+      });
     });
     return { token, sesion: publica(cuenta) };
   }

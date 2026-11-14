@@ -1,5 +1,6 @@
 "use client";
 import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -58,6 +59,8 @@ export default function MisVacantes() {
       <Typography variant="h1" sx={{ fontSize: 28 }}>
         Mis vacantes
       </Typography>
+      {lista?.estadoPlan?.avisoPlan && <Alert severity="warning" action={<Button color="inherit" href="/empresa/planes">Ver planes y pagos</Button>}>{lista.estadoPlan.avisoPlan}</Alert>}
+      {lista?.estadoPlan?.activo && <Typography>{lista.estadoPlan.plan === "basico" ? `Plan Básico: te quedan ${lista.estadoPlan.publicacionesRestantes} de 4 publicaciones adicionales.` : "Plan Ilimitado activo."} Hasta {lista.estadoPlan.planVenceEn ? fechaLarga(lista.estadoPlan.planVenceEn.slice(0, 10)) : ""}.</Typography>}
       <Typography>
         Te quedan {lista?.cuposGratis ?? "…"} de 2 publicaciones gratis en estos
         6 meses.
@@ -74,7 +77,7 @@ export default function MisVacantes() {
       {error &&
         (lista ? (
           <AvisoError mensaje={error}>
-            <Button href="/empresa/perfil">Revisar mi empresa</Button>
+            <Button href={/cupo|publicaciones|planes/i.test(error) ? "/empresa/planes" : "/empresa/perfil"}>{/cupo|publicaciones|planes/i.test(error) ? "Ver planes y pagos" : "Revisar mi empresa"}</Button>
           </AvisoError>
         ) : (
           <AvisoError mensaje={error} reintentar={recargar} />

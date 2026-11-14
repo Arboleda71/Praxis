@@ -20,6 +20,7 @@ import { randomUUID } from 'node:crypto';
 import type { TipoArchivo as TipoArchivoDb } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
 import { Archivos } from './archivos.js';
+import { cuentaActiva } from '../auth/sesion.js';
 
 const EN_DB: Record<TipoArchivo, TipoArchivoDb> = {
   'hoja-de-vida': 'HOJA_DE_VIDA',
@@ -83,16 +84,20 @@ export class PerfilService {
   }
 
   async guardarFormacion(cuentaId: string, d: Formacion) {
-    await this.prisma.estudiante.update({
-      where: { cuentaId },
-      data: { ...d, perfilActualizadoEn: new Date() },
+    await this.prisma.$transaction(async (tx) => {
+      await cuentaActiva(tx, cuentaId);
+      await tx.estudiante.update({
+        where: { cuentaId },
+        data: { ...d, perfilActualizadoEn: new Date() },
+      });
     });
     return this.obtener(cuentaId);
   }
 
   async guardarDisponibilidad(cuentaId: string, d: Disponibilidad) {
-    await this.prisma.$transaction([
-      this.prisma.estudiante.update({
+    await this.prisma.$transaction(async (tx) => {
+      await cuentaActiva(tx, cuentaId);
+      await tx.estudiante.update({
         where: { cuentaId },
         data: {
           disponibleDesde: d.disponibleDesde
@@ -101,18 +106,19 @@ export class PerfilService {
           jornada: d.jornada,
           perfilActualizadoEn: new Date(),
         },
-      }),
-      this.prisma.idiomaDeclarado.deleteMany({ where: { cuentaId } }),
-      this.prisma.idiomaDeclarado.createMany({
+      });
+      await tx.idiomaDeclarado.deleteMany({ where: { cuentaId } });
+      await tx.idiomaDeclarado.createMany({
         data: d.idiomas.map((i) => ({ cuentaId, ...i })),
-      }),
-    ]);
+      });
+    });
     return this.obtener(cuentaId);
   }
 
   /** «No» o sin responder quita el soporte: no hay aval que soportar. */
   async guardarAval(cuentaId: string, aval: boolean | null) {
     const anterior = await this.prisma.$transaction(async (tx) => {
+      await cuentaActiva(tx, cuentaId);
       await tx.estudiante.update({
         where: { cuentaId },
         data: { aval, perfilActualizadoEn: new Date() },
@@ -165,6 +171,7 @@ export class PerfilService {
     let anterior;
     try {
       anterior = await this.prisma.$transaction(async (tx) => {
+        await cuentaActiva(tx, cuentaId);
         await tx.$queryRaw`SELECT "cuentaId" FROM "Estudiante" WHERE "cuentaId" = ${cuentaId}::uuid FOR UPDATE`;
         if (
           tipo === 'soporte-aval' &&
@@ -212,6 +219,7 @@ export class PerfilService {
 
   private async borrar(cuentaId: string, tipo: TipoArchivoDb) {
     const a = await this.prisma.$transaction(async (tx) => {
+      await cuentaActiva(tx, cuentaId);
       await tx.$queryRaw`SELECT "cuentaId" FROM "Estudiante" WHERE "cuentaId" = ${cuentaId}::uuid FOR UPDATE`;
       const actual = await tx.archivoPerfil.findUnique({
         where: { cuentaId_tipo: { cuentaId, tipo } },

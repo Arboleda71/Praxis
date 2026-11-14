@@ -19,7 +19,7 @@ export default function SiteHeader({ session }: { session: Session | null }) {
           {session && <NavTabs role={session.rol} />}
           <Box sx={{ flexGrow: 1 }} />
           {session ? (
-            <AccountMenu name={session.nombre} email={session.correo} />
+            <AccountMenu name={session.nombre} email={session.correo} role={session.rol} />
           ) : (
             <>
               <Button href="/ingresar" sx={compact}>

@@ -181,14 +181,15 @@ test("MVP: publicar → buscar → comprobar → postular → seguir → notific
     await expect(
       page.getByText(/Disponibilidad: 1 de febrero de 2027\./),
     ).toBeVisible();
-    await elegir(page, "Nuevo estado", "En revisión");
-    await page.getByRole("button", { name: "Actualizar estado" }).click();
     await expect(page.getByText("En revisión", { exact: true })).toBeVisible();
+    await elegir(page, "Nuevo estado", "Entrevista");
+    await page.getByRole("button", { name: "Actualizar estado" }).click();
+    await expect(page.getByText("Entrevista", { exact: true })).toBeVisible();
     await sinViolaciones(page);
     await sinDesborde(page);
     await alumno.reload();
     await expect(
-      alumno.getByText("En revisión", { exact: true }),
+      alumno.getByText("Entrevista", { exact: true }),
     ).toBeVisible();
     await sinViolaciones(alumno);
     await alumno.goto("/notificaciones");

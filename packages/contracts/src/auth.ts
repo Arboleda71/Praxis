@@ -120,7 +120,7 @@ export type RegistroEmpresa = z.output<typeof registroEmpresaSchema>;
 export type Login = z.infer<typeof loginSchema>;
 export type RestablecerContrasena = z.infer<typeof restablecerContrasenaSchema>;
 
-export type Rol = "estudiante" | "empresa";
+export type Rol = "estudiante" | "empresa" | "admin";
 
 /** Lo que la API devuelve de la sesión actual. */
 export type SesionPublica = {

@@ -27,16 +27,24 @@ import {
 } from '../auth/sesion.js';
 import { ZodPipe } from '../auth/zod.pipe.js';
 import { VacantesService } from './vacantes.service.js';
+import { PagosService } from '../pagos/pagos.service.js';
 
 @Controller('empresa/vacantes')
 @UseGuards(SoloEmpresaGuard)
 export class VacantesEmpresaController {
-  constructor(private readonly vacantes: VacantesService) {}
-  @Get() lista(
+  constructor(
+    private readonly vacantes: VacantesService,
+    private readonly pagos: PagosService,
+  ) {}
+  @Get() async lista(
     @Req() req: RequestConSesion,
     @Query(new ZodPipe(busquedaSchema)) b: Busqueda,
   ) {
-    return this.vacantes.propias(req.sesion.cuentaId, b);
+    const [lista, estadoPlan] = await Promise.all([
+      this.vacantes.propias(req.sesion.cuentaId, b),
+      this.pagos.planes(req.sesion.cuentaId),
+    ]);
+    return { ...lista, estadoPlan };
   }
   @Post() crear(
     @Req() req: RequestConSesion,

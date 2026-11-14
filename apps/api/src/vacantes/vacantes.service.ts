@@ -17,6 +17,7 @@ import { randomUUID } from 'node:crypto';
 import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../prisma.service.js';
 import { Archivos } from '../perfil/archivos.js';
+import { cuentaActiva } from '../auth/sesion.js';
 
 const TAMANO = TAMANO_PAGINA;
 /**
@@ -44,6 +45,7 @@ const VACANTE_PUBLICA = {
 } as const;
 /** Lo que el estudiante ve de la empresa: sus datos declarados. Nunca NIT, plan ni ids internos. */
 const EMPRESA_PUBLICA = {
+  logoClave: true,
   razonSocial: true,
   descripcion: true,
   ciudad: true,
@@ -104,9 +106,39 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     if (this.reloj) clearInterval(this.reloj);
   }
   cerrarVencidas() {
-    return this.prisma.vacante.updateMany({
-      where: { estado: 'Abierta', vigencia: { lt: new Date(hoyBogota()) } },
-      data: { estado: 'Cerrada', motivoCierre: 'venció' },
+    return this.cerrarConAvisos(
+      { estado: 'Abierta', vigencia: { lt: new Date(hoyBogota()) } },
+      'venció',
+    );
+  }
+  private cerrarConAvisos(
+    where: Prisma.VacanteWhereInput,
+    motivo: string,
+    empresaId?: string,
+  ) {
+    return this.prisma.$transaction(async (tx) => {
+      if (empresaId) await cuentaActiva(tx, empresaId);
+      // UPDATE toma el bloqueo de fila: solo la transacción que cierra crea avisos.
+      const cerradas = await tx.vacante.updateManyAndReturn({
+        where,
+        data: { estado: 'Cerrada', motivoCierre: motivo },
+        select: { id: true, titulo: true },
+      });
+      for (const v of cerradas) {
+        const candidaturas = await tx.postulacion.findMany({
+          where: { vacanteId: v.id },
+          select: { id: true, estudianteId: true },
+        });
+        if (candidaturas.length)
+          await tx.notificacion.createMany({
+            data: candidaturas.map((p) => ({
+              cuentaId: p.estudianteId,
+              postulacionId: p.id,
+              texto: `La vacante ${v.titulo} está cerrada: ${motivo}. Tu postulación conserva su estado y su historial.`,
+            })),
+          });
+      }
+      return { count: cerradas.length };
     });
   }
   async propias(empresaId: string, b: Busqueda) {
@@ -135,13 +167,16 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     };
   }
   crear(empresaId: string, d: VacanteDatos) {
-    return this.prisma.vacante.create({
-      data: {
-        ...d,
-        empresaId,
-        fechaInicio: new Date(d.fechaInicio),
-        vigencia: new Date(d.vigencia),
-      },
+    return this.prisma.$transaction(async (tx) => {
+      await cuentaActiva(tx, empresaId);
+      return tx.vacante.create({
+        data: {
+          ...d,
+          empresaId,
+          fechaInicio: new Date(d.fechaInicio),
+          vigencia: new Date(d.vigencia),
+        },
+      });
     });
   }
   async propia(empresaId: string, id: string) {
@@ -156,6 +191,7 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     d: VacanteDatos | { descripcion: string },
   ) {
     return this.prisma.$transaction(async (tx) => {
+      await cuentaActiva(tx, empresaId);
       await tx.$queryRaw`SELECT id FROM "Vacante" WHERE id = ${id}::uuid FOR UPDATE`;
       const v = await tx.vacante.findFirst({ where: { id, empresaId } });
       if (!v) throw new NotFoundException();
@@ -180,7 +216,7 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
   }
   async publicar(empresaId: string, id: string) {
     return this.prisma.$transaction(async (tx) => {
-      await tx.$queryRaw`SELECT id FROM "Cuenta" WHERE id = ${empresaId}::uuid FOR UPDATE`;
+      await cuentaActiva(tx, empresaId);
       await tx.$queryRaw`SELECT id FROM "Vacante" WHERE id = ${id}::uuid FOR UPDATE`;
       const cuenta = await tx.cuenta.findUniqueOrThrow({
         where: { id: empresaId },
@@ -248,10 +284,11 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     });
   }
   async cerrar(empresaId: string, id: string) {
-    const r = await this.prisma.vacante.updateMany({
-      where: { id, empresaId, estado: 'Abierta' },
-      data: { estado: 'Cerrada', motivoCierre: 'cerrada por la empresa' },
-    });
+    const r = await this.cerrarConAvisos(
+      { id, empresaId, estado: 'Abierta' },
+      'cerrada por la empresa',
+      empresaId,
+    );
     if (!r.count)
       throw new ConflictException({
         mensaje:
@@ -260,8 +297,11 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     return this.propia(empresaId, id);
   }
   async eliminar(empresaId: string, id: string) {
-    const r = await this.prisma.vacante.deleteMany({
-      where: { id, empresaId, estado: 'Borrador' },
+    const r = await this.prisma.$transaction(async (tx) => {
+      await cuentaActiva(tx, empresaId);
+      return tx.vacante.deleteMany({
+        where: { id, empresaId, estado: 'Borrador' },
+      });
     });
     if (!r.count)
       throw new ConflictException({
@@ -271,7 +311,10 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
   async recientes() {
     await this.cerrarVencidas();
     return this.prisma.vacante.findMany({
-      where: { estado: 'Abierta' },
+      where: {
+        estado: 'Abierta',
+        empresa: { cuenta: { accesoRevocadoEn: null, eliminadaEn: null } },
+      },
       orderBy: [{ publicadaEn: 'desc' }, { id: 'desc' }],
       take: 5,
       select: {
@@ -288,6 +331,7 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     await this.cerrarVencidas();
     const where: Prisma.VacanteWhereInput = {
       estado: 'Abierta',
+      empresa: { cuenta: { accesoRevocadoEn: null, eliminadaEn: null } },
       ...(b.q
         ? { titulo: { contains: literalLike(b.q), mode: 'insensitive' } }
         : {}),
@@ -325,10 +369,15 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
   async detalle(id: string, estudianteId: string) {
     await this.cerrarVencidas();
     const v = await this.prisma.vacante.findFirst({
-      where: { id, estado: { not: 'Borrador' } },
+      where: {
+        id,
+        estado: { not: 'Borrador' },
+        empresa: { cuenta: { accesoRevocadoEn: null } },
+      },
       select: { ...VACANTE_PUBLICA, empresa: { select: EMPRESA_PUBLICA } },
     });
     if (!v) throw new NotFoundException();
+    const { logoClave, ...empresaPublica } = v.empresa;
     const p = await this.perfil(this.prisma, estudianteId);
     const anterior = await this.prisma.postulacion.findUnique({
       where: { vacanteId_estudianteId: { vacanteId: id, estudianteId } },
@@ -336,6 +385,10 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     });
     return {
       ...v,
+      empresa: {
+        ...empresaPublica,
+        logoUrl: logoClave ? (await this.archivos.enlace(logoClave)).url : null,
+      },
       evaluacion: evaluarElegibilidad(datosVacante(v), perfilElegible(p)),
       postulación: anterior,
     };
@@ -345,11 +398,23 @@ export class VacantesService implements OnModuleInit, OnModuleDestroy {
     try {
       return await this.prisma.$transaction(
         async (tx) => {
+          await cuentaActiva(tx, estudianteId);
+          const destino = await tx.vacante.findUnique({
+            where: { id },
+            select: { empresaId: true },
+          });
+          if (!destino) throw new NotFoundException();
+          await tx.$queryRaw`SELECT id FROM "Cuenta" WHERE id = ${destino.empresaId}::uuid FOR NO KEY UPDATE`;
           await tx.$queryRaw`SELECT id FROM "Vacante" WHERE id = ${id}::uuid FOR UPDATE`;
           await tx.$queryRaw`SELECT "cuentaId" FROM "Estudiante" WHERE "cuentaId" = ${estudianteId}::uuid FOR UPDATE`;
           const v = await tx.vacante.findUnique({ where: { id } });
+          const empresa =
+            v && (await tx.cuenta.findUnique({ where: { id: v.empresaId } }));
           if (
             !v ||
+            !empresa ||
+            empresa.eliminadaEn ||
+            empresa.accesoRevocadoEn ||
             v.estado !== 'Abierta' ||
             v.vigencia < new Date(hoyBogota())
           )
