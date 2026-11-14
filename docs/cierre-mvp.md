@@ -7,6 +7,13 @@ Administración. La entrega permanece en 013-cierre-mvp, sin mezclar ramas ajena
 El trabajo previo de 013 se guardó en 51b455d. Constitución 5.0.0 preparada para
 revisión: no se inventa aprobación del equipo.
 
+Commits de esta entrega: 4a8ff3e (implementación/pruebas) y 0d4d1f5 (specs,
+backlog y evidencia), además de 51b455d. El intento real de push de la rama falló
+por falta de usuario/credencial de GitHub, con interacción deshabilitada; no hubo
+publicación, PR ni ejecución de CI remoto. Se comprobó también GitHub como
+integración alternativa: está disponible pero no instalada/conectada. No sustituye
+la autenticación pendiente. El cuerpo del PR y el comando de publicación quedan preparados.
+
 | Área | Estado local | Evidencia |
 |---|---|---|
 | M0–M2: navegación, cuentas, recuperación y catálogos | Implementado | Guardas, contratos, auth y recorridos de navegador |

@@ -19,7 +19,7 @@
 - [ ] Revisión manual de teclado y lector: el control de Windows se detuvo por
   no poder determinar la URL del navegador con suficiente confianza. No se certifica.
 - [ ] Resend y S3/R2 remotos: faltan credenciales y destinatario de correo autorizado.
-- [x] Código y specs preparados para el commit final de esta entrega.
+- [x] Código y specs guardados: 4a8ff3e y 0d4d1f5, más el trabajo previo 51b455d.
 - [ ] Push y PR/CI: Git Credential Manager no tiene credencial disponible.
 - [ ] Revisión humana de la enmienda v5.0.0 y del PR.
 
