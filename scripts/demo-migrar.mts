@@ -3,6 +3,7 @@ import { createRequire } from "node:module";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { prepararBase } from "../apps/api/test/seguridad/base-libre.ts";
+import { crearCuentasDemo } from './demo-cuentas.mts';
 import {
   BASE_DEMO,
   validarBasePruebas,
@@ -22,3 +23,4 @@ execFileSync(
     env: { ...process.env, DATABASE_URL: url },
   },
 );
+await crearCuentasDemo(url);

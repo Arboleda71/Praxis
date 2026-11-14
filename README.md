@@ -23,6 +23,24 @@ No ejecutar demo y Playwright a la vez: comparten compilación y bandeja de corr
 
 ## Validación y alcance
 
+### Cuentas públicas de demo
+
+`npm run demo:db` aplica migraciones y crea automáticamente estos dos accesos:
+
+| Rol | Correo | Contraseña pública |
+|---|---|---|
+| Estudiante | estudiante@demo.praxis.test | PraxisDemo2026! |
+| Empresa | empresa@demo.praxis.test | PraxisDemo2026! |
+
+Tienen el correo confirmado y solo datos ficticios. Tras clonar, ejecutar los
+comandos de preparación anteriores y arrancar API/web permite entrar con estos
+accesos en la base de cada persona. No se comparten datos posteriores entre clones.
+`npm run demo:cuentas` permite recrearlas sin reiniciar la demo. Repetir el seed no
+sobrescribe cuentas, contraseñas ni perfiles existentes. Nunca se ejecuta contra
+producción o una base remota; no usar estas credenciales para cuentas personales.
+
+## Estado y documentación
+
 - [Estado de entrega y bloqueos](docs/cierre-mvp.md)
 - [Backlog y specs de cada mockup](docs/backlog-specs.md)
 - [Alcance integral y tareas](specs/014-praxis-completo/spec.md)
